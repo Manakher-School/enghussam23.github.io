@@ -5,6 +5,19 @@
         "materials": "المواد",
         "news": "الأخبار"
     },
+    "gradeSelection": {
+        "title": "اختر صفك وشعبتك",
+        "selectGrade": "اختر الصف",
+        "selectSection": "اختر الشعبة",
+        "confirm": "تأكيد",
+        "changeGrade": "تغيير الصف",
+        "currentGrade": "الصف الحالي"
+    },
+    "menu": {
+        "changeGrade": "تغيير الصف والشعبة",
+        "changeLanguage": "تغيير اللغة",
+        "settings": "الإعدادات"
+    },
     "homework": {
         "title": "الواجبات المدرسية",
         "submit": "إرسال",
@@ -58,7 +71,12 @@
         "next": "التالي",
         "previous": "السابق",
         "offline": "غير متصل بالإنترنت",
-        "online": "متصل بالإنترنت"
+        "online": "متصل بالإنترنت",
+        "questions": "أسئلة",
+        "minutes": "دقيقة",
+        "question": "سؤال",
+        "of": "من",
+        "uploadedOn": "تم الرفع في"
     },
     "notifications": {
         "title": "الإشعارات",

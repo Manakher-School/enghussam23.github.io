@@ -2,60 +2,56 @@
 
 ## Project Overview
 
-This is a **React Native + Expo web application** (`enghussam23.github.io`) serving as an educational platform for students (KG–11 & Tawjihi). The app is built for cross-platform deployment (web via GitHub Pages, with future mobile support).
+This is a **React web application** (`enghussam23.github.io`) built with **Vite** and **Material-UI (MUI)**, serving as an educational platform for students (KG–11 & Tawjihi). The app is deployed on GitHub Pages.
 
 ## Architecture & Technology Stack
 
-- **Framework**: React Native with Expo (Web + Mobile)
-- **UI Library**: React Native Paper (Material Design)
-- **Navigation**: React Navigation (Bottom Tabs)
+- **Framework**: React 18.3.1 (Web only, NOT React Native)
+- **Build Tool**: Vite 5.1.0
+- **UI Library**: Material-UI (MUI) 5.15.10
+- **Routing**: React Router DOM 6.22.0
 - **State Management**: React Context API
-- **i18n**: react-i18next (Arabic primary, English secondary)
-- **Deployment**: GitHub Pages (static build from `docs/` folder)
+- **i18n**: react-i18next 24.2.0 (Arabic primary, English secondary)
+- **Storage**: localforage 1.10.0 (IndexedDB/localStorage wrapper)
+- **Deployment**: GitHub Pages (static build from `/docs/` folder)
 - **Data**: Local mock data (JSON structures in `/src/data/`)
-- **Offline**: AsyncStorage + caching strategy
 
 ## Project Structure
 
 ```
 /
-├── App.js                      # Main entry point
-├── app.json                    # Expo configuration
+├── index.html                  # HTML entry point
+├── vite.config.js              # Vite configuration
 ├── package.json                # Dependencies
-├── babel.config.js             # Babel configuration
-├── metro.config.js             # Metro bundler config
 ├── docs/                       # GitHub Pages build output
 ├── src/
-│   ├── navigation/
-│   │   └── AppNavigator.js     # Tab navigation setup
-│   ├── screens/
-│   │   ├── HomeworkScreen.js   # Homework tab
-│   │   ├── MaterialsScreen.js  # Materials tab
-│   │   ├── NewsScreen.js       # News tab
-│   │   └── QuizzesScreen.js    # Quizzes tab (if separate)
-│   ├── components/
-│   │   ├── CommentSection.js   # Comments UI
-│   │   ├── SearchBar.js        # Global search
-│   │   ├── MaterialCard.js     # Material display card
-│   │   ├── HomeworkCard.js     # Homework display card
-│   │   └── NewsCard.js         # News display card
+│   ├── main.jsx                # React entry point
+│   ├── App.jsx                 # Root component with providers
+│   ├── index.css               # Global styles + RTL support
+│   ├── i18n.js                 # i18next configuration
 │   ├── context/
-│   │   ├── DataContext.js      # Global data state
-│   │   └── LanguageContext.js  # i18n context
+│   │   ├── GradeContext.jsx    # Grade/section selection state
+│   │   └── DataContext.jsx     # Content data & filtering
+│   ├── components/
+│   │   ├── GradeSelectionDialog.jsx  # First-visit grade selector
+│   │   ├── MainLayout.jsx            # App shell with MUI AppBar & Tabs
+│   │   ├── HomeworkTab.jsx           # Homework list view
+│   │   ├── MaterialsTab.jsx          # Materials list view
+│   │   ├── NewsTab.jsx               # News list view
+│   │   ├── HomeworkCard.jsx          # Homework display card
+│   │   ├── QuizCard.jsx              # Quiz display card
+│   │   ├── MaterialCard.jsx          # Material display card
+│   │   └── NewsCard.jsx              # News with comments
 │   ├── data/
 │   │   ├── homework.json       # Mock homework data
 │   │   ├── materials.json      # Mock materials data
 │   │   ├── news.json           # Mock news data
 │   │   └── quizzes.json        # Mock quizzes data
-│   ├── services/
-│   │   ├── storage.js          # AsyncStorage utilities
-│   │   ├── notifications.js    # Push notification setup
-│   │   └── cache.js            # Offline caching logic
 │   ├── locales/
 │   │   ├── ar.json             # Arabic translations
 │   │   └── en.json             # English translations
 │   └── theme/
-│       └── theme.js            # React Native Paper theme
+│       └── theme.js            # MUI theme (RTL support)
 └── assets/                     # Images, fonts, icons
 ```
 
@@ -63,11 +59,12 @@ This is a **React Native + Expo web application** (`enghussam23.github.io`) serv
 
 ### Code Style
 
-- **Component Names**: PascalCase (e.g., `HomeworkScreen`, `MaterialCard`)
-- **File Names**: PascalCase for components, camelCase for utilities
+- **Component Names**: PascalCase (e.g., `HomeworkTab`, `MaterialCard`)
+- **File Names**: PascalCase for components (.jsx), camelCase for utilities (.js)
 - **Hooks**: Use functional components with hooks (no class components)
 - **Props**: Destructure in function signature
 - **Async Operations**: Use async/await, handle errors with try/catch
+- **MUI Components**: Import from `@mui/material` and `@mui/icons-material`
 
 ### Data Structure Patterns
 
@@ -79,23 +76,25 @@ All mock data follows consistent schema:
   title: { ar: "العنوان", en: "Title" },
   content: { ar: "المحتوى", en: "Content" },
   date: "ISO 8601 timestamp",
+  grade: "Grade 10", // For filtering
   metadata: { /* item-specific fields */ }
 }
 ```
 
 ### Navigation
 
-- Bottom tabs: Homework, Materials, News (Quizzes in Homework tab)
-- Use `react-navigation` with proper type safety
-- Deep linking configured for `/homework`, `/materials`, `/news`
+- Single-page app with React Router DOM
+- Main navigation: MUI Tabs (Homework, Materials, News)
+- Quizzes integrated into Homework tab
+- Grade selection dialog on first visit
 
 ### Internationalization
 
-- Primary: Arabic (RTL layout)
+- Primary: Arabic (RTL layout via MUI theme direction)
 - Secondary: English (LTR layout)
 - Use `useTranslation()` hook in all components
 - Store all strings in `/src/locales/*.json`
-- React Native Paper supports RTL automatically
+- MUI supports RTL automatically via theme
 
 ## Development Workflow
 
@@ -105,79 +104,88 @@ All mock data follows consistent schema:
 # Install dependencies
 npm install
 
-# Start Expo dev server (web)
-npx expo start --web
+# Start Vite dev server
+npm run dev
+# Opens on http://localhost:5173/
 
-# Or use Expo Go for mobile testing
-npx expo start
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
 ```
 
 ### Building for GitHub Pages
 
 ```bash
-# Build web bundle
-npx expo export:web
+# Build and deploy
+npm run deploy
 
-# Output goes to web-build/ (then copy to docs/)
-npm run deploy  # Custom script that builds and moves to docs/
+# This runs: vite build --base=/ && rm -rf docs && mv dist docs && touch docs/.nojekyll
 ```
 
 ### Testing
 
 - **Web**: Test in Chrome, Firefox, Safari
-- **Mobile Preview**: Use Expo Go app to test on device
-- **Offline**: Disable network in DevTools to verify caching
+- **Responsive**: Use DevTools responsive mode
 - **RTL**: Switch language to Arabic to test layout
+- **Offline**: Disable network in DevTools to verify localforage caching
 
 ### GitHub Pages Deployment
 
 - Build output must be in `docs/` folder (configured in repo settings)
 - Push to `main` triggers automatic deployment
 - Verify at: https://enghussam23.github.io/
-- Include `.nojekyll` file in `docs/` to prevent Jekyll processing
+- `.nojekyll` file prevents Jekyll processing
 
 ## Key Features Implementation
 
+### Grade & Section Selection
+
+- Dialog shown on first visit (using `GradeContext`)
+- Persisted in localforage: `{ grade: "Grade 10", section: "A" }`
+- All content filtered by selected grade
+- Can change grade via menu in AppBar
+
 ### Homework Submissions
 
-- Display all homework items (newest first)
-- Optional file/text submission via mock form (stored in AsyncStorage)
+- Display all homework items for selected grade (newest first)
+- Text submission stored in localforage
 - Submission status: "Not Submitted", "Submitted", "Graded"
+- Expandable card shows submission form or submitted content
 
 ### Materials Viewer
 
-- PDF/DOCX preview using `react-native-webview` (web) or linking
-- Download button using `expo-file-system` or browser download
-- Filter by subject/grade level
+- MUI Cards with download/view buttons
+- Filter by subject using MUI Select
+- Search by title/content
+- Opens files in new tab (fileUrl from mock data)
 
 ### News with Comments
 
-- Public text comments (no files)
-- Comments stored in AsyncStorage (mock backend)
-- All students see all comments
+- Public text comments stored in localforage
+- MUI List component for comments
+- Avatar with initials for each commenter
+- Expandable comment section using MUI Collapse
 
 ### Quizzes
 
-- Available in Homework tab as separate section
-- Multiple choice questions with timer
-- Submit for grading (mock admin review)
-- Show score after "teacher approval"
+- MUI Dialog for quiz interface
+- Multiple choice with MUI RadioGroup
+- Timer display with Chip component
+- Linear progress bar shows completion
+- Navigate between questions with Previous/Next buttons
+- Submit stores attempt in localforage
 
 ### Search
 
-- Global search bar in header
-- Searches across Homework, Materials, News
-- Filters by title, content, tags
-
-### Notifications
-
-- Use `expo-notifications` for web/mobile
-- Default: enabled for Homework, Materials, News
-- Settings page to toggle notification types
+- TextField with SearchIcon in each tab
+- Searches across title, content, and metadata
+- Real-time filtering as user types
 
 ### Offline Support
 
-- Cache all content using AsyncStorage
+- Cache all content using localforage
 - Show cached content when offline
 - Queue submissions for when online (future enhancement)
 
@@ -186,17 +194,17 @@ npm run deploy  # Custom script that builds and moves to docs/
 ### Adding New Content Type
 
 1. Create JSON file in `/src/data/` with standard schema
-2. Add context provider in `/src/context/`
-3. Create screen component in `/src/screens/`
-4. Add to navigation in `AppNavigator.js`
-5. Update search logic in `SearchBar.js`
+2. Add context provider logic in `DataContext.jsx`
+3. Create tab component in `/src/components/`
+4. Add tab to `MainLayout.jsx` (MUI Tabs)
+5. Update search logic if needed
 
 ### Adding UI Component
 
-1. Create in `/src/components/` as functional component
-2. Use React Native Paper components for consistency
-3. Support both RTL and LTR layouts
-4. Add to theme if component has custom styling
+1. Create in `/src/components/` as functional component (.jsx)
+2. Use MUI components for consistency
+3. Support both RTL and LTR layouts (MUI handles automatically)
+4. Import icons from `@mui/icons-material`
 
 ### Updating Translations
 
@@ -210,42 +218,113 @@ npm run deploy  # Custom script that builds and moves to docs/
 - IDs must be unique across all items
 - Dates in ISO 8601 format
 - Bilingual fields use `{ ar: "...", en: "..." }` structure
+- Include `grade` field for filtering (e.g., "Grade 10", "KG", "Tawjihi")
 
 ## Important Notes
 
+- **Web Only**: This is NOT React Native - it's standard React for web
 - **No Backend**: All data is mock/local until backend integration
 - **Public Repository**: Never commit sensitive student data
-- **Expo Compatibility**: Ensure all dependencies work with Expo
-- **Web-First**: Prioritize web functionality, mobile is secondary for POC
+- **Vite HMR**: Hot Module Replacement works automatically in dev mode
 - **Performance**: Keep bundle size small for GitHub Pages hosting
 - **Arabic Support**: Always test RTL layout when adding UI components
+- **MUI Theming**: Use theme values for colors, spacing, breakpoints
 
-## Dependencies to Install
+## MUI Best Practices
+
+### Responsive Design
+
+```jsx
+import { Box, Grid, useMediaQuery, useTheme } from '@mui/material';
+
+// Use breakpoints
+<Grid container spacing={3}>
+  <Grid item xs={12} md={6} lg={4}>
+    {/* Content */}
+  </Grid>
+</Grid>
+
+// Use useMediaQuery hook
+const theme = useTheme();
+const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+```
+
+### Common MUI Components Used
+
+- `AppBar`, `Toolbar`, `Tabs`, `Tab` - Navigation
+- `Card`, `CardContent`, `CardActions` - Content containers
+- `TextField`, `Select`, `MenuItem` - Form inputs
+- `Button`, `IconButton`, `Chip` - Actions & tags
+- `Dialog`, `DialogTitle`, `DialogContent` - Modals
+- `List`, `ListItem`, `ListItemText` - Lists
+- `Typography` - All text elements
+- `Box`, `Container`, `Grid` - Layout
+- `CircularProgress`, `LinearProgress` - Loading states
+
+### Theme Customization
+
+Located in `src/theme/theme.js`:
+
+```js
+import { createTheme } from '@mui/material/styles';
+
+const theme = createTheme({
+  direction: 'rtl', // or 'ltr'
+  palette: {
+    primary: { main: '#2196F3' },
+    // ...
+  },
+  typography: {
+    fontFamily: 'Cairo, Roboto, Arial, sans-serif',
+  },
+});
+```
+
+## Dependencies
 
 ```json
 {
-  "expo": "~52.0.0",
-  "react": "18.3.1",
-  "react-native": "0.76.5",
-  "react-native-paper": "^5.12.3",
-  "@react-navigation/native": "^7.0.7",
-  "@react-navigation/bottom-tabs": "^7.2.2",
+  "react": "^18.3.1",
+  "react-dom": "^18.3.1",
+  "react-router-dom": "^6.22.0",
+  "@mui/material": "^5.15.10",
+  "@mui/icons-material": "^5.15.10",
+  "@emotion/react": "^11.11.3",
+  "@emotion/styled": "^11.11.0",
   "react-i18next": "^15.2.4",
   "i18next": "^24.2.0",
-  "expo-notifications": "~0.29.13",
-  "@react-native-async-storage/async-storage": "2.1.0",
-  "react-native-vector-icons": "^10.2.0"
+  "localforage": "^1.10.0"
 }
 ```
 
-## Next Steps
+## Troubleshooting
 
-1. Initialize Expo project: `npx create-expo-app@latest --template blank`
-2. Install dependencies listed above
-3. Create folder structure as defined
-4. Implement navigation with bottom tabs
-5. Add mock data and context providers
-6. Build out each screen component
-7. Configure i18n with Arabic/English
-8. Set up GitHub Pages deployment script
-9. Test on web and mobile platforms
+### Vite not starting
+- Check Node.js version (18+)
+- Delete `node_modules` and `package-lock.json`, run `npm install`
+
+### MUI components not rendering
+- Ensure `@emotion/react` and `@emotion/styled` are installed
+- Check ThemeProvider wraps app in `App.jsx`
+
+### RTL not working
+- Verify theme direction is set based on i18n language
+- Use MUI's RTL support, don't manually flip CSS
+
+### Build fails
+- Check all imports resolve correctly
+- Ensure no server-side only code (e.g., Node.js fs module)
+
+## Next Steps for Production
+
+1. Replace mock data with real API calls
+2. Add authentication (student login)
+3. Implement real file uploads for homework
+4. Add admin panel for teachers
+5. Set up push notifications
+6. Add analytics tracking
+7. Optimize images and assets
+8. Add error boundary components
+9. Implement proper loading states
+10. Add unit tests with Vitest
+

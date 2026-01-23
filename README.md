@@ -1,168 +1,68 @@
-# School Educational Platform
+# School Educational Platform 🎓
 
-A React Native + Expo web application serving as an educational platform for students.
+A responsive educational platform for students (KG–11 & Tawjihi) built with React, Material-UI, and Vite. Features homework management, educational materials, news/announcements, quizzes, and bilingual support (Arabic/English).
 
-## 🚀 Quick Start
+**Live Demo:** [https://enghussam23.github.io/](https://enghussam23.github.io/)
 
-### Prerequisites
-- Node.js 18+ installed
-- npm or yarn package manager
+## ✨ Features
 
-### Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/EngHussam23/enghussam23.github.io.git
-cd enghussam23.github.io
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Start the development server:
-```bash
-npm start
-```
-
-4. Run on web:
-```bash
-npm run web
-```
-
-## 📱 Features
-
-### Student Features
-- **Homework Tab**: View assignments, submit work (text/files), check grades
-- **Materials Tab**: Browse educational materials, view/download PDF/DOCX files
-- **News Tab**: Read announcements, post public comments
-- **Quizzes**: Take timed quizzes with multiple choice questions
-- **Search**: Search across all content types
-- **Offline Support**: Cached content available offline
-- **Multi-language**: Arabic (primary) and English support
-- **Notifications**: Push notifications for new content
-
-## 🏗️ Project Structure
-
-```
-/
-├── App.js                      # Main entry point
-├── package.json                # Dependencies
-├── app.json                    # Expo configuration
-├── src/
-│   ├── navigation/             # Navigation setup
-│   ├── screens/                # Main screens (Homework, Materials, News)
-│   ├── components/             # Reusable components
-│   ├── context/                # State management (Data, Language)
-│   ├── data/                   # Mock JSON data
-│   ├── services/               # Storage, notifications, cache
-│   ├── locales/                # i18n translations (ar, en)
-│   └── theme/                  # React Native Paper theme
-└── assets/                     # Images, icons, fonts
-```
+- **Grade & Section Selection**: Students select their grade and section on first visit
+- **Homework Management**: View assignments, submit homework, and track grades
+- **Educational Materials**: Browse and download PDFs, DOCX files filtered by subject
+- **News & Announcements**: Read updates with public commenting system
+- **Quizzes**: Take timed multiple-choice quizzes with automatic grading
+- **Bilingual Support**: Full Arabic (RTL) and English (LTR) support
+- **Offline Support**: Content cached for offline viewing using localforage
+- **Responsive Design**: Works on desktop, tablet, and mobile devices
 
 ## 🛠️ Technology Stack
 
-- **Framework**: React Native with Expo SDK 52
-- **UI Library**: React Native Paper (Material Design)
-- **Navigation**: React Navigation (Bottom Tabs)
-- **State Management**: React Context API
-- **i18n**: react-i18next
-- **Storage**: AsyncStorage
-- **Notifications**: expo-notifications
+- **Framework**: React 18.3.1
+- **UI Library**: Material-UI (MUI) 5.15.10
+- **Build Tool**: Vite 5.1.0
+- **Routing**: React Router DOM 6.22.0
+- **i18n**: react-i18next 24.2.0
+- **Storage**: localforage 1.10.0
+- **Deployment**: GitHub Pages
 
-## 📦 Available Scripts
+## 🚀 Getting Started
 
-- `npm start` - Start Expo development server
-- `npm run web` - Run on web browser
-- `npm run android` - Run on Android (requires Expo Go or emulator)
-- `npm run ios` - Run on iOS (requires Expo Go or simulator)
-- `npm run build:web` - Build for web deployment
-- `npm run deploy` - Build and deploy to GitHub Pages
+### Prerequisites
+- Node.js 18+ and npm
 
-## 🌐 Deployment to GitHub Pages
+### Installation
+\`\`\`bash
+npm install
+npm run dev
+\`\`\`
 
-1. Build the web version:
-```bash
+The app will be available at http://localhost:5173/
+
+### Available Scripts
+- \`npm run dev\` - Start Vite dev server
+- \`npm run build\` - Build for production
+- \`npm run preview\` - Preview production build
+- \`npm run deploy\` - Build and deploy to GitHub Pages
+
+## 📊 Data Structure
+
+All content follows a consistent bilingual schema with grade filtering.
+
+## 🌍 Internationalization
+
+- **Arabic (ar)**: Default, RTL layout
+- **English (en)**: LTR layout
+
+## 🚢 Deployment
+
+\`\`\`bash
 npm run deploy
-```
-
-2. Commit and push the `docs/` folder:
-```bash
 git add docs/
 git commit -m "Deploy to GitHub Pages"
 git push origin main
-```
+\`\`\`
 
-3. Configure GitHub Pages:
-   - Go to repository Settings → Pages
-   - Source: Deploy from a branch
-   - Branch: `main`, Folder: `/docs`
+## 👤 Author
 
-4. Your site will be available at: `https://enghussam23.github.io/`
-
-## 🎨 Customization
-
-### Adding Mock Data
-Edit JSON files in `src/data/`:
-- `homework.json` - Homework assignments
-- `materials.json` - Educational materials
-- `news.json` - News and announcements
-- `quizzes.json` - Quiz questions
-
-### Changing Theme
-Edit `src/theme/theme.js` to customize colors and styling.
-
-### Adding Translations
-Add keys to `src/locales/ar.json` and `src/locales/en.json`.
-
-## 📝 Data Structure
-
-All content follows a consistent bilingual schema:
-
-```javascript
-{
-  "id": "unique-id",
-  "title": { "ar": "العنوان", "en": "Title" },
-  "content": { "ar": "المحتوى", "en": "Content" },
-  "date": "ISO 8601 timestamp",
-  "metadata": { /* item-specific fields */ }
-}
-```
-
-## 🔧 Development
-
-### Testing
-- **Web**: Test in Chrome, Firefox, Safari
-- **Mobile**: Use Expo Go app to test on device
-- **Offline**: Disable network in DevTools to verify caching
-- **RTL**: Switch language to Arabic to test layout
-
-### Debugging
-- Use React DevTools browser extension
-- Check Expo DevTools in browser when running `npm start`
-- View console logs for errors
-
-## 📱 Mobile App (Future)
-
-To build native apps:
-1. Install EAS CLI: `npm install -g eas-cli`
-2. Configure: `eas build:configure`
-3. Build: `eas build --platform android` or `eas build --platform ios`
-
-## 🤝 Contributing
-
-This is a school project. Contributions are welcome via pull requests.
-
-## 📄 License
-
-MIT License - See LICENSE file for details
-
-## 📧 Contact
-
-For questions or support, contact the school administration.
-
----
-
-**Note**: This is a Proof of Concept (POC) using mock data. Backend integration and admin dashboard will be added in future versions.
+**Eng. Hussam**
+- GitHub: [@enghussam23](https://github.com/enghussam23)

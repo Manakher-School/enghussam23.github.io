@@ -5,6 +5,19 @@
         "materials": "Materials",
         "news": "News"
     },
+    "gradeSelection": {
+        "title": "Select Your Grade and Section",
+        "selectGrade": "Select Grade",
+        "selectSection": "Select Section",
+        "confirm": "Confirm",
+        "changeGrade": "Change Grade",
+        "currentGrade": "Current Grade"
+    },
+    "menu": {
+        "changeGrade": "Change Grade & Section",
+        "changeLanguage": "Change Language",
+        "settings": "Settings"
+    },
     "homework": {
         "title": "Homework Assignments",
         "submit": "Submit",
@@ -58,7 +71,12 @@
         "next": "Next",
         "previous": "Previous",
         "offline": "Offline",
-        "online": "Online"
+        "online": "Online",
+        "questions": "questions",
+        "minutes": "minutes",
+        "question": "Question",
+        "of": "of",
+        "uploadedOn": "Uploaded on"
     },
     "notifications": {
         "title": "Notifications",
