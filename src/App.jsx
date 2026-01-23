@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { I18nextProvider } from 'react-i18next';
 import i18n from './i18n';
-import { DataProvider } from './context/DataContext';
+import DataProvider from './context/DataContext';
 import { GradeProvider } from './context/GradeContext';
 import GradeSelectionDialog from './components/GradeSelectionDialog';
 import MainLayout from './components/MainLayout';

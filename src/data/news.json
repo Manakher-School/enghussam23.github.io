@@ -1,5 +1,24 @@
 [
     {
+        "id": "news-0",
+        "title": {
+            "ar": "العودة إلى المدرسة 2026",
+            "en": "Back to School 2026"
+        },
+        "content": {
+            "ar": "نرحب بجميع الطلاب والطالبات في العام الدراسي الجديد 2026! نتمنى لكم عاماً دراسياً مليئاً بالنجاح والتفوق. ستبدأ الدراسة يوم الأحد 1 سبتمبر 2026. يرجى التأكد من جلب جميع الكتب والأدوات المدرسية المطلوبة. نحن متحمسون لرؤيتكم جميعاً!",
+            "en": "We welcome all students to the new academic year 2026! We wish you a year full of success and excellence. Classes will begin on Sunday, September 1, 2026. Please make sure to bring all required textbooks and school supplies. We are excited to see you all!"
+        },
+        "category": {
+            "ar": "إعلانات عامة",
+            "en": "General Announcements"
+        },
+        "publishedAt": "2026-01-24T09:00:00Z",
+        "type": "news",
+        "important": true,
+        "imageUrl": "/images/school_2026_banner.png"
+    },
+    {
         "id": "news-1",
         "title": {
             "ar": "إعلان عن موعد الامتحانات النهائية",

@@ -1,5 +1,8 @@
 {
     "appName": "School Educational Platform",
+    "hero": {
+        "subtitle": "Towards a bright future of excellence and creativity"
+    },
     "nav": {
         "home": "Home",
         "exams": "Exams",

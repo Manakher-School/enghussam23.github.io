@@ -205,9 +205,9 @@ const MainLayout = () => {
       </Drawer>
 
       {/* Main Content */}
-      <Container maxWidth="xl" sx={{ flexGrow: 1, py: 4 }}>
+      <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
         {renderPage()}
-      </Container>
+      </Box>
 
       {/* Footer */}
       <Box

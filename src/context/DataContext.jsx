@@ -8,7 +8,8 @@ import quizzesData from '../data/quizzes.json';
 
 const DataContext = createContext();
 
-export const DataProvider = ({ children }) => {
+// Export the provider as default
+export default function DataProvider({ children }) {
   const { gradeSelection } = useGrade();
   const [submissions, setSubmissions] = useState({});
   const [comments, setComments] = useState({});
@@ -43,7 +44,7 @@ export const DataProvider = ({ children }) => {
 
   const homework = filterByGrade(homeworkData);
   const materials = filterByGrade(materialsData);
-  const news = filterByGrade(newsData);
+  const news = newsData; // News is for all grades
   const quizzes = filterByGrade(quizzesData);
 
   const submitHomework = async (homeworkId, submission) => {
@@ -117,9 +118,11 @@ export const DataProvider = ({ children }) => {
         materials,
         news,
         quizzes,
-        submissions,
-        comments,
-        quizAttempts,
+        userSubmissions: Object.values(submissions),
+        newsComments: Object.entries(comments).flatMap(([newsId, cmts]) => 
+          (cmts || []).map(c => ({ ...c, newsId }))
+        ),
+        quizAttempts: Object.values(quizAttempts),
         loading,
         submitHomework,
         addComment,
@@ -130,12 +133,12 @@ export const DataProvider = ({ children }) => {
       {children}
     </DataContext.Provider>
   );
-};
+}
 
-export const useData = () => {
+export function useData() {
   const context = useContext(DataContext);
   if (!context) {
     throw new Error('useData must be used within DataProvider');
   }
   return context;
-};
+}

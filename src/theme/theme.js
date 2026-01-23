@@ -5,7 +5,7 @@ export const createAppTheme = (direction = "rtl") => {
     direction: direction,
     palette: {
       primary: {
-        main: "#2196F3",
+        main: "#2196f3ff",
         light: "#64B5F6",
         dark: "#1976D2",
       },

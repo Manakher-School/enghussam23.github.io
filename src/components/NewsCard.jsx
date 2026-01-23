@@ -2,6 +2,7 @@ import { useState } from 'react';
 import {
   Card,
   CardContent,
+  CardMedia,
   Typography,
   Box,
   TextField,
@@ -12,7 +13,8 @@ import {
   Divider,
   Collapse,
   IconButton,
-  Avatar
+  Avatar,
+  Chip
 } from '@mui/material';
 import CommentIcon from '@mui/icons-material/Comment';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -26,7 +28,7 @@ function NewsCard({ news }) {
   const [commentText, setCommentText] = useState('');
 
   const currentLang = i18n.language;
-  const comments = newsComments.filter(c => c.newsId === news.id);
+  const comments = (newsComments || []).filter(c => c.newsId === news.id);
 
   const handleAddComment = () => {
     if (commentText.trim()) {
@@ -46,13 +48,34 @@ function NewsCard({ news }) {
 
   return (
     <Card elevation={2}>
+      {/* News Image */}
+      {news.imageUrl && (
+        <CardMedia
+          component="img"
+          height="300"
+          image={news.imageUrl}
+          alt={news.title[currentLang]}
+          sx={{ objectFit: 'cover' }}
+        />
+      )}
+      
       <CardContent>
-        <Typography variant="h5" component="h2" gutterBottom>
-          {news.title[currentLang]}
-        </Typography>
+        <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+          <Typography variant="h5" component="h2" sx={{ flex: 1 }}>
+            {news.title[currentLang]}
+          </Typography>
+          {news.important && (
+            <Chip 
+              label={currentLang === 'ar' ? 'هام' : 'Important'} 
+              color="error" 
+              size="small" 
+              sx={{ ml: 2 }}
+            />
+          )}
+        </Box>
 
         <Typography variant="caption" color="text.secondary" display="block" mb={2}>
-          {new Date(news.date).toLocaleDateString(currentLang, { 
+          {new Date(news.publishedAt || news.date).toLocaleDateString(currentLang, { 
             year: 'numeric', 
             month: 'long', 
             day: 'numeric' 
@@ -62,83 +85,10 @@ function NewsCard({ news }) {
         <Typography variant="body1" paragraph sx={{ whiteSpace: 'pre-line' }}>
           {news.content[currentLang]}
         </Typography>
-
-        <Box display="flex" alignItems="center" gap={1} mt={2}>
-          <IconButton 
-            onClick={() => setExpanded(!expanded)}
-            sx={{ 
-              transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
-              transition: '0.3s'
-            }}
-          >
-            <CommentIcon />
-          </IconButton>
-          <Typography variant="body2" color="text.secondary">
-            {comments.length} {t('news.comments')}
-          </Typography>
-        </Box>
       </CardContent>
 
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <Divider />
-        <CardContent>
-          {/* Comments List */}
-          {comments.length > 0 ? (
-            <List sx={{ mb: 2 }}>
-              {comments.map((comment, index) => (
-                <Box key={index}>
-                  <ListItem alignItems="flex-start" sx={{ px: 0 }}>
-                    <Avatar sx={{ mr: 2, bgcolor: 'primary.main' }}>
-                      {getInitials(comment.userName)}
-                    </Avatar>
-                    <ListItemText
-                      primary={
-                        <Box display="flex" justifyContent="space-between" alignItems="center">
-                          <Typography variant="subtitle2">
-                            {comment.userName}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {new Date(comment.date).toLocaleDateString(currentLang)}
-                          </Typography>
-                        </Box>
-                      }
-                      secondary={
-                        <Typography variant="body2" sx={{ mt: 1 }}>
-                          {comment.text}
-                        </Typography>
-                      }
-                    />
-                  </ListItem>
-                  {index < comments.length - 1 && <Divider variant="inset" component="li" />}
-                </Box>
-              ))}
-            </List>
-          ) : (
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, textAlign: 'center' }}>
-              {t('news.noComments')}
-            </Typography>
-          )}
-
-          {/* Add Comment Form */}
-          <Box>
-            <TextField
-              fullWidth
-              multiline
-              rows={3}
-              placeholder={t('news.writeComment')}
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              sx={{ mb: 1 }}
-            />
-            <Button 
-              variant="contained" 
-              onClick={handleAddComment}
-              disabled={!commentText.trim()}
-            >
-              {t('news.postComment')}
-            </Button>
-          </Box>
-        </CardContent>
       </Collapse>
     </Card>
   );
