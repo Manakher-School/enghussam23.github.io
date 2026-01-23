@@ -1,0 +1,70 @@
+{
+    "appName": "منصة المدرسة التعليمية",
+    "tabs": {
+        "homework": "الواجبات",
+        "materials": "المواد",
+        "news": "الأخبار"
+    },
+    "homework": {
+        "title": "الواجبات المدرسية",
+        "submit": "إرسال",
+        "submitted": "تم الإرسال",
+        "notSubmitted": "لم يتم الإرسال",
+        "graded": "تم التقييم",
+        "dueDate": "تاريخ الاستحقاق",
+        "submitText": "إرسال نص",
+        "submitFile": "إرسال ملف",
+        "yourSubmission": "إجابتك",
+        "grade": "الدرجة",
+        "quizzes": "الاختبارات",
+        "viewQuiz": "عرض الاختبار",
+        "startQuiz": "بدء الاختبار",
+        "submitQuiz": "إرسال الاختبار",
+        "timeRemaining": "الوقت المتبقي",
+        "score": "النتيجة",
+        "pending": "قيد المراجعة"
+    },
+    "materials": {
+        "title": "المواد التعليمية",
+        "download": "تحميل",
+        "view": "عرض",
+        "subject": "المادة",
+        "grade": "الصف",
+        "filterBySubject": "تصفية حسب المادة",
+        "filterByGrade": "تصفية حسب الصف",
+        "all": "الكل"
+    },
+    "news": {
+        "title": "الأخبار والإعلانات",
+        "comments": "التعليقات",
+        "addComment": "إضافة تعليق",
+        "writeComment": "اكتب تعليقك هنا...",
+        "postComment": "نشر التعليق",
+        "noComments": "لا توجد تعليقات بعد"
+    },
+    "search": {
+        "placeholder": "بحث في الواجبات، المواد، والأخبار...",
+        "noResults": "لا توجد نتائج",
+        "searching": "جاري البحث..."
+    },
+    "common": {
+        "loading": "جاري التحميل...",
+        "error": "حدث خطأ",
+        "retry": "إعادة المحاولة",
+        "cancel": "إلغاء",
+        "save": "حفظ",
+        "close": "إغلاق",
+        "back": "رجوع",
+        "next": "التالي",
+        "previous": "السابق",
+        "offline": "غير متصل بالإنترنت",
+        "online": "متصل بالإنترنت"
+    },
+    "notifications": {
+        "title": "الإشعارات",
+        "enableAll": "تفعيل جميع الإشعارات",
+        "homework": "إشعارات الواجبات",
+        "materials": "إشعارات المواد",
+        "news": "إشعارات الأخبار"
+    }
+}

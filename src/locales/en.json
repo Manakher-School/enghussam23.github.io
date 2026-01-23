@@ -1,0 +1,70 @@
+{
+    "appName": "School Educational Platform",
+    "tabs": {
+        "homework": "Homework",
+        "materials": "Materials",
+        "news": "News"
+    },
+    "homework": {
+        "title": "Homework Assignments",
+        "submit": "Submit",
+        "submitted": "Submitted",
+        "notSubmitted": "Not Submitted",
+        "graded": "Graded",
+        "dueDate": "Due Date",
+        "submitText": "Submit Text",
+        "submitFile": "Submit File",
+        "yourSubmission": "Your Submission",
+        "grade": "Grade",
+        "quizzes": "Quizzes",
+        "viewQuiz": "View Quiz",
+        "startQuiz": "Start Quiz",
+        "submitQuiz": "Submit Quiz",
+        "timeRemaining": "Time Remaining",
+        "score": "Score",
+        "pending": "Pending Review"
+    },
+    "materials": {
+        "title": "Educational Materials",
+        "download": "Download",
+        "view": "View",
+        "subject": "Subject",
+        "grade": "Grade",
+        "filterBySubject": "Filter by Subject",
+        "filterByGrade": "Filter by Grade",
+        "all": "All"
+    },
+    "news": {
+        "title": "News & Announcements",
+        "comments": "Comments",
+        "addComment": "Add Comment",
+        "writeComment": "Write your comment here...",
+        "postComment": "Post Comment",
+        "noComments": "No comments yet"
+    },
+    "search": {
+        "placeholder": "Search in homework, materials, and news...",
+        "noResults": "No results found",
+        "searching": "Searching..."
+    },
+    "common": {
+        "loading": "Loading...",
+        "error": "An error occurred",
+        "retry": "Retry",
+        "cancel": "Cancel",
+        "save": "Save",
+        "close": "Close",
+        "back": "Back",
+        "next": "Next",
+        "previous": "Previous",
+        "offline": "Offline",
+        "online": "Online"
+    },
+    "notifications": {
+        "title": "Notifications",
+        "enableAll": "Enable All Notifications",
+        "homework": "Homework Notifications",
+        "materials": "Materials Notifications",
+        "news": "News Notifications"
+    }
+}

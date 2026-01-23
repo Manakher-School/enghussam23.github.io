@@ -1,0 +1,74 @@
+[
+    {
+        "id": "news-1",
+        "title": {
+            "ar": "إعلان عن موعد الامتحانات النهائية",
+            "en": "Announcement: Final Exams Schedule"
+        },
+        "content": {
+            "ar": "تبدأ الامتحانات النهائية للفصل الدراسي الأول يوم 15 فبراير 2026. يرجى مراجعة الجدول الزمني المرفق.",
+            "en": "Final exams for the first semester will begin on February 15, 2026. Please review the attached schedule."
+        },
+        "category": {
+            "ar": "امتحانات",
+            "en": "Exams"
+        },
+        "publishedAt": "2026-01-22T08:00:00Z",
+        "type": "news",
+        "important": true
+    },
+    {
+        "id": "news-2",
+        "title": {
+            "ar": "رحلة ميدانية إلى المتحف العلمي",
+            "en": "Field Trip to Science Museum"
+        },
+        "content": {
+            "ar": "ستنظم المدرسة رحلة ميدانية إلى المتحف العلمي يوم الخميس 1 فبراير. التسجيل مفتوح حتى يوم الأحد.",
+            "en": "The school will organize a field trip to the Science Museum on Thursday, February 1. Registration is open until Sunday."
+        },
+        "category": {
+            "ar": "فعاليات",
+            "en": "Events"
+        },
+        "publishedAt": "2026-01-21T10:00:00Z",
+        "type": "news",
+        "important": false
+    },
+    {
+        "id": "news-3",
+        "title": {
+            "ar": "تحديث: جدول الحصص الأسبوعي",
+            "en": "Update: Weekly Class Schedule"
+        },
+        "content": {
+            "ar": "تم تحديث جدول الحصص الأسبوعي بدءاً من الأسبوع القادم. يرجى مراجعة الجدول الجديد على لوحة الإعلانات.",
+            "en": "The weekly class schedule has been updated starting next week. Please check the new schedule on the bulletin board."
+        },
+        "category": {
+            "ar": "إعلانات عامة",
+            "en": "General Announcements"
+        },
+        "publishedAt": "2026-01-20T14:30:00Z",
+        "type": "news",
+        "important": false
+    },
+    {
+        "id": "news-4",
+        "title": {
+            "ar": "ورشة عمل: مهارات الدراسة الفعّالة",
+            "en": "Workshop: Effective Study Skills"
+        },
+        "content": {
+            "ar": "سيتم عقد ورشة عمل حول مهارات الدراسة الفعّالة يوم الأربعاء 28 يناير. الحضور مفتوح لجميع الطلاب.",
+            "en": "A workshop on effective study skills will be held on Wednesday, January 28. Attendance is open to all students."
+        },
+        "category": {
+            "ar": "ورش عمل",
+            "en": "Workshops"
+        },
+        "publishedAt": "2026-01-19T09:00:00Z",
+        "type": "news",
+        "important": false
+    }
+]

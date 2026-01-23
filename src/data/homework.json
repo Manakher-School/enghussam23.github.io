@@ -1,0 +1,65 @@
+[
+    {
+        "id": "hw-1",
+        "title": {
+            "ar": "واجب الرياضيات - الجبر",
+            "en": "Math Homework - Algebra"
+        },
+        "content": {
+            "ar": "حل المعادلات من 1 إلى 20 في الكتاب المدرسي",
+            "en": "Solve equations 1 to 20 from the textbook"
+        },
+        "subject": {
+            "ar": "رياضيات",
+            "en": "Mathematics"
+        },
+        "grade": "10",
+        "dueDate": "2026-01-30T23:59:59Z",
+        "createdAt": "2026-01-20T10:00:00Z",
+        "type": "homework",
+        "allowFileSubmission": true,
+        "allowTextSubmission": true
+    },
+    {
+        "id": "hw-2",
+        "title": {
+            "ar": "واجب اللغة العربية - قراءة",
+            "en": "Arabic Homework - Reading"
+        },
+        "content": {
+            "ar": "اقرأ النص في الصفحة 45 وأجب على الأسئلة",
+            "en": "Read the text on page 45 and answer the questions"
+        },
+        "subject": {
+            "ar": "لغة عربية",
+            "en": "Arabic Language"
+        },
+        "grade": "9",
+        "dueDate": "2026-01-28T23:59:59Z",
+        "createdAt": "2026-01-22T09:00:00Z",
+        "type": "homework",
+        "allowFileSubmission": false,
+        "allowTextSubmission": true
+    },
+    {
+        "id": "hw-3",
+        "title": {
+            "ar": "واجب العلوم - التجربة المعملية",
+            "en": "Science Homework - Lab Experiment"
+        },
+        "content": {
+            "ar": "اكتب تقرير عن التجربة المعملية التي قمنا بها اليوم",
+            "en": "Write a report about today's lab experiment"
+        },
+        "subject": {
+            "ar": "علوم",
+            "en": "Science"
+        },
+        "grade": "11",
+        "dueDate": "2026-02-05T23:59:59Z",
+        "createdAt": "2026-01-23T14:00:00Z",
+        "type": "homework",
+        "allowFileSubmission": true,
+        "allowTextSubmission": true
+    }
+]
