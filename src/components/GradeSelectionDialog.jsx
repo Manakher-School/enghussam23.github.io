@@ -52,10 +52,6 @@ const GradeSelectionDialog = () => {
         </Box>
       </DialogTitle>
       <DialogContent>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          {t('gradeSelection.subtitle')}
-        </Typography>
-
         <FormControl fullWidth sx={{ mb: 2 }}>
           <InputLabel>{t('gradeSelection.selectGrade')}</InputLabel>
           <Select
@@ -79,9 +75,7 @@ const GradeSelectionDialog = () => {
             label={t('gradeSelection.selectSection')}
           >
             {sections.map((section) => (
-              <MenuItem key={section} value={section}>
-                {t('gradeSelection.section')} {section}
-              </MenuItem>
+              <MenuItem key={section} value={section}>{section}</MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -93,7 +87,7 @@ const GradeSelectionDialog = () => {
           fullWidth
           disabled={!selectedGrade || !selectedSection}
         >
-          {t('gradeSelection.continue')}
+          {t('تأكيد')}
         </Button>
       </DialogActions>
     </Dialog>

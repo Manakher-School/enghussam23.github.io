@@ -1,9 +1,39 @@
 {
     "appName": "School Educational Platform",
-    "tabs": {
-        "homework": "Homework",
-        "materials": "Materials",
-        "news": "News"
+    "nav": {
+        "home": "Home",
+        "exams": "Exams",
+        "materials": "Educational Resources",
+        "activities": "Educational Activities",
+        "vision": "Vision & Mission",
+        "about": "About Us"
+    },
+    "pages": {
+        "home": {
+            "title": "Home",
+            "subtitle": "Latest News and Updates"
+        },
+        "exams": {
+            "title": "Exams and Quizzes",
+            "subtitle": "Available Exams",
+            "columns": {
+                "title": "Title",
+                "subject": "Subject",
+                "duration": "Duration",
+                "questions": "Questions",
+                "status": "Status",
+                "action": "Action"
+            }
+        },
+        "vision": {
+            "title": "Vision & Mission",
+            "visionTitle": "Our Vision",
+            "missionTitle": "Our Mission"
+        },
+        "about": {
+            "title": "About Us",
+            "subtitle": "About Our School"
+        }
     },
     "gradeSelection": {
         "title": "Select Your Grade and Section",
@@ -76,7 +106,8 @@
         "minutes": "minutes",
         "question": "Question",
         "of": "of",
-        "uploadedOn": "Uploaded on"
+        "uploadedOn": "Uploaded on",
+        "allRightsReserved": "All Rights Reserved"
     },
     "notifications": {
         "title": "Notifications",

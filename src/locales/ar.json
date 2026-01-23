@@ -1,9 +1,38 @@
 {
-    "appName": "منصة المدرسة التعليمية",
-    "tabs": {
-        "homework": "الواجبات",
-        "materials": "المواد",
-        "news": "الأخبار"
+    "appName": "مدرسة المناخر الأساسية",
+    "nav": {
+        "home": "الصفحة الرئيسية",
+        "exams": "الامتحانات",
+        "materials": "مصادر تعليمية",
+        "activities": "أنشطة تعليمية",
+        "vision": "الرؤية والرسالة",
+        "about": "من نحن"
+    },
+    "pages": {
+        "home": {
+            "title": "الصفحة الرئيسية",
+            "subtitle": "آخر الأخبار والتحديثات"
+        },
+        "exams": {
+            "title": "الامتحانات والاختبارات",
+            "subtitle": "الامتحانات المتاحة",
+            "columns": {
+                "title": "العنوان",
+                "subject": "المادة",
+                "duration": "المدة",
+                "status": "الحالة",
+                "action": "الإجراء"
+            }
+        },
+        "vision": {
+            "title": "الرؤية والرسالة",
+            "visionTitle": "رؤيتنا",
+            "missionTitle": "رسالتنا"
+        },
+        "about": {
+            "title": "من نحن",
+            "subtitle": "نبذة عن المدرسة"
+        }
     },
     "gradeSelection": {
         "title": "اختر صفك وشعبتك",
@@ -76,7 +105,8 @@
         "minutes": "دقيقة",
         "question": "سؤال",
         "of": "من",
-        "uploadedOn": "تم الرفع في"
+        "uploadedOn": "تم الرفع في",
+        "allRightsReserved": "جميع الحقوق محفوظة"
     },
     "notifications": {
         "title": "الإشعارات",
