@@ -16,8 +16,8 @@ function VisionMissionPage() {
     : 'We are committed to providing high-quality education in a stimulating learning environment that enhances students\' creative and intellectual abilities, and develops their moral values and life skills necessary to achieve success in academic and professional life.';
 
   return (
-    <Box>
-      <Typography variant="h3" component="h1" gutterBottom>
+    <Box padding={4}>
+      <Typography variant="h4" component="h1" gutterBottom>
         {t('pages.vision.title')}
       </Typography>
 

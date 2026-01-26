@@ -1,131 +1,288 @@
 [
     {
-        "id": "quiz-1",
+        "id": "quiz-kg-1",
         "title": {
-            "ar": "اختبار الرياضيات - الفصل الأول",
-            "en": "Math Quiz - Chapter 1"
+            "ar": "اختبار الأشكال والألوان",
+            "en": "Shapes and Colors Quiz"
         },
         "subject": {
             "ar": "رياضيات",
             "en": "Mathematics"
         },
-        "grade": "10",
-        "duration": 30,
-        "totalPoints": 10,
+        "grade": "KG",
+        "date": "2026-02-05",
+        "duration": 15,
+        "totalPoints": 6,
         "questions": [
             {
                 "id": "q1",
                 "question": {
-                    "ar": "ما هو حل المعادلة: 2x + 5 = 15؟",
-                    "en": "What is the solution to: 2x + 5 = 15?"
+                    "ar": "كم عدد الدوائر؟",
+                    "en": "How many circles?"
                 },
                 "options": [
+                    {
+                        "ar": "2",
+                        "en": "2"
+                    },
+                    {
+                        "ar": "3",
+                        "en": "3"
+                    },
+                    {
+                        "ar": "4",
+                        "en": "4"
+                    },
+                    {
+                        "ar": "5",
+                        "en": "5"
+                    }
+                ],
+                "correctAnswer": 1,
+                "points": 2
+            }
+        ]
+    },
+    {
+        "id": "quiz-kg-2",
+        "title": {
+            "ar": "اختبار الحروف",
+            "en": "Letters Quiz"
+        },
+        "subject": {
+            "ar": "لغة عربية",
+            "en": "Arabic Language"
+        },
+        "grade": "KG",
+        "date": "2026-02-07",
+        "duration": 15,
+        "totalPoints": 6,
+        "questions": [
+            {
+                "id": "q1",
+                "question": {
+                    "ar": "ما هو الحرف الأول في كلمة 'أسد'؟",
+                    "en": "What is the first letter in the word 'أسد'?"
+                },
+                "options": [
+                    {
+                        "ar": "أ",
+                        "en": "أ"
+                    },
+                    {
+                        "ar": "ب",
+                        "en": "ب"
+                    },
+                    {
+                        "ar": "س",
+                        "en": "س"
+                    },
+                    {
+                        "ar": "د",
+                        "en": "د"
+                    }
+                ],
+                "correctAnswer": 0,
+                "points": 2
+            }
+        ]
+    },
+    {
+        "id": "quiz-1-1",
+        "title": {
+            "ar": "اختبار الجمع البسيط",
+            "en": "Simple Addition Quiz"
+        },
+        "subject": {
+            "ar": "رياضيات",
+            "en": "Mathematics"
+        },
+        "grade": "1",
+        "date": "2026-02-10",
+        "duration": 20,
+        "totalPoints": 8,
+        "questions": [
+            {
+                "id": "q1",
+                "question": {
+                    "ar": "كم يساوي 3 + 2؟",
+                    "en": "What is 3 + 2?"
+                },
+                "options": [
+                    {
+                        "ar": "4",
+                        "en": "4"
+                    },
                     {
                         "ar": "5",
                         "en": "5"
                     },
                     {
-                        "ar": "10",
-                        "en": "10"
+                        "ar": "6",
+                        "en": "6"
                     },
                     {
-                        "ar": "7.5",
-                        "en": "7.5"
-                    },
-                    {
-                        "ar": "2.5",
-                        "en": "2.5"
-                    }
-                ],
-                "correctAnswer": 0,
-                "points": 2
-            },
-            {
-                "id": "q2",
-                "question": {
-                    "ar": "ما هي قيمة π تقريباً؟",
-                    "en": "What is the approximate value of π?"
-                },
-                "options": [
-                    {
-                        "ar": "3.14",
-                        "en": "3.14"
-                    },
-                    {
-                        "ar": "2.71",
-                        "en": "2.71"
-                    },
-                    {
-                        "ar": "1.41",
-                        "en": "1.41"
-                    },
-                    {
-                        "ar": "4.67",
-                        "en": "4.67"
-                    }
-                ],
-                "correctAnswer": 0,
-                "points": 2
-            },
-            {
-                "id": "q3",
-                "question": {
-                    "ar": "ما هو مربع العدد 9؟",
-                    "en": "What is the square of 9?"
-                },
-                "options": [
-                    {
-                        "ar": "18",
-                        "en": "18"
-                    },
-                    {
-                        "ar": "81",
-                        "en": "81"
-                    },
-                    {
-                        "ar": "27",
-                        "en": "27"
-                    },
-                    {
-                        "ar": "72",
-                        "en": "72"
+                        "ar": "7",
+                        "en": "7"
                     }
                 ],
                 "correctAnswer": 1,
                 "points": 2
-            },
+            }
+        ]
+    },
+    {
+        "id": "quiz-1-2",
+        "title": {
+            "ar": "اختبار القراءة",
+            "en": "Reading Quiz"
+        },
+        "subject": {
+            "ar": "لغة عربية",
+            "en": "Arabic Language"
+        },
+        "grade": "1",
+        "date": "2026-02-12",
+        "duration": 20,
+        "totalPoints": 8,
+        "questions": [
             {
-                "id": "q4",
+                "id": "q1",
                 "question": {
-                    "ar": "ما هو الجذر التربيعي للعدد 144؟",
-                    "en": "What is the square root of 144?"
+                    "ar": "كم كلمة في الجملة: 'القطة تلعب'؟",
+                    "en": "How many words in the sentence: 'القطة تلعب'?"
                 },
                 "options": [
                     {
-                        "ar": "11",
-                        "en": "11"
+                        "ar": "1",
+                        "en": "1"
                     },
                     {
-                        "ar": "12",
-                        "en": "12"
+                        "ar": "2",
+                        "en": "2"
                     },
                     {
-                        "ar": "13",
-                        "en": "13"
+                        "ar": "3",
+                        "en": "3"
                     },
                     {
-                        "ar": "14",
-                        "en": "14"
+                        "ar": "4",
+                        "en": "4"
                     }
                 ],
                 "correctAnswer": 1,
                 "points": 2
-            },
+            }
+        ]
+    },
+    {
+        "id": "quiz-2-1",
+        "title": {
+            "ar": "اختبار الجمع والطرح",
+            "en": "Addition and Subtraction Quiz"
+        },
+        "subject": {
+            "ar": "رياضيات",
+            "en": "Mathematics"
+        },
+        "grade": "2",
+        "date": "2026-01-24",
+        "duration": 20,
+        "totalPoints": 8,
+        "questions": [
             {
-                "id": "q5",
+                "id": "q1",
                 "question": {
-                    "ar": "ما هي قيمة 5³؟",
-                    "en": "What is the value of 5³?"
+                    "ar": "كم يساوي 15 + 7؟",
+                    "en": "What is 15 + 7?"
+                },
+                "options": [
+                    {
+                        "ar": "20",
+                        "en": "20"
+                    },
+                    {
+                        "ar": "21",
+                        "en": "21"
+                    },
+                    {
+                        "ar": "22",
+                        "en": "22"
+                    },
+                    {
+                        "ar": "23",
+                        "en": "23"
+                    }
+                ],
+                "correctAnswer": 2,
+                "points": 2
+            }
+        ]
+    },
+    {
+        "id": "quiz-2-2",
+        "title": {
+            "ar": "اختبار الكلمات والجمل",
+            "en": "Words and Sentences Quiz"
+        },
+        "subject": {
+            "ar": "لغة عربية",
+            "en": "Arabic Language"
+        },
+        "grade": "2",
+        "date": "2026-01-26",
+        "duration": 20,
+        "totalPoints": 8,
+        "questions": [
+            {
+                "id": "q1",
+                "question": {
+                    "ar": "ما هو عكس كلمة 'كبير'؟",
+                    "en": "What is the opposite of 'big'?"
+                },
+                "options": [
+                    {
+                        "ar": "صغير",
+                        "en": "small"
+                    },
+                    {
+                        "ar": "طويل",
+                        "en": "tall"
+                    },
+                    {
+                        "ar": "واسع",
+                        "en": "wide"
+                    },
+                    {
+                        "ar": "قصير",
+                        "en": "short"
+                    }
+                ],
+                "correctAnswer": 0,
+                "points": 2
+            }
+        ]
+    },
+    {
+        "id": "quiz-3-1",
+        "title": {
+            "ar": "اختبار الضرب",
+            "en": "Multiplication Quiz"
+        },
+        "subject": {
+            "ar": "رياضيات",
+            "en": "Mathematics"
+        },
+        "grade": "3",
+        "date": "2026-01-28",
+        "duration": 25,
+        "totalPoints": 10,
+        "questions": [
+            {
+                "id": "q1",
+                "question": {
+                    "ar": "كم يساوي 5 × 4؟",
+                    "en": "What is 5 × 4?"
                 },
                 "options": [
                     {
@@ -133,122 +290,329 @@
                         "en": "15"
                     },
                     {
+                        "ar": "20",
+                        "en": "20"
+                    },
+                    {
                         "ar": "25",
                         "en": "25"
                     },
                     {
-                        "ar": "125",
-                        "en": "125"
-                    },
-                    {
-                        "ar": "625",
-                        "en": "625"
+                        "ar": "30",
+                        "en": "30"
                     }
                 ],
-                "correctAnswer": 2,
+                "correctAnswer": 1,
                 "points": 2
             }
-        ],
-        "createdAt": "2026-01-22T10:00:00Z",
-        "dueDate": "2026-01-29T23:59:59Z"
+        ]
     },
     {
-        "id": "quiz-2",
+        "id": "quiz-3-2",
         "title": {
-            "ar": "اختبار العلوم - الخلايا",
-            "en": "Science Quiz - Cells"
+            "ar": "اختبار العلوم - النباتات",
+            "en": "Science Quiz - Plants"
         },
         "subject": {
             "ar": "علوم",
             "en": "Science"
         },
-        "grade": "9",
-        "duration": 20,
-        "totalPoints": 6,
+        "grade": "3",
+        "date": "2026-01-30",
+        "duration": 25,
+        "totalPoints": 10,
         "questions": [
             {
                 "id": "q1",
                 "question": {
-                    "ar": "ما هي الوحدة الأساسية للحياة؟",
-                    "en": "What is the basic unit of life?"
+                    "ar": "ما الذي تحتاجه النباتات للنمو؟",
+                    "en": "What do plants need to grow?"
                 },
                 "options": [
                     {
-                        "ar": "الخلية",
-                        "en": "Cell"
+                        "ar": "ماء وضوء",
+                        "en": "Water and light"
                     },
                     {
-                        "ar": "النسيج",
-                        "en": "Tissue"
+                        "ar": "سكر فقط",
+                        "en": "Only sugar"
                     },
                     {
-                        "ar": "العضو",
-                        "en": "Organ"
+                        "ar": "ملح فقط",
+                        "en": "Only salt"
                     },
                     {
-                        "ar": "الجهاز",
-                        "en": "System"
+                        "ar": "هواء فقط",
+                        "en": "Only air"
                     }
                 ],
                 "correctAnswer": 0,
                 "points": 2
-            },
+            }
+        ]
+    },
+    {
+        "id": "quiz-4-1",
+        "title": {
+            "ar": "اختبار القسمة",
+            "en": "Division Quiz"
+        },
+        "subject": {
+            "ar": "رياضيات",
+            "en": "Mathematics"
+        },
+        "grade": "4",
+        "date": "2026-02-01",
+        "duration": 25,
+        "totalPoints": 10,
+        "questions": [
             {
-                "id": "q2",
+                "id": "q1",
                 "question": {
-                    "ar": "أين توجد المادة الوراثية في الخلية؟",
-                    "en": "Where is genetic material found in the cell?"
+                    "ar": "كم يساوي 20 ÷ 5؟",
+                    "en": "What is 20 ÷ 5?"
                 },
                 "options": [
                     {
-                        "ar": "في السيتوبلازم",
-                        "en": "In cytoplasm"
+                        "ar": "3",
+                        "en": "3"
                     },
                     {
-                        "ar": "في النواة",
-                        "en": "In nucleus"
+                        "ar": "4",
+                        "en": "4"
                     },
                     {
-                        "ar": "في الغشاء",
-                        "en": "In membrane"
+                        "ar": "5",
+                        "en": "5"
                     },
                     {
-                        "ar": "في الميتوكندريا",
-                        "en": "In mitochondria"
-                    }
-                ],
-                "correctAnswer": 1,
-                "points": 2
-            },
-            {
-                "id": "q3",
-                "question": {
-                    "ar": "ما هي وظيفة الميتوكندريا؟",
-                    "en": "What is the function of mitochondria?"
-                },
-                "options": [
-                    {
-                        "ar": "التمثيل الضوئي",
-                        "en": "Photosynthesis"
-                    },
-                    {
-                        "ar": "إنتاج الطاقة",
-                        "en": "Energy production"
-                    },
-                    {
-                        "ar": "تخزين الماء",
-                        "en": "Water storage"
-                    },
-                    {
-                        "ar": "الحركة",
-                        "en": "Movement"
+                        "ar": "6",
+                        "en": "6"
                     }
                 ],
                 "correctAnswer": 1,
                 "points": 2
             }
-        ],
-        "createdAt": "2026-01-21T11:00:00Z",
-        "dueDate": "2026-01-28T23:59:59Z"
+        ]
+    },
+    {
+        "id": "quiz-4-2",
+        "title": {
+            "ar": "اختبار الإنجليزي - الحيوانات",
+            "en": "English Quiz - Animals"
+        },
+        "subject": {
+            "ar": "لغة إنجليزية",
+            "en": "English Language"
+        },
+        "grade": "4",
+        "date": "2026-02-03",
+        "duration": 25,
+        "totalPoints": 10,
+        "questions": [
+            {
+                "id": "q1",
+                "question": {
+                    "ar": "ما هو الحيوان الأكبر في البحر؟",
+                    "en": "What is the largest animal in the sea?"
+                },
+                "options": [
+                    {
+                        "ar": "الحوت الأزرق",
+                        "en": "Blue Whale"
+                    },
+                    {
+                        "ar": "القرش",
+                        "en": "Shark"
+                    },
+                    {
+                        "ar": "الدولفين",
+                        "en": "Dolphin"
+                    },
+                    {
+                        "ar": "السلحفاة",
+                        "en": "Turtle"
+                    }
+                ],
+                "correctAnswer": 0,
+                "points": 2
+            }
+        ]
+    },
+    {
+        "id": "quiz-5-1",
+        "title": {
+            "ar": "اختبار الكسور",
+            "en": "Fractions Quiz"
+        },
+        "subject": {
+            "ar": "رياضيات",
+            "en": "Mathematics"
+        },
+        "grade": "5",
+        "date": "2026-02-05",
+        "duration": 30,
+        "totalPoints": 10,
+        "questions": [
+            {
+                "id": "q1",
+                "question": {
+                    "ar": "كم يساوي ½ + ¼؟",
+                    "en": "What is ½ + ¼?"
+                },
+                "options": [
+                    {
+                        "ar": "¼",
+                        "en": "¼"
+                    },
+                    {
+                        "ar": "½",
+                        "en": "½"
+                    },
+                    {
+                        "ar": "¾",
+                        "en": "¾"
+                    },
+                    {
+                        "ar": "1",
+                        "en": "1"
+                    }
+                ],
+                "correctAnswer": 2,
+                "points": 2
+            }
+        ]
+    },
+    {
+        "id": "quiz-5-2",
+        "title": {
+            "ar": "اختبار التاريخ - الحضارات",
+            "en": "History Quiz - Civilizations"
+        },
+        "subject": {
+            "ar": "تاريخ",
+            "en": "History"
+        },
+        "grade": "5",
+        "date": "2026-02-07",
+        "duration": 30,
+        "totalPoints": 10,
+        "questions": [
+            {
+                "id": "q1",
+                "question": {
+                    "ar": "أين نشأت الحضارة الفرعونية؟",
+                    "en": "Where did the Pharaonic civilization originate?"
+                },
+                "options": [
+                    {
+                        "ar": "مصر",
+                        "en": "Egypt"
+                    },
+                    {
+                        "ar": "العراق",
+                        "en": "Iraq"
+                    },
+                    {
+                        "ar": "سوريا",
+                        "en": "Syria"
+                    },
+                    {
+                        "ar": "اليونان",
+                        "en": "Greece"
+                    }
+                ],
+                "correctAnswer": 0,
+                "points": 2
+            }
+        ]
+    },
+    {
+        "id": "quiz-6-1",
+        "title": {
+            "ar": "اختبار الهندسة - المساحات",
+            "en": "Geometry Quiz - Areas"
+        },
+        "subject": {
+            "ar": "رياضيات",
+            "en": "Mathematics"
+        },
+        "grade": "6",
+        "date": "2026-02-08",
+        "duration": 30,
+        "totalPoints": 10,
+        "questions": [
+            {
+                "id": "q1",
+                "question": {
+                    "ar": "ما هي مساحة المستطيل الذي طوله 5 وعرضه 3؟",
+                    "en": "What is the area of a rectangle with length 5 and width 3?"
+                },
+                "options": [
+                    {
+                        "ar": "8",
+                        "en": "8"
+                    },
+                    {
+                        "ar": "15",
+                        "en": "15"
+                    },
+                    {
+                        "ar": "16",
+                        "en": "16"
+                    },
+                    {
+                        "ar": "20",
+                        "en": "20"
+                    }
+                ],
+                "correctAnswer": 1,
+                "points": 2
+            }
+        ]
+    },
+    {
+        "id": "quiz-6-2",
+        "title": {
+            "ar": "اختبار الجغرافيا - القارات",
+            "en": "Geography Quiz - Continents"
+        },
+        "subject": {
+            "ar": "جغرافيا",
+            "en": "Geography"
+        },
+        "grade": "6",
+        "date": "2026-02-10",
+        "duration": 30,
+        "totalPoints": 10,
+        "questions": [
+            {
+                "id": "q1",
+                "question": {
+                    "ar": "كم عدد القارات في العالم؟",
+                    "en": "How many continents are in the world?"
+                },
+                "options": [
+                    {
+                        "ar": "5",
+                        "en": "5"
+                    },
+                    {
+                        "ar": "6",
+                        "en": "6"
+                    },
+                    {
+                        "ar": "7",
+                        "en": "7"
+                    },
+                    {
+                        "ar": "8",
+                        "en": "8"
+                    }
+                ],
+                "correctAnswer": 2,
+                "points": 2
+            }
+        ]
     }
 ]

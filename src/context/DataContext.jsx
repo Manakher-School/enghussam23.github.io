@@ -45,7 +45,7 @@ export default function DataProvider({ children }) {
   const homework = filterByGrade(homeworkData);
   const materials = filterByGrade(materialsData);
   const news = newsData; // News is for all grades
-  const quizzes = quizzesData; // Show all quizzes for now
+  const quizzes = filterByGrade(quizzesData);
 
   const submitHomework = async (homeworkId, submission) => {
     const newSubmissions = {

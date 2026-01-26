@@ -12,7 +12,10 @@ function HomePage() {
   const heroImages = [
     '/images/hero/students_queue.png',
     '/images/hero/students_breakfast.png',
-    '/images/hero/students_class_activity_01.png'
+    '/images/hero/students_class_activity_01.png',
+    '/images/hero/little_students_stairs_queue.jpeg',
+    '/images/hero/school_morning_routine.jpeg',
+    '/images/hero/teacher_hug_students.jpeg'
   ];
   
   const [currentImageIndex, setCurrentImageIndex] = useState(0);

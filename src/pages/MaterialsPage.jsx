@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Box,
+  Container,
   TextField,
   InputAdornment,
   Typography,
@@ -14,35 +15,58 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../context/DataContext';
-import MaterialCard from './MaterialCard';
+import MaterialCard from '../components/MaterialCard';
+import Fuse from 'fuse.js';
 
-function MaterialsTab() {
-  const { t } = useTranslation();
+function MaterialsPage() {
+  const { t, i18n } = useTranslation();
   const { materials, loading } = useData();
   const [searchQuery, setSearchQuery] = useState('');
   const [subjectFilter, setSubjectFilter] = useState('all');
+  const currentLang = i18n.language;
 
   // Get unique subjects from materials
-  const subjects = ['all', ...new Set(materials.map(m => m.subject))];
+  const subjects = useMemo(() => {
+    const subjectSet = new Set(materials.map(m => m.subject?.[currentLang] || ''));
+    return ['all', ...Array.from(subjectSet).filter(Boolean)];
+  }, [materials, currentLang]);
+
+  // Configure Fuse.js for fuzzy search
+  const fuse = useMemo(() => new Fuse(materials, {
+    keys: [
+      { name: 'title.ar', weight: 3 },
+      { name: 'title.en', weight: 3 },
+      { name: 'subject.ar', weight: 2 },
+      { name: 'subject.en', weight: 2 },
+      { name: 'description.ar', weight: 1 },
+      { name: 'description.en', weight: 1 }
+    ],
+    threshold: 0.3,
+    includeScore: true
+  }), [materials]);
 
   const filterMaterials = () => {
     let filtered = materials;
 
-    // Filter by subject
+    // Filter by subject first
     if (subjectFilter !== 'all') {
-      filtered = filtered.filter(m => m.subject === subjectFilter);
+      filtered = filtered.filter(m => m.subject?.[currentLang] === subjectFilter);
     }
 
-    // Filter by search query
+    // Then apply fuzzy search if there's a query
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(m =>
-        m.title.ar.toLowerCase().includes(query) ||
-        m.title.en.toLowerCase().includes(query) ||
-        (m.description?.ar || '').toLowerCase().includes(query) ||
-        (m.description?.en || '').toLowerCase().includes(query) ||
-        m.subject.toLowerCase().includes(query)
-      );
+      const fuseFiltered = new Fuse(filtered, {
+        keys: [
+          { name: 'title.ar', weight: 3 },
+          { name: 'title.en', weight: 3 },
+          { name: 'subject.ar', weight: 2 },
+          { name: 'subject.en', weight: 2 },
+          { name: 'description.ar', weight: 1 },
+          { name: 'description.en', weight: 1 }
+        ],
+        threshold: 0.3
+      });
+      return fuseFiltered.search(searchQuery).map(result => result.item);
     }
 
     return filtered;
@@ -59,7 +83,11 @@ function MaterialsTab() {
   }
 
   return (
-    <Box>
+    <Box padding={4}>
+      <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3 }}>
+        {t('nav.materials')}
+      </Typography>
+
       {/* Search and Filter Bar */}
       <Box display="flex" gap={2} mb={3} flexDirection={{ xs: 'column', md: 'row' }}>
         <TextField
@@ -115,4 +143,4 @@ function MaterialsTab() {
   );
 }
 
-export default MaterialsTab;
+export default MaterialsPage;

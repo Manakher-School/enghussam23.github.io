@@ -25,8 +25,8 @@ function AboutPage() {
       ];
 
   return (
-    <Box>
-      <Typography variant="h3" component="h1" gutterBottom>
+    <Box padding={4}>
+      <Typography variant="h4" component="h1" gutterBottom>
         {t('pages.about.title')}
       </Typography>
       <Typography variant="h6" color="text.secondary" paragraph>

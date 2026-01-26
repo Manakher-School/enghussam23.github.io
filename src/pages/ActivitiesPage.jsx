@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   Box,
+  Container,
   TextField,
   InputAdornment,
   Typography,
@@ -12,10 +13,10 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../context/DataContext';
-import HomeworkCard from './HomeworkCard';
-import QuizCard from './QuizCard';
+import HomeworkCard from '../components/HomeworkCard';
+import QuizCard from '../components/QuizCard';
 
-function HomeworkTab() {
+function ActivitiesPage() {
   const { t } = useTranslation();
   const { homework, quizzes, loading } = useData();
   const [searchQuery, setSearchQuery] = useState('');
@@ -44,7 +45,11 @@ function HomeworkTab() {
   }
 
   return (
-    <Box>
+    <Box padding={4}>
+      <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3 }}>
+        {t('nav.activities')}
+      </Typography>
+
       {/* Search Bar */}
       <TextField
         fullWidth
@@ -63,16 +68,7 @@ function HomeworkTab() {
       />
 
       {/* Sub Tabs */}
-      <Tabs 
-        value={subTab} 
-        onChange={(e, newValue) => setSubTab(newValue)}
-        sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}
-      >
-        <Tab label={t('homework.title')} />
-        <Tab label={t('homework.quizzes')} />
-      </Tabs>
-
-      {/* Homework List */}
+      {/* Activities List */}
       {subTab === 0 && (
         <Grid container spacing={3}>
           {filteredHomework.length === 0 ? (
@@ -113,4 +109,4 @@ function HomeworkTab() {
   );
 }
 
-export default HomeworkTab;
+export default ActivitiesPage;

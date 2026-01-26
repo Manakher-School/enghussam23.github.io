@@ -22,8 +22,10 @@
             "columns": {
                 "title": "Title",
                 "subject": "Subject",
+                "grade": "Grade",
                 "duration": "Duration",
                 "questions": "Questions",
+                "date": "Date",
                 "status": "Status",
                 "action": "Action"
             }

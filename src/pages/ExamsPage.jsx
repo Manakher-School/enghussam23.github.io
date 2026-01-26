@@ -15,6 +15,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useData } from '../context/DataContext';
 import QuizCard from '../components/QuizCard';
+import gradeLabels from '../data/grades.json';
 
 function ExamsPage() {
   const { t, i18n } = useTranslation();
@@ -42,7 +43,7 @@ function ExamsPage() {
 
   return (
     <Box padding={4}>
-      <Typography variant="h3" component="h1" gutterBottom>
+      <Typography variant="h4" component="h1" gutterBottom>
         {t('pages.exams.title')}
       </Typography>
       <Typography variant="h6" color="text.secondary" paragraph>
@@ -57,10 +58,16 @@ function ExamsPage() {
                 {t('pages.exams.columns.title')}
               </TableCell>
               <TableCell sx={{ color: 'white', fontWeight: 'bold' , textAlign:"center"}}>
+                {t('pages.exams.columns.subject')}
+              </TableCell>
+              <TableCell sx={{ color: 'white', fontWeight: 'bold' , textAlign:"center"}}>
+                {t('pages.exams.columns.grade')}
+              </TableCell>
+              <TableCell sx={{ color: 'white', fontWeight: 'bold' , textAlign:"center"}}>
                 {t('pages.exams.columns.duration')}
               </TableCell>
               <TableCell sx={{ color: 'white', fontWeight: 'bold' , textAlign:"center"}}>
-                {t('pages.exams.columns.status')}
+                {t('pages.exams.columns.date')}
               </TableCell>
             </TableRow>
           </TableHead>
@@ -70,30 +77,21 @@ function ExamsPage() {
               return (
                 <TableRow key={quiz.id} hover>
                   <TableCell>
-                    <Typography variant="body1" fontWeight="medium">
+                    <Typography variant="body1" fontWeight="medium" sx={{textAlign:"center"}}>
                       {quiz.title[currentLang]}
                     </Typography>
                   </TableCell>
-                  <TableCell>
-                    {quiz.timeLimit} {t('common.minutes')}
+                  <TableCell sx={{textAlign:"center"}}>
+                    {quiz.subject[currentLang]}
                   </TableCell>
-                  <TableCell>
-                    {quiz.questions.length} {t('common.questions')}
+                  <TableCell sx={{textAlign:"center"}}>
+                    {gradeLabels[quiz.grade]?.[currentLang] || quiz.grade}
                   </TableCell>
-                  <TableCell>
-                    <Chip label={status.text} color={status.color} size="small" />
+                  <TableCell sx={{textAlign:"center"}}>
+                    {quiz.duration} {t('common.minutes')}
                   </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="contained"
-                      size="small"
-                      onClick={() => setSelectedQuiz(quiz)}
-                      disabled={!!quizAttempts.find(a => a.quizId === quiz.id)}
-                    >
-                      {quizAttempts.find(a => a.quizId === quiz.id) 
-                        ? t('homework.submitted') 
-                        : t('homework.startQuiz')}
-                    </Button>
+                  <TableCell sx={{textAlign:"center"}}>
+                    {quiz.date ? new Date(quiz.date).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US') : '-'}
                   </TableCell>
                 </TableRow>
               );

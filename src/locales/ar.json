@@ -22,7 +22,9 @@
             "columns": {
                 "title": "العنوان",
                 "subject": "المادة",
+                "grade": "الصف",
                 "duration": "المدة",
+                "date": "التاريخ",
                 "status": "الحالة",
                 "action": "الإجراء"
             }

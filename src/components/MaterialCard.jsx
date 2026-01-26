@@ -57,7 +57,7 @@ function MaterialCard({ material }) {
 
         <Box display="flex" gap={1} flexWrap="wrap" mt={2}>
           <Chip 
-            label={material.subject} 
+            label={material.subject[currentLang]} 
             size="small" 
             variant="outlined"
           />

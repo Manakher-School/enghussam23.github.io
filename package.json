@@ -9,16 +9,17 @@
     "deploy": "vite build --base=/ && rm -rf docs && mv dist docs && touch docs/.nojekyll"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.30.3",
-    "@mui/material": "^5.18.0",
-    "@mui/icons-material": "^5.18.0",
     "@emotion/react": "^11.13.5",
     "@emotion/styled": "^11.13.5",
+    "@mui/icons-material": "^5.18.0",
+    "@mui/material": "^5.18.0",
+    "fuse.js": "^7.1.0",
     "i18next": "^24.2.3",
+    "localforage": "^1.10.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-i18next": "^15.7.4",
-    "localforage": "^1.10.0"
+    "react-router-dom": "^6.30.3"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.7.0",

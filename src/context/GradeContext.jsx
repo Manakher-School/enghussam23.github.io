@@ -11,12 +11,6 @@ const GRADES = [
   { id: '4', label: { ar: 'الصف الرابع', en: 'Grade 4' } },
   { id: '5', label: { ar: 'الصف الخامس', en: 'Grade 5' } },
   { id: '6', label: { ar: 'الصف السادس', en: 'Grade 6' } },
-  { id: '7', label: { ar: 'الصف السابع', en: 'Grade 7' } },
-  { id: '8', label: { ar: 'الصف الثامن', en: 'Grade 8' } },
-  { id: '9', label: { ar: 'الصف التاسع', en: 'Grade 9' } },
-  { id: '10', label: { ar: 'الصف العاشر', en: 'Grade 10' } },
-  { id: '11', label: { ar: 'الصف الحادي عشر', en: 'Grade 11' } },
-  { id: 'Tawjihi', label: { ar: 'التوجيهي', en: 'Tawjihi' } },
 ];
 
 const SECTIONS = ['أ', 'ب', 'ج', 'د'];

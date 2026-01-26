@@ -26,8 +26,8 @@ import { useTranslation } from 'react-i18next';
 import { useGrade } from '../context/GradeContext';
 import HomePage from '../pages/HomePage';
 import ExamsPage from '../pages/ExamsPage';
-import MaterialsTab from './MaterialsTab';
-import HomeworkTab from './HomeworkTab';
+import MaterialsPage from '../pages/MaterialsPage';
+import ActivitiesPage from '../pages/ActivitiesPage';
 import VisionMissionPage from '../pages/VisionMissionPage';
 import AboutPage from '../pages/AboutPage';
 
@@ -83,9 +83,9 @@ const MainLayout = () => {
       case 'exams':
         return <ExamsPage />;
       case 'materials':
-        return <MaterialsTab />;
+        return <MaterialsPage />;
       case 'activities':
-        return <HomeworkTab />;
+        return <ActivitiesPage />;
       case 'vision':
         return <VisionMissionPage />;
       case 'about':

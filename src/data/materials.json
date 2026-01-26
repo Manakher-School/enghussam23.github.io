@@ -1,86 +1,352 @@
 [
     {
-        "id": "mat-1",
+        "id": "mat-kg-1",
         "title": {
-            "ar": "كتاب الفيزياء - الوحدة الأولى",
-            "en": "Physics Book - Unit 1"
+            "ar": "أوراق التلوين - الحيوانات",
+            "en": "Coloring Sheets - Animals"
         },
         "content": {
-            "ar": "الحركة والقوة - دراسة القوانين الأساسية",
-            "en": "Motion and Force - Study of Basic Laws"
+            "ar": "أوراق تلوين ممتعة لتعليم أسماء الحيوانات",
+            "en": "Fun coloring sheets to learn animal names"
         },
         "subject": {
-            "ar": "فيزياء",
-            "en": "Physics"
+            "ar": "فنون",
+            "en": "Arts"
         },
-        "grade": "11",
-        "fileType": "PDF",
-        "fileUrl": "https://example.com/physics-unit1.pdf",
-        "fileSize": "2.5 MB",
-        "createdAt": "2026-01-15T10:00:00Z",
+        "grade": "KG",
+        "fileType": "pdf",
+        "fileUrl": "https://example.com/kg-coloring-animals.pdf",
+        "fileSize": "500 KB",
+        "uploadDate": "2026-01-15T10:00:00Z",
+        "description": {
+            "ar": "مجموعة من 10 أوراق تلوين للحيوانات الأليفة والبرية",
+            "en": "Collection of 10 coloring pages for domestic and wild animals"
+        },
         "type": "material"
     },
     {
-        "id": "mat-2",
+        "id": "mat-kg-2",
         "title": {
-            "ar": "ملخص الكيمياء - الجدول الدوري",
-            "en": "Chemistry Summary - Periodic Table"
+            "ar": "بطاقات الأرقام",
+            "en": "Number Cards"
         },
         "content": {
-            "ar": "ملخص شامل للجدول الدوري والعناصر الكيميائية",
-            "en": "Comprehensive summary of the periodic table and chemical elements"
-        },
-        "subject": {
-            "ar": "كيمياء",
-            "en": "Chemistry"
-        },
-        "grade": "10",
-        "fileType": "PDF",
-        "fileUrl": "https://example.com/chemistry-periodic.pdf",
-        "fileSize": "1.8 MB",
-        "createdAt": "2026-01-18T12:00:00Z",
-        "type": "material"
-    },
-    {
-        "id": "mat-3",
-        "title": {
-            "ar": "شرح قواعد اللغة الإنجليزية",
-            "en": "English Grammar Explanation"
-        },
-        "content": {
-            "ar": "الأزمنة في اللغة الإنجليزية - شرح مفصل",
-            "en": "English Tenses - Detailed Explanation"
-        },
-        "subject": {
-            "ar": "لغة إنجليزية",
-            "en": "English Language"
-        },
-        "grade": "9",
-        "fileType": "DOCX",
-        "fileUrl": "https://example.com/english-tenses.docx",
-        "fileSize": "850 KB",
-        "createdAt": "2026-01-20T09:30:00Z",
-        "type": "material"
-    },
-    {
-        "id": "mat-4",
-        "title": {
-            "ar": "مراجعة الرياضيات - الفصل الثاني",
-            "en": "Math Review - Chapter 2"
-        },
-        "content": {
-            "ar": "أسئلة ومسائل محلولة للمراجعة",
-            "en": "Solved questions and problems for review"
+            "ar": "بطاقات تعليمية للأرقام من 1 إلى 10",
+            "en": "Educational cards for numbers 1 to 10"
         },
         "subject": {
             "ar": "رياضيات",
             "en": "Mathematics"
         },
-        "grade": "10",
-        "fileType": "PDF",
-        "fileUrl": "https://example.com/math-chapter2.pdf",
-        "fileSize": "3.2 MB",
-        "createdAt": "2026-01-21T11:00:00Z",
+        "grade": "KG",
+        "fileType": "pdf",
+        "fileUrl": "https://example.com/kg-number-cards.pdf",
+        "fileSize": "800 KB",
+        "uploadDate": "2026-01-16T09:00:00Z",
+        "description": {
+            "ar": "بطاقات ملونة لتعليم الأرقام مع الصور",
+            "en": "Colorful cards to teach numbers with pictures"
+        },
+        "type": "material"
+    },
+    {
+        "id": "mat-1-1",
+        "title": {
+            "ar": "كتاب القراءة - الوحدة الأولى",
+            "en": "Reading Book - Unit 1"
+        },
+        "content": {
+            "ar": "قصص قصيرة للقراءة والفهم",
+            "en": "Short stories for reading and comprehension"
+        },
+        "subject": {
+            "ar": "لغة عربية",
+            "en": "Arabic Language"
+        },
+        "grade": "1",
+        "fileType": "pdf",
+        "fileUrl": "https://example.com/grade1-reading-unit1.pdf",
+        "fileSize": "1.2 MB",
+        "uploadDate": "2026-01-17T11:00:00Z",
+        "description": {
+            "ar": "مجموعة من القصص القصيرة البسيطة",
+            "en": "Collection of simple short stories"
+        },
+        "type": "material"
+    },
+    {
+        "id": "mat-1-2",
+        "title": {
+            "ar": "تمارين الجمع والطرح",
+            "en": "Addition and Subtraction Exercises"
+        },
+        "content": {
+            "ar": "تمارين رياضيات للأعداد حتى 20",
+            "en": "Math exercises for numbers up to 20"
+        },
+        "subject": {
+            "ar": "رياضيات",
+            "en": "Mathematics"
+        },
+        "grade": "1",
+        "fileType": "pdf",
+        "fileUrl": "https://example.com/grade1-math-exercises.pdf",
+        "fileSize": "900 KB",
+        "uploadDate": "2026-01-18T10:30:00Z",
+        "description": {
+            "ar": "ورقة عمل تحتوي على 50 تمرين جمع وطرح",
+            "en": "Worksheet containing 50 addition and subtraction exercises"
+        },
+        "type": "material"
+    },
+    {
+        "id": "mat-2-1",
+        "title": {
+            "ar": "قواعد اللغة العربية - الاسم والفعل",
+            "en": "Arabic Grammar - Nouns and Verbs"
+        },
+        "content": {
+            "ar": "شرح مبسط للاسم والفعل مع أمثلة",
+            "en": "Simple explanation of nouns and verbs with examples"
+        },
+        "subject": {
+            "ar": "لغة عربية",
+            "en": "Arabic Language"
+        },
+        "grade": "2",
+        "fileType": "pdf",
+        "fileUrl": "https://example.com/grade2-grammar.pdf",
+        "fileSize": "1.5 MB",
+        "uploadDate": "2026-01-19T09:15:00Z",
+        "description": {
+            "ar": "دليل القواعد الأساسية مع تمارين تطبيقية",
+            "en": "Basic grammar guide with practical exercises"
+        },
+        "type": "material"
+    },
+    {
+        "id": "mat-2-2",
+        "title": {
+            "ar": "جدول الضرب",
+            "en": "Multiplication Table"
+        },
+        "content": {
+            "ar": "جدول الضرب من 1 إلى 10",
+            "en": "Multiplication table from 1 to 10"
+        },
+        "subject": {
+            "ar": "رياضيات",
+            "en": "Mathematics"
+        },
+        "grade": "2",
+        "fileType": "pdf",
+        "fileUrl": "https://example.com/grade2-multiplication.pdf",
+        "fileSize": "600 KB",
+        "uploadDate": "2026-01-20T14:00:00Z",
+        "description": {
+            "ar": "جدول الضرب الكامل مع تمارين الحفظ",
+            "en": "Complete multiplication table with memorization exercises"
+        },
+        "type": "material"
+    },
+    {
+        "id": "mat-3-1",
+        "title": {
+            "ar": "العلوم - جسم الإنسان",
+            "en": "Science - Human Body"
+        },
+        "content": {
+            "ar": "أجزاء جسم الإنسان ووظائفها",
+            "en": "Parts of the human body and their functions"
+        },
+        "subject": {
+            "ar": "علوم",
+            "en": "Science"
+        },
+        "grade": "3",
+        "fileType": "pdf",
+        "fileUrl": "https://example.com/grade3-human-body.pdf",
+        "fileSize": "2.1 MB",
+        "uploadDate": "2026-01-21T10:00:00Z",
+        "description": {
+            "ar": "دراسة الأعضاء الرئيسية في جسم الإنسان",
+            "en": "Study of major organs in the human body"
+        },
+        "type": "material"
+    },
+    {
+        "id": "mat-3-2",
+        "title": {
+            "ar": "اللغة الإنجليزية - المفردات الأساسية",
+            "en": "English - Basic Vocabulary"
+        },
+        "content": {
+            "ar": "قائمة بأهم 100 كلمة إنجليزية",
+            "en": "List of the most important 100 English words"
+        },
+        "subject": {
+            "ar": "لغة إنجليزية",
+            "en": "English Language"
+        },
+        "grade": "3",
+        "fileType": "pdf",
+        "fileUrl": "https://example.com/grade3-english-vocab.pdf",
+        "fileSize": "800 KB",
+        "uploadDate": "2026-01-22T11:30:00Z",
+        "description": {
+            "ar": "مفردات أساسية مع الصور والترجمة",
+            "en": "Basic vocabulary with pictures and translation"
+        },
+        "type": "material"
+    },
+    {
+        "id": "mat-4-1",
+        "title": {
+            "ar": "الرياضيات - الكسور",
+            "en": "Mathematics - Fractions"
+        },
+        "content": {
+            "ar": "شرح الكسور البسيطة والعمليات عليها",
+            "en": "Explanation of simple fractions and operations"
+        },
+        "subject": {
+            "ar": "رياضيات",
+            "en": "Mathematics"
+        },
+        "grade": "4",
+        "fileType": "pdf",
+        "fileUrl": "https://example.com/grade4-fractions.pdf",
+        "fileSize": "1.8 MB",
+        "uploadDate": "2026-01-23T09:00:00Z",
+        "description": {
+            "ar": "دروس ومسائل عن الكسور والعمليات الحسابية",
+            "en": "Lessons and problems on fractions and arithmetic operations"
+        },
+        "type": "material"
+    },
+    {
+        "id": "mat-4-2",
+        "title": {
+            "ar": "التاريخ - الحضارات القديمة",
+            "en": "History - Ancient Civilizations"
+        },
+        "content": {
+            "ar": "نبذة عن الحضارات القديمة في المنطقة",
+            "en": "Overview of ancient civilizations in the region"
+        },
+        "subject": {
+            "ar": "تاريخ",
+            "en": "History"
+        },
+        "grade": "4",
+        "fileType": "pdf",
+        "fileUrl": "https://example.com/grade4-history.pdf",
+        "fileSize": "2.5 MB",
+        "uploadDate": "2026-01-24T13:00:00Z",
+        "description": {
+            "ar": "دراسة الحضارات العربية والفرعونية",
+            "en": "Study of Arab and Pharaonic civilizations"
+        },
+        "type": "material"
+    },
+    {
+        "id": "mat-5-1",
+        "title": {
+            "ar": "اللغة العربية - الإعراب",
+            "en": "Arabic Grammar - Parsing"
+        },
+        "content": {
+            "ar": "قواعد الإعراب الأساسية",
+            "en": "Basic parsing rules"
+        },
+        "subject": {
+            "ar": "لغة عربية",
+            "en": "Arabic Language"
+        },
+        "grade": "5",
+        "fileType": "pdf",
+        "fileUrl": "https://example.com/grade5-parsing.pdf",
+        "fileSize": "2.0 MB",
+        "uploadDate": "2026-01-25T10:00:00Z",
+        "description": {
+            "ar": "شرح مفصل للإعراب مع أمثلة وتمارين",
+            "en": "Detailed explanation of parsing with examples and exercises"
+        },
+        "type": "material"
+    },
+    {
+        "id": "mat-5-2",
+        "title": {
+            "ar": "العلوم - النباتات",
+            "en": "Science - Plants"
+        },
+        "content": {
+            "ar": "دورة حياة النباتات وأجزاؤها",
+            "en": "Plant life cycle and parts"
+        },
+        "subject": {
+            "ar": "علوم",
+            "en": "Science"
+        },
+        "grade": "5",
+        "fileType": "pdf",
+        "fileUrl": "https://example.com/grade5-plants.pdf",
+        "fileSize": "1.9 MB",
+        "uploadDate": "2026-01-26T11:00:00Z",
+        "description": {
+            "ar": "دراسة النباتات وعملية التمثيل الضوئي",
+            "en": "Study of plants and photosynthesis process"
+        },
+        "type": "material"
+    },
+    {
+        "id": "mat-6-1",
+        "title": {
+            "ar": "الرياضيات - الهندسة",
+            "en": "Mathematics - Geometry"
+        },
+        "content": {
+            "ar": "الأشكال الهندسية والمساحات",
+            "en": "Geometric shapes and areas"
+        },
+        "subject": {
+            "ar": "رياضيات",
+            "en": "Mathematics"
+        },
+        "grade": "6",
+        "fileType": "pdf",
+        "fileUrl": "https://example.com/grade6-geometry.pdf",
+        "fileSize": "2.3 MB",
+        "uploadDate": "2026-01-27T09:30:00Z",
+        "description": {
+            "ar": "حساب مساحات ومحيطات الأشكال الهندسية",
+            "en": "Calculating areas and perimeters of geometric shapes"
+        },
+        "type": "material"
+    },
+    {
+        "id": "mat-6-2",
+        "title": {
+            "ar": "التربية الإسلامية - السيرة النبوية",
+            "en": "Islamic Education - Prophet's Biography"
+        },
+        "content": {
+            "ar": "قصص من حياة الرسول صلى الله عليه وسلم",
+            "en": "Stories from the life of Prophet Muhammad (PBUH)"
+        },
+        "subject": {
+            "ar": "تربية إسلامية",
+            "en": "Islamic Education"
+        },
+        "grade": "6",
+        "fileType": "pdf",
+        "fileUrl": "https://example.com/grade6-seerah.pdf",
+        "fileSize": "1.7 MB",
+        "uploadDate": "2026-01-27T14:00:00Z",
+        "description": {
+            "ar": "مواقف تربوية من السيرة النبوية الشريفة",
+            "en": "Educational lessons from the Prophet's biography"
+        },
         "type": "material"
     }
 ]

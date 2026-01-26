@@ -1,65 +1,296 @@
 [
     {
-        "id": "hw-1",
+        "id": "hw-kg-1",
         "title": {
-            "ar": "واجب الرياضيات - الجبر",
-            "en": "Math Homework - Algebra"
+            "ar": "واجب التلوين",
+            "en": "Coloring Homework"
         },
         "content": {
-            "ar": "حل المعادلات من 1 إلى 20 في الكتاب المدرسي",
-            "en": "Solve equations 1 to 20 from the textbook"
+            "ar": "لون الصورة بألوان جميلة",
+            "en": "Color the picture with beautiful colors"
+        },
+        "subject": {
+            "ar": "فنون",
+            "en": "Arts"
+        },
+        "grade": "KG",
+        "dueDate": "2026-02-05T23:59:59Z",
+        "createdAt": "2026-01-27T10:00:00Z",
+        "type": "homework",
+        "allowFileSubmission": true,
+        "allowTextSubmission": false
+    },
+    {
+        "id": "hw-kg-2",
+        "title": {
+            "ar": "واجب الأرقام",
+            "en": "Numbers Homework"
+        },
+        "content": {
+            "ar": "اكتب الأرقام من 1 إلى 5",
+            "en": "Write numbers from 1 to 5"
         },
         "subject": {
             "ar": "رياضيات",
             "en": "Mathematics"
         },
-        "grade": "10",
-        "dueDate": "2026-01-30T23:59:59Z",
-        "createdAt": "2026-01-20T10:00:00Z",
+        "grade": "KG",
+        "dueDate": "2026-02-07T23:59:59Z",
+        "createdAt": "2026-01-28T09:00:00Z",
         "type": "homework",
         "allowFileSubmission": true,
         "allowTextSubmission": true
     },
     {
-        "id": "hw-2",
+        "id": "hw-1-1",
         "title": {
-            "ar": "واجب اللغة العربية - قراءة",
-            "en": "Arabic Homework - Reading"
+            "ar": "واجب القراءة",
+            "en": "Reading Homework"
         },
         "content": {
-            "ar": "اقرأ النص في الصفحة 45 وأجب على الأسئلة",
-            "en": "Read the text on page 45 and answer the questions"
+            "ar": "اقرأ القصة في الصفحة 10 وأجب على السؤالين",
+            "en": "Read the story on page 10 and answer two questions"
         },
         "subject": {
             "ar": "لغة عربية",
             "en": "Arabic Language"
         },
-        "grade": "9",
-        "dueDate": "2026-01-28T23:59:59Z",
-        "createdAt": "2026-01-22T09:00:00Z",
+        "grade": "1",
+        "dueDate": "2026-02-10T23:59:59Z",
+        "createdAt": "2026-01-29T10:00:00Z",
         "type": "homework",
         "allowFileSubmission": false,
         "allowTextSubmission": true
     },
     {
-        "id": "hw-3",
+        "id": "hw-1-2",
         "title": {
-            "ar": "واجب العلوم - التجربة المعملية",
-            "en": "Science Homework - Lab Experiment"
+            "ar": "واجب الجمع",
+            "en": "Addition Homework"
         },
         "content": {
-            "ar": "اكتب تقرير عن التجربة المعملية التي قمنا بها اليوم",
-            "en": "Write a report about today's lab experiment"
+            "ar": "حل تمارين الجمع من 1 إلى 10",
+            "en": "Solve addition exercises from 1 to 10"
+        },
+        "subject": {
+            "ar": "رياضيات",
+            "en": "Mathematics"
+        },
+        "grade": "1",
+        "dueDate": "2026-02-12T23:59:59Z",
+        "createdAt": "2026-01-30T11:00:00Z",
+        "type": "homework",
+        "allowFileSubmission": true,
+        "allowTextSubmission": true
+    },
+    {
+        "id": "hw-2-1",
+        "title": {
+            "ar": "واجب الإملاء",
+            "en": "Spelling Homework"
+        },
+        "content": {
+            "ar": "اكتب 10 كلمات من درس الإملاء",
+            "en": "Write 10 words from the spelling lesson"
+        },
+        "subject": {
+            "ar": "لغة عربية",
+            "en": "Arabic Language"
+        },
+        "grade": "2",
+        "dueDate": "2026-02-08T23:59:59Z",
+        "createdAt": "2026-01-27T09:00:00Z",
+        "type": "homework",
+        "allowFileSubmission": true,
+        "allowTextSubmission": true
+    },
+    {
+        "id": "hw-2-2",
+        "title": {
+            "ar": "واجب جدول الضرب",
+            "en": "Multiplication Table Homework"
+        },
+        "content": {
+            "ar": "احفظ جدول الضرب للرقم 2 و 3",
+            "en": "Memorize multiplication table for 2 and 3"
+        },
+        "subject": {
+            "ar": "رياضيات",
+            "en": "Mathematics"
+        },
+        "grade": "2",
+        "dueDate": "2026-02-14T23:59:59Z",
+        "createdAt": "2026-01-31T10:00:00Z",
+        "type": "homework",
+        "allowFileSubmission": false,
+        "allowTextSubmission": true
+    },
+    {
+        "id": "hw-3-1",
+        "title": {
+            "ar": "واجب العلوم - جسم الإنسان",
+            "en": "Science Homework - Human Body"
+        },
+        "content": {
+            "ar": "ارسم جسم الإنسان واكتب أسماء 5 أعضاء",
+            "en": "Draw the human body and write names of 5 organs"
         },
         "subject": {
             "ar": "علوم",
             "en": "Science"
         },
-        "grade": "11",
-        "dueDate": "2026-02-05T23:59:59Z",
-        "createdAt": "2026-01-23T14:00:00Z",
+        "grade": "3",
+        "dueDate": "2026-02-11T23:59:59Z",
+        "createdAt": "2026-01-28T11:00:00Z",
         "type": "homework",
         "allowFileSubmission": true,
+        "allowTextSubmission": false
+    },
+    {
+        "id": "hw-3-2",
+        "title": {
+            "ar": "واجب الإنجليزي",
+            "en": "English Homework"
+        },
+        "content": {
+            "ar": "اكتب 20 كلمة إنجليزية مع الترجمة",
+            "en": "Write 20 English words with translation"
+        },
+        "subject": {
+            "ar": "لغة إنجليزية",
+            "en": "English Language"
+        },
+        "grade": "3",
+        "dueDate": "2026-02-13T23:59:59Z",
+        "createdAt": "2026-01-29T09:30:00Z",
+        "type": "homework",
+        "allowFileSubmission": true,
+        "allowTextSubmission": true
+    },
+    {
+        "id": "hw-4-1",
+        "title": {
+            "ar": "واجب الكسور",
+            "en": "Fractions Homework"
+        },
+        "content": {
+            "ar": "حل مسائل الكسور من 1 إلى 15",
+            "en": "Solve fractions problems from 1 to 15"
+        },
+        "subject": {
+            "ar": "رياضيات",
+            "en": "Mathematics"
+        },
+        "grade": "4",
+        "dueDate": "2026-02-09T23:59:59Z",
+        "createdAt": "2026-01-26T10:00:00Z",
+        "type": "homework",
+        "allowFileSubmission": true,
+        "allowTextSubmission": true
+    },
+    {
+        "id": "hw-4-2",
+        "title": {
+            "ar": "واجب التاريخ",
+            "en": "History Homework"
+        },
+        "content": {
+            "ar": "اكتب فقرة عن الحضارة الفرعونية",
+            "en": "Write a paragraph about Pharaonic civilization"
+        },
+        "subject": {
+            "ar": "تاريخ",
+            "en": "History"
+        },
+        "grade": "4",
+        "dueDate": "2026-02-15T23:59:59Z",
+        "createdAt": "2026-01-30T14:00:00Z",
+        "type": "homework",
+        "allowFileSubmission": false,
+        "allowTextSubmission": true
+    },
+    {
+        "id": "hw-5-1",
+        "title": {
+            "ar": "واجب الإعراب",
+            "en": "Parsing Homework"
+        },
+        "content": {
+            "ar": "أعرب الجمل من 1 إلى 10",
+            "en": "Parse sentences from 1 to 10"
+        },
+        "subject": {
+            "ar": "لغة عربية",
+            "en": "Arabic Language"
+        },
+        "grade": "5",
+        "dueDate": "2026-02-06T23:59:59Z",
+        "createdAt": "2026-01-25T10:00:00Z",
+        "type": "homework",
+        "allowFileSubmission": true,
+        "allowTextSubmission": true
+    },
+    {
+        "id": "hw-5-2",
+        "title": {
+            "ar": "واجب النباتات",
+            "en": "Plants Homework"
+        },
+        "content": {
+            "ar": "ارسم دورة حياة النبات واشرح كل مرحلة",
+            "en": "Draw the plant life cycle and explain each stage"
+        },
+        "subject": {
+            "ar": "علوم",
+            "en": "Science"
+        },
+        "grade": "5",
+        "dueDate": "2026-02-16T23:59:59Z",
+        "createdAt": "2026-01-31T11:00:00Z",
+        "type": "homework",
+        "allowFileSubmission": true,
+        "allowTextSubmission": true
+    },
+    {
+        "id": "hw-6-1",
+        "title": {
+            "ar": "واجب الهندسة",
+            "en": "Geometry Homework"
+        },
+        "content": {
+            "ar": "احسب مساحة ومحيط الأشكال الهندسية في الورقة",
+            "en": "Calculate area and perimeter of geometric shapes on the sheet"
+        },
+        "subject": {
+            "ar": "رياضيات",
+            "en": "Mathematics"
+        },
+        "grade": "6",
+        "dueDate": "2026-02-10T23:59:59Z",
+        "createdAt": "2026-01-27T09:30:00Z",
+        "type": "homework",
+        "allowFileSubmission": true,
+        "allowTextSubmission": true
+    },
+    {
+        "id": "hw-6-2",
+        "title": {
+            "ar": "واجب السيرة النبوية",
+            "en": "Prophet's Biography Homework"
+        },
+        "content": {
+            "ar": "اكتب عن موقف تعلمت منه من حياة الرسول صلى الله عليه وسلم",
+            "en": "Write about a lesson you learned from the Prophet's life (PBUH)"
+        },
+        "subject": {
+            "ar": "تربية إسلامية",
+            "en": "Islamic Education"
+        },
+        "grade": "6",
+        "dueDate": "2026-02-17T23:59:59Z",
+        "createdAt": "2026-02-01T14:00:00Z",
+        "type": "homework",
+        "allowFileSubmission": false,
         "allowTextSubmission": true
     }
 ]
