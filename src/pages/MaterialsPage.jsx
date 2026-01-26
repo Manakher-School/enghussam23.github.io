@@ -125,11 +125,27 @@ function MaterialsPage() {
       <Grid container spacing={3}>
         {filteredMaterials.length === 0 ? (
           <Grid item xs={12}>
-            <Typography variant="body1" color="text.secondary" textAlign="center">
-              {searchQuery || subjectFilter !== 'all' 
-                ? t('search.noResults') 
-                : t('common.loading')}
-            </Typography>
+            <Box 
+              textAlign="center" 
+              py={8}
+              sx={{
+                background: 'linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%)',
+                borderRadius: 4,
+                border: '2px dashed #81C784',
+              }}
+            >
+              <Typography variant="h3" sx={{ fontSize: '4rem', mb: 2 }}>🌸</Typography>
+              <Typography variant="h5" color="primary" gutterBottom fontWeight={600}>
+                {searchQuery || subjectFilter !== 'all' 
+                  ? t('search.noResults')
+                  : 'حديقة المعرفة في انتظارك! 🌱'}
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                {searchQuery || subjectFilter !== 'all'
+                  ? 'جرب البحث بكلمات مختلفة'
+                  : 'ستجد هنا قريباً الكثير من المصادر التعليمية الرائعة'}
+              </Typography>
+            </Box>
           </Grid>
         ) : (
           filteredMaterials.map(material => (

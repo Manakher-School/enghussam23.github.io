@@ -9,26 +9,36 @@ import {
   TextField,
   Box,
   Collapse,
-  IconButton
+  IconButton,
+  Rating
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import StarIcon from '@mui/icons-material/Star';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../context/DataContext';
+import { getSubjectColor } from '../theme/theme';
+import Confetti from './Confetti';
 
 function HomeworkCard({ homework }) {
   const { t, i18n } = useTranslation();
-  const { submitHomework, userSubmissions } = useData();
+  const { submitHomework, rateHomework, userSubmissions } = useData();
   const [expanded, setExpanded] = useState(false);
   const [submissionText, setSubmissionText] = useState('');
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const currentLang = i18n.language;
   const submission = userSubmissions.find(s => s.homeworkId === homework.id);
   const isSubmitted = !!submission;
 
   const handleSubmit = () => {
-    submitHomework(homework.id, submissionText);
+    submitHomework(homework.id, { text: submissionText });
     setSubmissionText('');
     setExpanded(false);
+    setShowConfetti(true);
+  };
+
+  const handleStarChange = (newValue) => {
+    rateHomework(homework.id, newValue);
   };
 
   const getStatusColor = () => {
@@ -43,8 +53,31 @@ function HomeworkCard({ homework }) {
     return t('homework.submitted');
   };
 
+  const subjectColor = getSubjectColor(homework.subject[currentLang]);
+
   return (
-    <Card elevation={2}>
+    <>
+      <Confetti active={showConfetti} onComplete={() => setShowConfetti(false)} />
+      <Card 
+      elevation={2}
+      sx={{
+        borderTop: `4px solid ${subjectColor.main}`,
+        position: 'relative',
+        overflow: 'visible',
+        '&::before': {
+          content: `"${subjectColor.emoji}"`,
+          position: 'absolute',
+          top: -12,
+          right: 16,
+          fontSize: '2rem',
+          background: '#fff',
+          borderRadius: '50%',
+          padding: '4px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          animation: 'float 3s ease-in-out infinite',
+        }
+      }}
+    >
       <CardContent>
         <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
           <Typography variant="h6" component="h3">
@@ -70,6 +103,21 @@ function HomeworkCard({ homework }) {
             <Typography variant="body2">
               {t('homework.grade')}: <strong>{submission.grade}</strong>
             </Typography>
+          </Box>
+        )}
+
+        {isSubmitted && (
+          <Box mt={2} textAlign="center">
+            <Typography variant="caption" display="block" mb={1} color="text.secondary">
+              قيّم عملك ⭐
+            </Typography>
+            <Rating
+              value={submission?.stars || 0}
+              onChange={(_, newValue) => handleStarChange(newValue)}
+              size="large"
+              icon={<StarIcon fontSize="inherit" sx={{ color: '#FFB300' }} />}
+              emptyIcon={<StarIcon fontSize="inherit" sx={{ color: '#E0E0E0' }} />}
+            />
           </Box>
         )}
       </CardContent>
@@ -114,6 +162,7 @@ function HomeworkCard({ homework }) {
         </CardContent>
       </Collapse>
     </Card>
+    </>
   );
 }
 

@@ -15,6 +15,7 @@ import {
 import { School as SchoolIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useGrade } from '../context/GradeContext';
+import { getGradeBadge } from '../theme/theme';
 
 const GradeSelectionDialog = () => {
   const { t, i18n } = useTranslation();

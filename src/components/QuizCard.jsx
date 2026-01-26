@@ -20,6 +20,8 @@ import {
 import QuizIcon from '@mui/icons-material/Quiz';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../context/DataContext';
+import { getSubjectColor } from '../theme/theme';
+import Confetti from './Confetti';
 
 function QuizCard({ quiz }) {
   const { t, i18n } = useTranslation();
@@ -28,6 +30,7 @@ function QuizCard({ quiz }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [timeLeft, setTimeLeft] = useState(quiz.timeLimit * 60); // Convert minutes to seconds
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const currentLang = i18n.language;
   const attempt = quizAttempts.find(a => a.quizId === quiz.id);
@@ -63,6 +66,7 @@ function QuizCard({ quiz }) {
   const handleSubmitQuiz = () => {
     submitQuiz(quiz.id, answers);
     setDialogOpen(false);
+    setShowConfetti(true);
   };
 
   const formatTime = (seconds) => {
@@ -71,9 +75,31 @@ function QuizCard({ quiz }) {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const subjectColor = getSubjectColor(quiz.subject[currentLang]);
+
   return (
     <>
-      <Card elevation={2}>
+      <Confetti active={showConfetti} onComplete={() => setShowConfetti(false)} />
+      <Card 
+        elevation={2}
+        sx={{
+          borderTop: `4px solid ${subjectColor.main}`,
+          position: 'relative',
+          overflow: 'visible',
+          '&::before': {
+            content: `"${subjectColor.emoji}"`,
+            position: 'absolute',
+            top: -12,
+            right: 16,
+            fontSize: '2rem',
+            background: '#fff',
+            borderRadius: '50%',
+            padding: '4px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            animation: 'float 3s ease-in-out infinite',
+          }
+        }}
+      >
         <CardContent>
           <Box display="flex" alignItems="center" gap={1} mb={2}>
             <QuizIcon color="primary" />
@@ -147,12 +173,43 @@ function QuizCard({ quiz }) {
         </DialogTitle>
 
         <DialogContent>
-          <LinearProgress variant="determinate" value={progress} sx={{ mb: 3 }} />
+          {/* Vine Progress */}
+          <Box mb={3}>
+            <Box display="flex" justifyContent="space-between" mb={1}>
+              <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                🌱 {t('common.question')} {currentQuestionIndex + 1} {t('common.of')} {totalQuestions}
+              </Typography>
+            </Box>
+            <Box 
+              sx={{ 
+                height: 12, 
+                background: '#E8F5E9',
+                borderRadius: 10,
+                overflow: 'hidden',
+                position: 'relative',
+                border: '2px solid #81C784',
+              }}
+            >
+              <Box
+                sx={{
+                  width: `${progress}%`,
+                  height: '100%',
+                  background: 'linear-gradient(90deg, #4CAF50 0%, #66BB6A 50%, #81C784 100%)',
+                  transition: 'width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  borderRadius: 10,
+                  position: 'relative',
+                  '&::after': {
+                    content: '"🌿"',
+                    position: 'absolute',
+                    right: -8,
+                    top: -12,
+                    fontSize: '1.5rem',
+                  }
+                }}
+              />
+            </Box>
+          </Box>
           
-          <Typography variant="subtitle1" gutterBottom>
-            {t('common.question')} {currentQuestionIndex + 1} {t('common.of')} {totalQuestions}
-          </Typography>
-
           <Typography variant="h6" paragraph>
             {currentQuestion.question[currentLang]}
           </Typography>

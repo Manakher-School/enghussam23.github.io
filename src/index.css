@@ -5,10 +5,49 @@
 }
 
 body {
-    font-family: 'Roboto', 'Cairo', sans-serif;
+    font-family: 'Nunito', 'Cairo', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #f5f5f5;
+    background: linear-gradient(to bottom,
+            #E3F2FD 0%,
+            #E8F5E9 20%,
+            #F1F8E9 80%,
+            #C8E6C9 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Floating leaves animation */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(circle at 10% 20%, rgba(76, 175, 80, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(129, 199, 132, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(165, 214, 167, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Grass at bottom */
+body::after {
+    content: '';
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: linear-gradient(to top,
+            rgba(76, 175, 80, 0.15) 0%,
+            transparent 100%);
+    pointer-events: none;
+    z-index: 0;
 }
 
 [dir="rtl"] {
@@ -26,14 +65,65 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: #E8F5E9;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
+    background: #81C784;
+    border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: #4CAF50;
+}
+
+/* Checkbox animations */
+@keyframes checkboxPop {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.3);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Wiggle animation for buttons */
+@keyframes wiggle {
+
+    0%,
+    100% {
+        transform: translateY(-2px) scale(1.05) rotate(0deg);
+    }
+
+    25% {
+        transform: translateY(-2px) scale(1.05) rotate(-2deg);
+    }
+
+    75% {
+        transform: translateY(-2px) scale(1.05) rotate(2deg);
+    }
+}
+
+/* Floating animation */
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Ensure content is above background */
+#root {
+    position: relative;
+    z-index: 1;
 }

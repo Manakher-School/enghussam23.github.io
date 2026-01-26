@@ -10,6 +10,7 @@ import {
 import DownloadIcon from '@mui/icons-material/Download';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useTranslation } from 'react-i18next';
+import { getSubjectColor } from '../theme/theme';
 
 function MaterialCard({ material }) {
   const { t, i18n } = useTranslation();
@@ -35,8 +36,32 @@ function MaterialCard({ material }) {
     return colors[type] || 'default';
   };
 
+  const subjectColor = getSubjectColor(material.subject[currentLang]);
+
   return (
-    <Card elevation={2} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Card 
+      elevation={2} 
+      sx={{ 
+        height: '100%', 
+        display: 'flex', 
+        flexDirection: 'column',
+        borderTop: `4px solid ${subjectColor.main}`,
+        position: 'relative',
+        overflow: 'visible',
+        '&::before': {
+          content: `"${subjectColor.emoji}"`,
+          position: 'absolute',
+          top: -12,
+          right: 16,
+          fontSize: '2rem',
+          background: '#fff',
+          borderRadius: '50%',
+          padding: '4px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          animation: 'float 3s ease-in-out infinite',
+        }
+      }}
+    >
       <CardContent sx={{ flexGrow: 1 }}>
         <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
           <Typography variant="h6" component="h3">
@@ -59,7 +84,11 @@ function MaterialCard({ material }) {
           <Chip 
             label={material.subject[currentLang]} 
             size="small" 
-            variant="outlined"
+            sx={{
+              backgroundColor: subjectColor.light,
+              color: '#fff',
+              fontWeight: 600,
+            }}
           />
           <Chip 
             label={`${t('materials.grade')}: ${material.grade}`} 

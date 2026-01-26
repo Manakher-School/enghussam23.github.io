@@ -73,9 +73,23 @@ function ActivitiesPage() {
         <Grid container spacing={3}>
           {filteredHomework.length === 0 ? (
             <Grid item xs={12}>
-              <Typography variant="body1" color="text.secondary" textAlign="center">
-                {searchQuery ? t('search.noResults') : t('common.loading')}
-              </Typography>
+              <Box 
+                textAlign="center" 
+                py={8}
+                sx={{
+                  background: 'linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%)',
+                  borderRadius: 4,
+                  border: '2px dashed #81C784',
+                }}
+              >
+                <Typography variant="h3" sx={{ fontSize: '4rem', mb: 2 }}>🎉</Typography>
+                <Typography variant="h5" color="primary" gutterBottom fontWeight={600}>
+                  {searchQuery ? t('search.noResults') : 'لا واجبات اليوم!'}
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  {searchQuery ? 'جرب البحث بكلمات مختلفة' : 'وقت اللعب والمرح! 🎮'}
+                </Typography>
+              </Box>
             </Grid>
           ) : (
             filteredHomework.map(item => (
@@ -92,9 +106,23 @@ function ActivitiesPage() {
         <Grid container spacing={3}>
           {filteredQuizzes.length === 0 ? (
             <Grid item xs={12}>
-              <Typography variant="body1" color="text.secondary" textAlign="center">
-                {searchQuery ? t('search.noResults') : t('common.loading')}
-              </Typography>
+              <Box 
+                textAlign="center" 
+                py={8}
+                sx={{
+                  background: 'linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%)',
+                  borderRadius: 4,
+                  border: '2px dashed #81C784',
+                }}
+              >
+                <Typography variant="h3" sx={{ fontSize: '4rem', mb: 2 }}>⭐</Typography>
+                <Typography variant="h5" color="primary" gutterBottom fontWeight={600}>
+                  {searchQuery ? t('search.noResults') : 'لا اختبارات الآن!'}
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  {searchQuery ? 'جرب البحث بكلمات مختلفة' : 'استمتع بيومك! ستكون هناك اختبارات قريباً 📝'}
+                </Typography>
+              </Box>
             </Grid>
           ) : (
             filteredQuizzes.map(item => (

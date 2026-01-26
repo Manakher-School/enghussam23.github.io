@@ -54,6 +54,19 @@ export default function DataProvider({ children }) {
         ...submission,
         submittedAt: new Date().toISOString(),
         status: 'submitted',
+        stars: submission.stars || 0,
+      },
+    };
+    setSubmissions(newSubmissions);
+    await localforage.setItem('submissions', newSubmissions);
+  };
+
+  const rateHomework = async (homeworkId, stars) => {
+    const newSubmissions = {
+      ...submissions,
+      [homeworkId]: {
+        ...submissions[homeworkId],
+        stars,
       },
     };
     setSubmissions(newSubmissions);
@@ -125,6 +138,7 @@ export default function DataProvider({ children }) {
         quizAttempts: Object.values(quizAttempts),
         loading,
         submitHomework,
+        rateHomework,
         addComment,
         submitQuiz,
         searchContent,

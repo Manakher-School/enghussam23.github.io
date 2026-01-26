@@ -24,6 +24,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useGrade } from '../context/GradeContext';
+import { getGradeBadge } from '../theme/theme';
 import HomePage from '../pages/HomePage';
 import ExamsPage from '../pages/ExamsPage';
 import MaterialsPage from '../pages/MaterialsPage';
@@ -42,6 +43,8 @@ const MainLayout = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   if (!gradeSelection) return null;
+
+  const gradeBadge = getGradeBadge(gradeSelection.grade);
 
   const navigationItems = [
     { key: 'home', label: t('nav.home') },
@@ -148,10 +151,15 @@ const MainLayout = () => {
               sx={{ 
                 border: '1px solid rgba(255,255,255,0.5)',
                 borderRadius: 2,
-                px: 2
+                px: 2,
               }}
             >
-              {gradeSelection.grade} - {gradeSelection.section}
+              <Box display="flex" alignItems="center" gap={0.5}>
+                <span style={{ fontSize: '1.2rem' }}>{gradeBadge.emoji}</span>
+                <Typography variant="body2">
+                  {gradeSelection.grade} - {gradeSelection.section}
+                </Typography>
+              </Box>
             </Button>
 
             {/* Mobile Menu Icon */}
