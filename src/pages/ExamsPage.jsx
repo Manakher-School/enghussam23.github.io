@@ -41,7 +41,7 @@ function ExamsPage() {
   }
 
   return (
-    <Box>
+    <Box padding={4}>
       <Typography variant="h3" component="h1" gutterBottom>
         {t('pages.exams.title')}
       </Typography>
@@ -53,17 +53,14 @@ function ExamsPage() {
         <Table>
           <TableHead>
             <TableRow sx={{ backgroundColor: 'primary.main' }}>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>
+              <TableCell sx={{ color: 'white', fontWeight: 'bold' , textAlign:"center"}}>
                 {t('pages.exams.columns.title')}
               </TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>
+              <TableCell sx={{ color: 'white', fontWeight: 'bold' , textAlign:"center"}}>
                 {t('pages.exams.columns.duration')}
               </TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>
+              <TableCell sx={{ color: 'white', fontWeight: 'bold' , textAlign:"center"}}>
                 {t('pages.exams.columns.status')}
-              </TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>
-                {t('pages.exams.columns.action')}
               </TableCell>
             </TableRow>
           </TableHead>

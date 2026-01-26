@@ -2,16 +2,16 @@
 
 ## Project Overview
 
-This is a **React web application** (`enghussam23.github.io`) built with **Vite** and **Material-UI (MUI)**, serving as an educational platform for students (KG–11 & Tawjihi). The app is deployed on GitHub Pages.
+This is a **React web application** (`enghussam23.github.io`) built with **Vite** and **Material-UI (MUI)**, serving as an educational platform for Al-Manakhir Basic School (مدرسة المناخر الأساسية) - students (KG–11 & Tawjihi). The app is deployed on GitHub Pages with a professional desktop-first design.
 
 ## Architecture & Technology Stack
 
 - **Framework**: React 18.3.1 (Web only, NOT React Native)
-- **Build Tool**: Vite 5.1.0
-- **UI Library**: Material-UI (MUI) 5.15.10
-- **Routing**: React Router DOM 6.22.0
+- **Build Tool**: Vite 5.4.21
+- **UI Library**: Material-UI (MUI) 5.18.0
+- **Routing**: React Router DOM 6.30.3
 - **State Management**: React Context API
-- **i18n**: react-i18next 24.2.0 (Arabic primary, English secondary)
+- **i18n**: react-i18next 15.7.4 / i18next 24.2.3 (Arabic primary, English secondary)
 - **Storage**: localforage 1.10.0 (IndexedDB/localStorage wrapper)
 - **Deployment**: GitHub Pages (static build from `/docs/` folder)
 - **Data**: Local mock data (JSON structures in `/src/data/`)
@@ -24,6 +24,10 @@ This is a **React web application** (`enghussam23.github.io`) built with **Vite*
 ├── vite.config.js              # Vite configuration
 ├── package.json                # Dependencies
 ├── docs/                       # GitHub Pages build output
+├── public/
+│   └── images/
+│       ├── hero/               # Hero carousel images (3 images)
+│       └── ...                 # Other assets
 ├── src/
 │   ├── main.jsx                # React entry point
 │   ├── App.jsx                 # Root component with providers
@@ -34,19 +38,26 @@ This is a **React web application** (`enghussam23.github.io`) built with **Vite*
 │   │   └── DataContext.jsx     # Content data & filtering
 │   ├── components/
 │   │   ├── GradeSelectionDialog.jsx  # First-visit grade selector
-│   │   ├── MainLayout.jsx            # App shell with MUI AppBar & Tabs
+│   │   ├── MainLayout.jsx            # App shell with horizontal navbar
 │   │   ├── HomeworkTab.jsx           # Homework list view
 │   │   ├── MaterialsTab.jsx          # Materials list view
-│   │   ├── NewsTab.jsx               # News list view
 │   │   ├── HomeworkCard.jsx          # Homework display card
 │   │   ├── QuizCard.jsx              # Quiz display card
 │   │   ├── MaterialCard.jsx          # Material display card
-│   │   └── NewsCard.jsx              # News with comments
+│   │   └── NewsCard.jsx              # News with images & comments
+│   ├── pages/
+│   │   ├── HomePage.jsx        # Hero carousel + news feed
+│   │   ├── ExamsPage.jsx       # Exam schedule table
+│   │   ├── VisionPage.jsx      # School vision & mission
+│   │   └── AboutPage.jsx       # School information
 │   ├── data/
 │   │   ├── homework.json       # Mock homework data
 │   │   ├── materials.json      # Mock materials data
 │   │   ├── news.json           # Mock news data
-│   │   └── quizzes.json        # Mock quizzes data
+│   │   ├── quizzes.json        # Mock quizzes data
+│   │   ├── exams.json          # Exam schedule data
+│   │   ├── vision.json         # Vision & mission data
+│   │   └── about.json          # School info data
 │   ├── locales/
 │   │   ├── ar.json             # Arabic translations
 │   │   └── en.json             # English translations
@@ -84,9 +95,17 @@ All mock data follows consistent schema:
 ### Navigation
 
 - Single-page app with React Router DOM
-- Main navigation: MUI Tabs (Homework, Materials, News)
+- Main navigation: MUI horizontal navbar with 6 items (Home, Exams, Materials, Activities, Vision, About)
 - Quizzes integrated into Homework tab
 - Grade selection dialog on first visit
+
+### Hero Section
+
+- Full-width carousel at top of homepage
+- Auto-rotates through 3 images every 5 seconds from `/public/images/hero/`
+- Smooth fade transitions
+- Animated scroll-down arrow at bottom
+- Images: students_queue.png, students_breakfast.png, students_class_activity_01.png
 
 ### Internationalization
 
@@ -235,18 +254,18 @@ npm run deploy
 ### Responsive Design
 
 ```jsx
-import { Box, Grid, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Grid, useMediaQuery, useTheme } from "@mui/material";
 
 // Use breakpoints
 <Grid container spacing={3}>
   <Grid item xs={12} md={6} lg={4}>
     {/* Content */}
   </Grid>
-</Grid>
+</Grid>;
 
 // Use useMediaQuery hook
 const theme = useTheme();
-const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 ```
 
 ### Common MUI Components Used
@@ -266,16 +285,16 @@ const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 Located in `src/theme/theme.js`:
 
 ```js
-import { createTheme } from '@mui/material/styles';
+import { createTheme } from "@mui/material/styles";
 
 const theme = createTheme({
-  direction: 'rtl', // or 'ltr'
+  direction: "rtl", // or 'ltr'
   palette: {
-    primary: { main: '#2196F3' },
+    primary: { main: "#2196F3" },
     // ...
   },
   typography: {
-    fontFamily: 'Cairo, Roboto, Arial, sans-serif',
+    fontFamily: "Cairo, Roboto, Arial, sans-serif",
   },
 });
 ```
@@ -300,18 +319,22 @@ const theme = createTheme({
 ## Troubleshooting
 
 ### Vite not starting
+
 - Check Node.js version (18+)
 - Delete `node_modules` and `package-lock.json`, run `npm install`
 
 ### MUI components not rendering
+
 - Ensure `@emotion/react` and `@emotion/styled` are installed
 - Check ThemeProvider wraps app in `App.jsx`
 
 ### RTL not working
+
 - Verify theme direction is set based on i18n language
 - Use MUI's RTL support, don't manually flip CSS
 
 ### Build fails
+
 - Check all imports resolve correctly
 - Ensure no server-side only code (e.g., Node.js fs module)
 
@@ -327,4 +350,3 @@ const theme = createTheme({
 8. Add error boundary components
 9. Implement proper loading states
 10. Add unit tests with Vitest
-

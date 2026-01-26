@@ -1,29 +1,39 @@
 # School Educational Platform 🎓
 
-A responsive educational platform for students (KG–11 & Tawjihi) built with React, Material-UI, and Vite. Features homework management, educational materials, news/announcements, quizzes, and bilingual support (Arabic/English).
+A modern, responsive educational website for Al-Manakhir Basic School (مدرسة المناخر الأساسية) serving students from KG to 11th grade and Tawjihi. Built with React, Material-UI, and Vite, featuring a professional desktop-first design with full bilingual support (Arabic/English).
 
 **Live Demo:** [https://enghussam23.github.io/](https://enghussam23.github.io/)
 
 ## ✨ Features
 
+### User Experience
+- **Full-Screen Hero Section**: Dynamic carousel showcasing school activities with 3 rotating images
+- **Professional Navigation**: Horizontal navbar with 6 main sections (Home, Exams, Materials, Activities, Vision, About)
 - **Grade & Section Selection**: Students select their grade and section on first visit
+- **Responsive Design**: Desktop-first layout that adapts to tablets and mobile devices
+
+### Educational Features
 - **Homework Management**: View assignments, submit homework, and track grades
 - **Educational Materials**: Browse and download PDFs, DOCX files filtered by subject
-- **News & Announcements**: Read updates with public commenting system
+- **Exam Schedule**: View exam timetables with date, time, and subject details
+- **News & Announcements**: Read updates with images and public commenting system
 - **Quizzes**: Take timed multiple-choice quizzes with automatic grading
-- **Bilingual Support**: Full Arabic (RTL) and English (LTR) support
+
+### Technical Features
+- **Bilingual Support**: Full Arabic (RTL) and English (LTR) support with language toggle
 - **Offline Support**: Content cached for offline viewing using localforage
-- **Responsive Design**: Works on desktop, tablet, and mobile devices
+- **Fast Refresh**: Optimized for development with Vite HMR
+- **Image Carousel**: Auto-rotating hero images with smooth transitions
 
 ## 🛠️ Technology Stack
 
-- **Framework**: React 18.3.1
-- **UI Library**: Material-UI (MUI) 5.15.10
-- **Build Tool**: Vite 5.1.0
-- **Routing**: React Router DOM 6.22.0
-- **i18n**: react-i18next 24.2.0
+- **Framework**: React 18.3.1 (Web only - NOT React Native)
+- **UI Library**: Material-UI (MUI) 5.18.0
+- **Build Tool**: Vite 5.4.21
+- **Routing**: React Router DOM 6.30.3
+- **i18n**: react-i18next 15.7.4 / i18next 24.2.3
 - **Storage**: localforage 1.10.0
-- **Deployment**: GitHub Pages
+- **Deployment**: GitHub Pages (via `/docs/` folder)
 
 ## 🚀 Getting Started
 
@@ -36,7 +46,7 @@ npm install
 npm run dev
 \`\`\`
 
-The app will be available at http://localhost:5173/
+The app will be available at `http://localhost:5173/`
 
 ### Available Scripts
 - \`npm run dev\` - Start Vite dev server
@@ -44,25 +54,93 @@ The app will be available at http://localhost:5173/
 - \`npm run preview\` - Preview production build
 - \`npm run deploy\` - Build and deploy to GitHub Pages
 
+## 📁 Project Structure
+
+\`\`\`
+/
+├── src/
+│   ├── components/          # Reusable UI components
+│   │   ├── MainLayout.jsx   # App shell with navbar
+│   │   ├── NewsCard.jsx     # News display with images
+│   │   ├── HomeworkCard.jsx # Homework submissions
+│   │   └── ...
+│   ├── pages/              # Main page components
+│   │   ├── HomePage.jsx    # Hero + news feed
+│   │   ├── ExamsPage.jsx   # Exam schedule
+│   │   ├── VisionPage.jsx  # School vision & mission
+│   │   └── AboutPage.jsx   # School information
+│   ├── context/            # React Context providers
+│   │   ├── DataContext.jsx # Content & user data
+│   │   └── GradeContext.jsx # Grade selection
+│   ├── data/               # Mock JSON data
+│   │   ├── news.json
+│   │   ├── materials.json
+│   │   ├── homework.json
+│   │   └── quizzes.json
+│   └── locales/            # Translation files
+│       ├── ar.json         # Arabic
+│       └── en.json         # English
+├── public/
+│   └── images/
+│       ├── hero/           # Carousel images
+│       └── ...             # Other assets
+└── docs/                   # GitHub Pages build output
+\`\`\`
+
+## 🎨 Key Pages
+
+1. **Home**: Full-screen hero carousel + news feed
+2. **Exams**: Table view of upcoming exams
+3. **Materials**: Filterable educational resources
+4. **Activities**: School activities and events
+5. **Vision**: School mission, vision, and values
+6. **About**: School information and contact
+
 ## 📊 Data Structure
 
-All content follows a consistent bilingual schema with grade filtering.
+All content follows a consistent bilingual schema:
+
+\`\`\`json
+{
+  "id": "unique-id",
+  "title": { "ar": "العنوان", "en": "Title" },
+  "content": { "ar": "المحتوى", "en": "Content" },
+  "date": "ISO 8601 timestamp",
+  "grade": "Grade 10"
+}
+\`\`\`
 
 ## 🌍 Internationalization
 
-- **Arabic (ar)**: Default, RTL layout
-- **English (en)**: LTR layout
+- **Arabic (ar)**: Default language, RTL layout
+- **English (en)**: Secondary language, LTR layout
+- MUI theme automatically handles RTL/LTR switching
 
 ## 🚢 Deployment
 
 \`\`\`bash
+# Build and deploy to GitHub Pages
 npm run deploy
+
+# Commit the built files
 git add docs/
 git commit -m "Deploy to GitHub Pages"
 git push origin main
 \`\`\`
 
+## 🖼️ Image Management
+
+Hero carousel images are located in `/public/images/hero/`:
+- Auto-rotates every 5 seconds
+- Smooth fade transitions
+- Currently displays: students_queue.png, students_breakfast.png, students_class_activity_01.png
+
 ## 👤 Author
 
 **Eng. Hussam**
 - GitHub: [@enghussam23](https://github.com/enghussam23)
+
+---
+
+**School**: Al-Manakhir Basic School (مدرسة المناخر الأساسية)  
+**Academic Years**: KG – Grade 11 & Tawjihi
