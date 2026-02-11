@@ -79,7 +79,7 @@ function HomePage() {
       </Box>
 
       {/* News Section */}
-      <Container sx={{ mt: 6 }}>
+      <Container sx={{ mt: 6, mb: 6 }}>
         <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
           {t('pages.home.subtitle')}
         </Typography>

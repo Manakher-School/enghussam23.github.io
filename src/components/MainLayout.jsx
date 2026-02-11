@@ -155,7 +155,6 @@ const MainLayout = () => {
               }}
             >
               <Box display="flex" alignItems="center" gap={0.5}>
-                <span style={{ fontSize: '1.2rem' }}>{gradeBadge.emoji}</span>
                 <Typography variant="body2">
                   {gradeSelection.grade} - {gradeSelection.section}
                 </Typography>
