@@ -27,13 +27,24 @@ A modern, responsive educational website for Al-Manakhir Basic School (مدرس�
 
 ## 🛠️ Technology Stack
 
+### Frontend (This Repository)
 - **Framework**: React 18.3.1 (Web only - NOT React Native)
 - **UI Library**: Material-UI (MUI) 5.18.0
 - **Build Tool**: Vite 5.4.21
 - **Routing**: React Router DOM 6.30.3
 - **i18n**: react-i18next 15.7.4 / i18next 24.2.3
-- **Storage**: localforage 1.10.0
+- **State**: React Context API
+- **Storage**: localforage 1.10.0 (offline caching)
 - **Deployment**: GitHub Pages (via `/docs/` folder)
+
+### Backend (Separate Repository)
+- **Database**: PocketBase (All-in-one backend)
+- **Authentication**: PocketBase Auth (built-in)
+- **File Storage**: PocketBase Files
+- **Real-time**: WebSocket support
+- **SDK**: pocketbase 0.26.8
+
+> **Note:** This repository contains frontend code only. The PocketBase backend is maintained in a separate repository.
 
 ## 🚀 Getting Started
 
@@ -84,8 +95,45 @@ The app will be available at `http://localhost:5173/`
 │   └── images/
 │       ├── hero/           # Carousel images
 │       └── ...             # Other assets
-└── docs/                   # GitHub Pages build output
+├── docs/                   # GitHub Pages build output
+└── pb_migrations/          # PocketBase schema migrations
 \`\`\`
+
+## 🔌 Backend Integration
+
+This project uses **PocketBase** as its backend (separate repository).
+
+### API Service Layer
+All backend communication is handled through `src/services/api.js`:
+
+\`\`\`javascript
+import { 
+  fetchHomework, 
+  fetchNews, 
+  submitHomework,
+  getBilingualValue 
+} from './services/api';
+
+// Fetch data
+const homework = await fetchHomework('Grade 10');
+const news = await fetchNews();
+
+// Submit homework
+await submitHomework(homeworkId, studentId, { text: 'Answer...' });
+\`\`\`
+
+### Documentation
+
+**For Backend Team:**
+- **[BACKEND_SETUP_GUIDE.md](BACKEND_SETUP_GUIDE.md)** - 📖 Complete setup instructions (START HERE!)
+- **[BACKEND_CHECKLIST.md](BACKEND_CHECKLIST.md)** - ✅ Quick checklist (print this!)
+- **[POCKETBASE_SCHEMA.md](POCKETBASE_SCHEMA.md)** - 📊 Collections schema reference
+- **[INTEGRATION_TESTING.md](INTEGRATION_TESTING.md)** - 🧪 Test frontend-backend connection
+
+**For Frontend Developers:**
+- **[BACKEND.md](BACKEND.md)** - Backend architecture overview
+- **[POCKETBASE_MIGRATION.md](POCKETBASE_MIGRATION.md)** - Migration from JSON to PocketBase
+- **[API_REFERENCE.md](API_REFERENCE.md)** - API functions quick reference
 
 ## 🎨 Key Pages
 
@@ -98,6 +146,12 @@ The app will be available at `http://localhost:5173/`
 
 ## 📊 Data Structure
 
+### Current State
+- **Development**: Using mock JSON data in `src/data/` (news, homework, materials, quizzes)
+- **Migration in Progress**: Moving to PocketBase backend
+
+### PocketBase Collections
+
 All content follows a consistent bilingual schema:
 
 \`\`\`json
@@ -109,6 +163,18 @@ All content follows a consistent bilingual schema:
   "grade": "Grade 10"
 }
 \`\`\`
+
+**Core Collections:**
+- `users` - Authentication and profiles
+- `activities` - Homework, Quizzes, Exams (unified)
+- `lessons` - Educational materials with attachments
+- `submissions` - Student homework/quiz submissions
+- `news` - Announcements and school news
+- `comments` - Comments on news items
+- `grades` - Grade levels (KG-Tawjihi)
+- `subjects` - Academic subjects
+
+See **[POCKETBASE_SCHEMA.md](POCKETBASE_SCHEMA.md)** for complete schema.
 
 ## 🌍 Internationalization
 

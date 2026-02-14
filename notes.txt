@@ -1,0 +1,8 @@
+### **How to use this:**
+
+1.  **Paste** the block above into your Copilot Chat or IDE.
+2.  Copilot will likely generate a `pb_migrations` file and a `src/services/pocketbase.js` file.
+3.  **Run the migration** (if it gives you a script) or manually create the `news` collection in your PocketBase Admin UI using the fields listed in **Task 1**.
+4.  **Copy the Service Code** into your project.
+
+This prompt solves your "Vocabulary Mismatch" by forcing the code to translate "Activities" into "Homework" before your UI ever sees it, keeping your UI code clean.
