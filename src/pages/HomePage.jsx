@@ -35,7 +35,7 @@ function HomePage() {
         sx={{
           position: 'relative',
           width: '100%',
-          height: 'calc(100vh - 64px)',
+          height: 'calc(60vh)',
           minHeight: '500px',
           backgroundImage: `url(${heroImages[currentImageIndex]})`,
           backgroundSize: 'cover',
@@ -53,10 +53,10 @@ function HomePage() {
             bottom: 30,
             left: '50%',
             transform: 'translateX(-50%)',
-            backgroundColor: 'rgba(33, 150, 243, 0.8)',
+            backgroundColor: 'rgba(76, 175, 80, 0.8)',
             color: 'white',
             '&:hover': {
-                color: 'rgba(33, 150, 243, 1)',
+                color: 'rgba(76, 175, 80, 1)',
               backgroundColor: 'rgba(250, 250, 250, 1)',
             },
             animation: 'bounce 2s infinite',

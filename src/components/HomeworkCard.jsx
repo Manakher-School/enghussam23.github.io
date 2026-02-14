@@ -64,19 +64,6 @@ function HomeworkCard({ homework }) {
         borderTop: `4px solid ${subjectColor.main}`,
         position: 'relative',
         overflow: 'visible',
-        '&::before': {
-          content: `"${subjectColor.emoji}"`,
-          position: 'absolute',
-          top: 8,
-          right: 8,
-          fontSize: '1.8rem',
-          background: 'rgba(255,255,255,0.95)',
-          borderRadius: '50%',
-          padding: '6px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          animation: 'float 3s ease-in-out infinite',
-          zIndex: 1,
-        }
       }}
     >
       <CardContent>
