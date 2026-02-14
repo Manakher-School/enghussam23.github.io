@@ -1,0 +1,5 @@
+Teacher token:
+{"record":{"active":true,"collectionId":"_pb_users_auth_","collectionName":"users","created":"2026-01-31 22:46:11.790Z","email":"teacher@school.com","emailVisibility":false,"id":"vbeata9jtsf6gq2","name":"","role":"teacher","updated":"2026-01-31 22:46:11.790Z","username":"users86938","verified":true},"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0aW9uSWQiOiJfcGJfdXNlcnNfYXV0aF8iLCJleHAiOjE3NzExMDk1OTcsImlkIjoidmJlYXRhOWp0c2Y2Z3EyIiwidHlwZSI6ImF1dGhSZWNvcmQifQ.ug1fjj2l9kwUWogof-YJrD4Eff3KFhDKBvpZLhA9TfM"}
+
+Lesson token:
+{"code":403,"message":"Only admins can perform this action.","data":{}}
