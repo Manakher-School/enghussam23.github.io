@@ -2,6 +2,12 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import localforage from 'localforage';
 import { useAuth } from './AuthContext';
 import { pb } from '../lib/pocketbase';
+import { 
+  fetchNews, 
+  fetchActivities, 
+  fetchLessons,
+  transformRecordToFrontend 
+} from '../services/api';
 
 const DataContext = createContext();
 
@@ -75,11 +81,13 @@ export default function DataProvider({ children }) {
     pb.collection('news').subscribe('*', (e) => {
       console.log('News update:', e.action);
       
+      const transformedRecord = transformRecordToFrontend(e.record, ['title', 'content']);
+      
       if (e.action === 'create' && e.record.is_published) {
-        setNews(prev => [e.record, ...prev]);
+        setNews(prev => [transformedRecord, ...prev]);
       } else if (e.action === 'update') {
         setNews(prev => prev.map(item => 
-          item.id === e.record.id ? e.record : item
+          item.id === e.record.id ? transformedRecord : item
         ));
       } else if (e.action === 'delete') {
         setNews(prev => prev.filter(item => item.id !== e.record.id));
@@ -90,11 +98,13 @@ export default function DataProvider({ children }) {
     pb.collection('activities').subscribe('*', (e) => {
       console.log('Activity update:', e.action);
       
+      const transformedRecord = transformRecordToFrontend(e.record, ['title', 'content', 'description', 'subject']);
+      
       if (e.action === 'create') {
-        setActivities(prev => [e.record, ...prev]);
+        setActivities(prev => [transformedRecord, ...prev]);
       } else if (e.action === 'update') {
         setActivities(prev => prev.map(item => 
-          item.id === e.record.id ? e.record : item
+          item.id === e.record.id ? transformedRecord : item
         ));
       } else if (e.action === 'delete') {
         setActivities(prev => prev.filter(item => item.id !== e.record.id));
@@ -105,11 +115,13 @@ export default function DataProvider({ children }) {
     pb.collection('lessons').subscribe('*', (e) => {
       console.log('Lesson update:', e.action);
       
+      const transformedRecord = transformRecordToFrontend(e.record, ['title', 'content', 'subject']);
+      
       if (e.action === 'create') {
-        setLessons(prev => [e.record, ...prev]);
+        setLessons(prev => [transformedRecord, ...prev]);
       } else if (e.action === 'update') {
         setLessons(prev => prev.map(item => 
-          item.id === e.record.id ? e.record : item
+          item.id === e.record.id ? transformedRecord : item
         ));
       } else if (e.action === 'delete') {
         setLessons(prev => prev.filter(item => item.id !== e.record.id));
@@ -214,19 +226,12 @@ export default function DataProvider({ children }) {
     const classRecords = enrollmentRecords.map(e => e.expand?.class_id).filter(Boolean);
     setClasses(classRecords);
 
-    // 3. Get lessons for enrolled classes
-    const classFilter = classIds.map(id => `class_id='${id}'`).join(' || ');
-    const lessonRecords = await pb.collection('lessons').getFullList({
-      filter: classFilter,
-      sort: '-created'
-    });
+    // 3. Get lessons for enrolled classes using API service
+    const lessonRecords = await fetchLessons(classIds);
     setLessons(lessonRecords);
 
-    // 4. Get activities for enrolled classes
-    const activityRecords = await pb.collection('activities').getFullList({
-      filter: classFilter,
-      sort: '-created'
-    });
+    // 4. Get activities for enrolled classes using API service
+    const activityRecords = await fetchActivities(classIds);
     setActivities(activityRecords);
 
     // 5. Get student's submissions
@@ -237,12 +242,8 @@ export default function DataProvider({ children }) {
     });
     setSubmissions(submissionRecords);
 
-    // 6. Get news (available to all)
-    const newsRecords = await pb.collection('news').getFullList({
-      filter: 'is_published=true',
-      sort: '-created',
-      limit: 20
-    });
+    // 6. Get news using API service
+    const newsRecords = await fetchNews(20);
     setNews(newsRecords);
   };
 
@@ -266,19 +267,12 @@ export default function DataProvider({ children }) {
       return;
     }
 
-    // Get lessons for teacher's classes
-    const classFilter = classIds.map(id => `class_id='${id}'`).join(' || ');
-    const lessonRecords = await pb.collection('lessons').getFullList({
-      filter: classFilter,
-      sort: '-created'
-    });
+    // Get lessons for teacher's classes using API service
+    const lessonRecords = await fetchLessons(classIds);
     setLessons(lessonRecords);
 
-    // Get activities for teacher's classes
-    const activityRecords = await pb.collection('activities').getFullList({
-      filter: classFilter,
-      sort: '-created'
-    });
+    // Get activities for teacher's classes using API service
+    const activityRecords = await fetchActivities(classIds);
     setActivities(activityRecords);
 
     // Get all submissions for teacher's activities
@@ -293,11 +287,8 @@ export default function DataProvider({ children }) {
       setSubmissions(submissionRecords);
     }
 
-    // Get news
-    const newsRecords = await pb.collection('news').getFullList({
-      filter: 'is_published=true',
-      sort: '-created'
-    });
+    // Get news using API service
+    const newsRecords = await fetchNews();
     setNews(newsRecords);
   };
 
@@ -308,9 +299,9 @@ export default function DataProvider({ children }) {
     // Admins get all data
     const [classRecords, lessonRecords, activityRecords, newsRecords, submissionRecords] = await Promise.all([
       pb.collection('classes').getFullList({ expand: 'course_id,teacher_id', sort: '-created' }),
-      pb.collection('lessons').getFullList({ sort: '-created' }),
-      pb.collection('activities').getFullList({ sort: '-created' }),
-      pb.collection('news').getFullList({ sort: '-created' }),
+      fetchLessons([]), // Fetch all lessons using API service
+      fetchActivities([]), // Fetch all activities using API service
+      fetchNews(), // Fetch all news using API service
       pb.collection('submissions').getFullList({ expand: 'student_id,activity_id', sort: '-created' })
     ]);
 

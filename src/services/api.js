@@ -61,11 +61,18 @@ export const fetchActivities = async (classIds = [], type = null) => {
 
     return records.map((record) => ({
       id: record.id,
-      title: record.title, // Plain string from backend
+      title: formatBilingualField(record.title), // Transform to bilingual object
+      content: formatBilingualField(record.content), // Transform to bilingual object
+      description: formatBilingualField(record.description), // Transform to bilingual object
+      subject: formatBilingualField(record.subject), // Transform to bilingual object
       class_id: record.class_id,
       type: record.type, // 'quiz' or 'exam'
       time_limit: record.time_limit,
       max_score: record.max_score,
+      dueDate: record.due_date ? formatDate(record.due_date) : null, // For homework
+      date: record.due_date
+        ? formatDate(record.due_date)
+        : formatDate(record.created), // Compatibility
       createdAt: formatDate(record.created),
       updatedAt: formatDate(record.updated),
       // Expanded data
@@ -101,7 +108,7 @@ export const fetchQuestions = async (activityId, includeAnswers = false) => {
       id: record.id,
       activity_id: record.activity_id,
       type: record.type, // 'mcq', 'tf', 'short'
-      question: record.question, // Plain string
+      question: formatBilingualField(record.question), // Transform to bilingual object
       options: record.options, // Array for MCQ
       correct_answer: record.correct_answer, // Only if includeAnswers=true
       created: formatDate(record.created),
@@ -136,9 +143,11 @@ export const fetchLessons = async (classIds = []) => {
     return records.map((record) => ({
       id: record.id,
       class_id: record.class_id,
-      title: record.title, // Plain string
-      content: record.content, // Plain string (HTML)
+      title: formatBilingualField(record.title), // Transform to bilingual object
+      content: formatBilingualField(record.content), // Transform to bilingual object
+      subject: formatBilingualField(record.subject), // Transform to bilingual object
       attachments: record.attachments || [], // Array of filenames
+      date: formatDate(record.created), // Add date field for compatibility
       createdAt: formatDate(record.created),
       updatedAt: formatDate(record.updated),
       // Expanded data
@@ -178,11 +187,12 @@ export const fetchNews = async (limit = null) => {
 
     const newsItems = (records.items || records).map((record) => ({
       id: record.id,
-      title: record.title, // Plain string
-      content: record.content, // Plain string (HTML)
+      title: formatBilingualField(record.title), // Transform to bilingual object
+      content: formatBilingualField(record.content), // Transform to bilingual object
       excerpt: record.excerpt || record.content?.substring(0, 200) || "",
       category: record.category || "General",
       publishedAt: formatDate(record.created),
+      date: formatDate(record.created), // Add date field for compatibility
       type: "news",
       important: record.important || false,
       // Image handling
@@ -838,3 +848,77 @@ export const createEnrollment = async (studentId, classId) => {
 
 // Export pb instance for direct access if needed
 export { pb };
+
+/**
+ * ============================================================================
+ * BILINGUAL DATA HELPERS
+ * ============================================================================
+ * These functions help transform data between backend format and frontend format
+ */
+
+/**
+ * Get bilingual value from field
+ * Handles both JSON objects and plain strings
+ * @param {Object|string} field - The bilingual field or plain string
+ * @param {string} language - Language code ('ar' or 'en')
+ * @returns {string}
+ */
+export const getBilingualValue = (field, language = "ar") => {
+  if (!field) return "";
+
+  // If it's already a string, return it
+  if (typeof field === "string") return field;
+
+  // If it's a bilingual object, get the value
+  if (typeof field === "object") {
+    return field[language] || field.ar || field.en || "";
+  }
+
+  return "";
+};
+
+/**
+ * Format field to bilingual object
+ * Converts plain strings to bilingual format for frontend compatibility
+ * @param {Object|string} field - The field value
+ * @returns {Object} Bilingual object {ar: string, en: string}
+ */
+export const formatBilingualField = (field) => {
+  if (!field) return { ar: "", en: "" };
+
+  // Already bilingual
+  if (typeof field === "object" && (field.ar || field.en)) {
+    return field;
+  }
+
+  // Plain string - use for both languages
+  if (typeof field === "string") {
+    return { ar: field, en: field };
+  }
+
+  return { ar: "", en: "" };
+};
+
+/**
+ * Transform PocketBase record to frontend format
+ * Ensures all text fields are bilingual objects
+ * @param {Object} record - PocketBase record
+ * @param {Array<string>} bilingualFields - Field names to transform
+ * @returns {Object} Transformed record
+ */
+export const transformRecordToFrontend = (
+  record,
+  bilingualFields = ["title", "content", "description", "subject"],
+) => {
+  if (!record) return null;
+
+  const transformed = { ...record };
+
+  bilingualFields.forEach((fieldName) => {
+    if (record[fieldName] !== undefined) {
+      transformed[fieldName] = formatBilingualField(record[fieldName]);
+    }
+  });
+
+  return transformed;
+};
