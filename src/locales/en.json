@@ -72,7 +72,20 @@
         "submitQuiz": "Submit Quiz",
         "timeRemaining": "Time Remaining",
         "score": "Score",
-        "pending": "Pending Review"
+        "pending": "Pending Review",
+        "dragDropFiles": "Drag and drop files here",
+        "or": "or",
+        "clickToSelect": "click to select files",
+        "maxFileSize": "Max file size: {{max}}",
+        "selectedFiles": "Selected Files",
+        "attachedFiles": "Attached Files",
+        "fileTooLarge": "File is too large. Maximum size: {{max}}",
+        "invalidFileType": "Invalid file type. Allowed: PDF, DOC, PPT, Excel, Images, TXT",
+        "noContent": "Please enter text or attach files",
+        "uploading": "Uploading",
+        "untitled": "Untitled Homework",
+        "createdDate": "Created",
+        "submittedOn": "Submitted on"
     },
     "quiz": {
         "untitled": "Untitled Quiz",
@@ -93,7 +106,11 @@
         "grade": "Grade",
         "filterBySubject": "Filter by Subject",
         "filterByGrade": "Filter by Grade",
-        "all": "All"
+        "filterByType": "Filter by Type",
+        "all": "All",
+        "files": "Files",
+        "showFiles": "Show Files",
+        "hideFiles": "Hide Files"
     },
     "news": {
         "title": "News & Announcements",

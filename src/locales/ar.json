@@ -71,7 +71,20 @@
         "submitQuiz": "إرسال الاختبار",
         "timeRemaining": "الوقت المتبقي",
         "score": "النتيجة",
-        "pending": "قيد المراجعة"
+        "pending": "قيد المراجعة",
+        "dragDropFiles": "اسحب وأفلت الملفات هنا",
+        "or": "أو",
+        "clickToSelect": "انقر لاختيار الملفات",
+        "maxFileSize": "الحد الأقصى لحجم الملف: {{max}}",
+        "selectedFiles": "الملفات المحددة",
+        "attachedFiles": "الملفات المرفقة",
+        "fileTooLarge": "الملف كبير جدًا. الحد الأقصى: {{max}}",
+        "invalidFileType": "نوع الملف غير صالح. المسموح: PDF, DOC, PPT, Excel, صور, TXT",
+        "noContent": "يرجى إدخال نص أو إرفاق ملفات",
+        "uploading": "جارٍ الرفع",
+        "untitled": "واجب بدون عنوان",
+        "createdDate": "تاريخ الإنشاء",
+        "submittedOn": "تم الإرسال في"
     },
     "quiz": {
         "untitled": "اختبار بدون عنوان",
@@ -92,7 +105,11 @@
         "grade": "الصف",
         "filterBySubject": "تصفية حسب المادة",
         "filterByGrade": "تصفية حسب الصف",
-        "all": "الكل"
+        "filterByType": "تصفية حسب النوع",
+        "all": "الكل",
+        "files": "ملفات",
+        "showFiles": "إظهار الملفات",
+        "hideFiles": "إخفاء الملفات"
     },
     "news": {
         "title": "الأخبار والإعلانات",
