@@ -10,8 +10,6 @@ import {
   CircularProgress,
   InputAdornment,
   IconButton,
-  ToggleButton,
-  ToggleButtonGroup,
   Divider,
 } from '@mui/material';
 import {
@@ -127,23 +125,31 @@ const LoginPage = () => {
           </Box>
 
           {/* Mode Toggle */}
-          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-            <ToggleButtonGroup
-              value={loginMode}
-              exclusive
-              onChange={handleModeChange}
-              aria-label="login mode"
-              size="large"
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3, gap: 2 }}>
+            <Button
+            onClick={() => handleModeChange(null, 'student')}
+            variant={loginMode === 'student' ? 'contained' : 'outlined'}
+            sx={{
+              minWidth: 180,
+              borderRadius: 2,
+              gap: 1,
+            }}
             >
-              <ToggleButton value="student" aria-label="student login">
-                <PersonIcon sx={{ mr: 1 }} />
-                {t('login.studentLogin') || 'Student'}
-              </ToggleButton>
-              <ToggleButton value="staff" aria-label="staff login">
-                <AdminIcon sx={{ mr: 1 }} />
-                {t('login.staffLogin') || 'Teacher / Admin'}
-              </ToggleButton>
-            </ToggleButtonGroup>
+              <PersonIcon/>
+              {t('login.studentLogin') || 'Student'}
+            </Button>
+            <Button
+            onClick={() => handleModeChange(null, 'staff')}
+            variant={loginMode === 'staff' ? 'contained' : 'outlined'}
+            sx={{
+              minWidth: 180,
+              borderRadius: 2,
+              gap: 1,
+            }}
+            >
+              <AdminIcon/>
+              {t('login.staffLogin') || 'Teacher / Admin'}
+            </Button>
           </Box>
 
           <Divider sx={{ mb: 3 }} />
