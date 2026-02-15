@@ -15,15 +15,17 @@ import {
   List,
   ListItem,
   ListItemButton,
-  ListItemText
+  ListItemText,
+  Chip
 } from '@mui/material';
 import {
   Menu as MenuIcon,
   Language as LanguageIcon,
   School as SchoolIcon,
-  Padding
+  Dashboard as DashboardIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
 import { useGrade } from '../context/GradeContext';
 import { getGradeBadge } from '../theme/theme';
 import HomePage from '../pages/HomePage';
@@ -32,29 +34,75 @@ import MaterialsPage from '../pages/MaterialsPage';
 import ActivitiesPage from '../pages/ActivitiesPage';
 import VisionMissionPage from '../pages/VisionMissionPage';
 import AboutPage from '../pages/AboutPage';
+import LoginPage from '../pages/LoginPage';
+import TeacherDashboard from '../pages/TeacherDashboard';
+import AdminDashboard from '../pages/AdminDashboard';
 
 const MainLayout = () => {
   const { t, i18n } = useTranslation();
+  const { user, logout, isAuthenticated, loading, isStudent, isTeacher, isAdmin } = useAuth();
   const { gradeSelection, clearGradeSelection } = useGrade();
-  const [currentPage, setCurrentPage] = useState('home');
+  
+  // Default page based on role: dashboard for teachers/admins, home for students
+  const getDefaultPage = () => {
+    if (isTeacher() || isAdmin()) return 'dashboard';
+    return 'home';
+  };
+  
+  const [currentPage, setCurrentPage] = useState(getDefaultPage());
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  if (!gradeSelection) return null;
+  // Show loading while checking auth
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <Typography>{t('common.loading') || 'Loading...'}</Typography>
+      </Box>
+    );
+  }
 
-  const gradeBadge = getGradeBadge(gradeSelection.grade);
+  // Show login page if not authenticated
+  if (!isAuthenticated()) {
+    return <LoginPage />;
+  }
 
-  const navigationItems = [
-    { key: 'home', label: t('nav.home') },
-    { key: 'exams', label: t('nav.exams') },
-    { key: 'materials', label: t('nav.materials') },
-    { key: 'activities', label: t('nav.activities') },
-    { key: 'vision', label: t('nav.vision') },
-    { key: 'about', label: t('nav.about') }
-  ];
+  if (!gradeSelection && isStudent()) return null;
+
+  const gradeBadge = gradeSelection ? getGradeBadge(gradeSelection.grade) : null;
+
+  // Navigation items based on user role
+  const getNavigationItems = () => {
+    const items = [];
+    
+    // Dashboard for teachers and admins
+    if (isTeacher() || isAdmin()) {
+      items.push({ key: 'dashboard', label: isTeacher() ? t('teacher.dashboard') : t('admin.dashboard'), icon: <DashboardIcon /> });
+    }
+    
+    // Student navigation
+    if (isStudent()) {
+      items.push(
+        { key: 'home', label: t('nav.home') },
+        { key: 'exams', label: t('nav.exams') },
+        { key: 'materials', label: t('nav.materials') },
+        { key: 'activities', label: t('nav.activities') }
+      );
+    }
+    
+    // Common navigation for all roles
+    items.push(
+      { key: 'vision', label: t('nav.vision') },
+      { key: 'about', label: t('nav.about') }
+    );
+    
+    return items;
+  };
+  
+  const navigationItems = getNavigationItems();
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -80,8 +128,26 @@ const MainLayout = () => {
     handleMenuClose();
   };
 
+  const handleLogout = () => {
+    logout();
+    handleMenuClose();
+  };
+
+  const getRoleBadge = () => {
+    const roleColors = {
+      student: 'primary',
+      teacher: 'secondary',
+      admin: 'error',
+    };
+    return roleColors[user?.role] || 'default';
+  };
+
   const renderPage = () => {
     switch (currentPage) {
+      case 'dashboard':
+        if (isTeacher()) return <TeacherDashboard />;
+        if (isAdmin()) return <AdminDashboard />;
+        return <HomePage />;
       case 'home':
         return <HomePage />;
       case 'exams':
@@ -95,7 +161,7 @@ const MainLayout = () => {
       case 'about':
         return <AboutPage />;
       default:
-        return <HomePage />;
+        return isStudent() ? <HomePage /> : (isTeacher() ? <TeacherDashboard /> : <AdminDashboard />);
     }
   };
 
@@ -142,7 +208,7 @@ const MainLayout = () => {
               <IconButton color="inherit" onClick={handleLanguageToggle}>
                 <LanguageIcon />
               </IconButton>
-              {/* Grade/Settings Menu */}
+              {/* Grade/Role Badge + Settings Menu */}
               <Button
                 color="inherit"
                 onClick={handleMenuOpen}
@@ -153,10 +219,19 @@ const MainLayout = () => {
                   px: 2,
                 }}
               >
-                <Box display="flex" alignItems="center" gap={0.5}>
-                  <Typography variant="body2">
-                    {gradeSelection.grade} - {gradeSelection.section}
-                  </Typography>
+                <Box display="flex" alignItems="center" gap={1}>
+                  {isStudent() && gradeSelection ? (
+                    <Typography variant="body2">
+                      {gradeSelection.grade} - {gradeSelection.section}
+                    </Typography>
+                  ) : (
+                    <Chip 
+                      label={t(`roles.${user?.role}`)} 
+                      size="small"
+                      color={getRoleBadge()}
+                      sx={{ color: 'white' }}
+                    />
+                  )}
                 </Box>
               </Button>
               {/* Mobile Menu Icon */}
@@ -180,8 +255,18 @@ const MainLayout = () => {
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        <MenuItem onClick={handleChangeGrade}>
-          {t('menu.changeGrade')}
+        <MenuItem disabled>
+          <Typography variant="caption" color="text.secondary">
+            {user?.name || user?.email}
+          </Typography>
+        </MenuItem>
+        {isStudent() && (
+          <MenuItem onClick={handleChangeGrade}>
+            {t('menu.changeGrade')}
+          </MenuItem>
+        )}
+        <MenuItem onClick={handleLogout}>
+          {t('nav.logout') || 'Logout'}
         </MenuItem>
       </Menu>
 

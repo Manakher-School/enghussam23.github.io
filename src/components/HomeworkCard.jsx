@@ -9,147 +9,176 @@ import {
   TextField,
   Box,
   Collapse,
-  IconButton,
-  Rating
+  Alert
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import StarIcon from '@mui/icons-material/Star';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../context/DataContext';
-import { getSubjectColor } from '../theme/theme';
 import Confetti from './Confetti';
 
+/**
+ * HomeworkCard Component
+ * 
+ * NOTE: Backend currently only supports 'quiz' and 'exam' activity types.
+ * This component is prepared for when 'homework' type is added to backend.
+ * Submissions use backend's submission_text field for text-based homework.
+ */
 function HomeworkCard({ homework }) {
-  const { t, i18n } = useTranslation();
-  const { submitHomework, rateHomework, userSubmissions } = useData();
+  const { t } = useTranslation();
+  const { submitHomework, getSubmissionForActivity } = useData();
   const [expanded, setExpanded] = useState(false);
   const [submissionText, setSubmissionText] = useState('');
   const [showConfetti, setShowConfetti] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
-  const currentLang = i18n.language;
-  const submission = userSubmissions.find(s => s.homeworkId === homework.id);
+  // Get submission for this homework activity
+  const submission = getSubmissionForActivity(homework.id);
   const isSubmitted = !!submission;
 
-  const handleSubmit = () => {
-    submitHomework(homework.id, { text: submissionText });
-    setSubmissionText('');
-    setExpanded(false);
-    setShowConfetti(true);
-  };
-
-  const handleStarChange = (newValue) => {
-    rateHomework(homework.id, newValue);
+  const handleSubmit = async () => {
+    if (!submissionText.trim()) return;
+    
+    try {
+      setSubmitting(true);
+      setSubmitError(null);
+      
+      await submitHomework(homework.id, { 
+        text: submissionText,
+        answers: { text_submission: submissionText } // Backend format
+      });
+      
+      setSubmissionText('');
+      setExpanded(false);
+      setShowConfetti(true);
+    } catch (error) {
+      console.error('Submit error:', error);
+      setSubmitError(error.message || 'Failed to submit homework');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const getStatusColor = () => {
     if (!submission) return 'default';
-    if (submission.grade) return 'success';
+    if (submission.score !== undefined && submission.score !== null) return 'success';
     return 'warning';
   };
 
   const getStatusText = () => {
     if (!submission) return t('homework.notSubmitted');
-    if (submission.grade) return `${t('homework.graded')}: ${submission.grade}`;
+    if (submission.score !== undefined && submission.score !== null) {
+      return `${t('homework.graded')}: ${submission.score}/${homework.max_score || 100}`;
+    }
     return t('homework.submitted');
   };
 
-  const subjectColor = getSubjectColor(homework.subject[currentLang]);
+  // Format the date for display
+  const formatDate = (dateString) => {
+    if (!dateString) return t('common.noDate');
+    try {
+      return new Date(dateString).toLocaleDateString();
+    } catch (e) {
+      return t('common.noDate');
+    }
+  };
 
   return (
     <>
       <Confetti active={showConfetti} onComplete={() => setShowConfetti(false)} />
       <Card 
-      elevation={2}
-      sx={{
-        borderTop: `4px solid ${subjectColor.main}`,
-        position: 'relative',
-        overflow: 'visible',
-      }}
-    >
-      <CardContent>
-        <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
-          <Typography variant="h6" component="h3">
-            {homework.title[currentLang]}
-          </Typography>
-          <Chip 
-            label={getStatusText()} 
-            color={getStatusColor()} 
-            size="small"
-          />
-        </Box>
-
-        <Typography variant="body2" color="text.secondary" paragraph>
-          {homework.content[currentLang]}
-        </Typography>
-
-        <Typography variant="caption" color="text.secondary">
-          {t('homework.dueDate')}: {new Date(homework.dueDate).toLocaleDateString(currentLang)}
-        </Typography>
-
-        {submission && submission.grade && (
-          <Box mt={2} p={2} bgcolor="success.light" borderRadius={1}>
-            <Typography variant="body2">
-              {t('homework.grade')}: <strong>{submission.grade}</strong>
+        elevation={2}
+        sx={{
+          borderTop: `4px solid #4CAF50`,
+          position: 'relative',
+          overflow: 'visible',
+        }}
+      >
+        <CardContent>
+          <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+            <Typography variant="h6" component="h3">
+              {homework.title || t('homework.untitled')}
             </Typography>
-          </Box>
-        )}
-
-        {isSubmitted && (
-          <Box mt={2} textAlign="center">
-            <Typography variant="caption" display="block" mb={1} color="text.secondary">
-              قيّم عملك ⭐
-            </Typography>
-            <Rating
-              value={submission?.stars || 0}
-              onChange={(_, newValue) => handleStarChange(newValue)}
-              size="large"
-              icon={<StarIcon fontSize="inherit" sx={{ color: '#FFB300' }} />}
-              emptyIcon={<StarIcon fontSize="inherit" sx={{ color: '#E0E0E0' }} />}
+            <Chip 
+              label={getStatusText()} 
+              color={getStatusColor()} 
+              size="small"
             />
           </Box>
-        )}
-      </CardContent>
 
-      <CardActions>
-        <Button 
-          size="small" 
-          onClick={() => setExpanded(!expanded)}
-          disabled={isSubmitted && !submission.grade}
-          endIcon={<ExpandMoreIcon sx={{ transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: '0.3s' }} />}
-        >
-          {isSubmitted ? t('homework.yourSubmission') : t('homework.submit')}
-        </Button>
-      </CardActions>
+          {homework.content && (
+            <Typography variant="body2" color="text.secondary" paragraph>
+              {homework.content}
+            </Typography>
+          )}
 
-      <Collapse in={expanded} timeout="auto" unmountOnExit>
-        <CardContent>
-          {isSubmitted ? (
-            <Box p={2} bgcolor="grey.100" borderRadius={1}>
-              <Typography variant="body2">{submission.text}</Typography>
-            </Box>
-          ) : (
-            <Box>
-              <TextField
-                fullWidth
-                multiline
-                rows={4}
-                placeholder={t('homework.submitText')}
-                value={submissionText}
-                onChange={(e) => setSubmissionText(e.target.value)}
-                sx={{ mb: 2 }}
-              />
-              <Button 
-                variant="contained" 
-                onClick={handleSubmit}
-                disabled={!submissionText.trim()}
-              >
-                {t('homework.submit')}
-              </Button>
+          {homework.created && (
+            <Typography variant="caption" color="text.secondary" display="block">
+              {t('homework.createdDate')}: {formatDate(homework.created)}
+            </Typography>
+          )}
+
+          {submission && submission.score !== undefined && submission.score !== null && (
+            <Box mt={2} p={2} bgcolor="success.light" borderRadius={1}>
+              <Typography variant="body2">
+                {t('homework.score')}: <strong>{submission.score}/{homework.max_score || 100}</strong>
+              </Typography>
             </Box>
           )}
         </CardContent>
-      </Collapse>
-    </Card>
+
+        <CardActions>
+          <Button 
+            size="small" 
+            onClick={() => setExpanded(!expanded)}
+            disabled={isSubmitted && submission.score !== null}
+            endIcon={<ExpandMoreIcon sx={{ transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: '0.3s' }} />}
+          >
+            {isSubmitted ? t('homework.yourSubmission') : t('homework.submit')}
+          </Button>
+        </CardActions>
+
+        <Collapse in={expanded} timeout="auto" unmountOnExit>
+          <CardContent>
+            {submitError && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {submitError}
+              </Alert>
+            )}
+            
+            {isSubmitted ? (
+              <Box p={2} bgcolor="grey.100" borderRadius={1}>
+                <Typography variant="body2">
+                  {submission.submission_text || submission.answers?.text_submission || t('homework.noContent')}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" display="block" mt={1}>
+                  {t('homework.submittedOn')}: {formatDate(submission.created)}
+                </Typography>
+              </Box>
+            ) : (
+              <Box>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={4}
+                  placeholder={t('homework.submitText')}
+                  value={submissionText}
+                  onChange={(e) => setSubmissionText(e.target.value)}
+                  sx={{ mb: 2 }}
+                  disabled={submitting}
+                />
+                <Button 
+                  variant="contained" 
+                  onClick={handleSubmit}
+                  disabled={!submissionText.trim() || submitting}
+                >
+                  {submitting ? t('common.loading') : t('homework.submit')}
+                </Button>
+              </Box>
+            )}
+          </CardContent>
+        </Collapse>
+      </Card>
     </>
   );
 }

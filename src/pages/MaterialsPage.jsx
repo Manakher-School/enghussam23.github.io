@@ -10,7 +10,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Alert
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +21,7 @@ import Fuse from 'fuse.js';
 
 function MaterialsPage() {
   const { t, i18n } = useTranslation();
-  const { materials, loading } = useData();
+  const { materials, loading, error } = useData();
   const [searchQuery, setSearchQuery] = useState('');
   const [subjectFilter, setSubjectFilter] = useState('all');
   const currentLang = i18n.language;
@@ -77,8 +78,23 @@ function MaterialsPage() {
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
-        <CircularProgress />
+        <CircularProgress size={60} />
       </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container sx={{ mt: 4 }}>
+        <Alert severity="error" sx={{ mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            {t('error.loadingFailed')}
+          </Typography>
+          <Typography variant="body2">
+            {error}
+          </Typography>
+        </Alert>
+      </Container>
     );
   }
 

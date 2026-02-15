@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -15,36 +15,65 @@ import {
   RadioGroup,
   FormControlLabel,
   FormControl,
-  LinearProgress
+  TextField,
+  CircularProgress,
+  Alert
 } from '@mui/material';
 import QuizIcon from '@mui/icons-material/Quiz';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../context/DataContext';
-import { getSubjectColor } from '../theme/theme';
+import { fetchQuestions } from '../services/api';
 import Confetti from './Confetti';
 
+/**
+ * QuizCard Component
+ * 
+ * Fetches questions from separate 'questions' collection.
+ * Students never see correct_answer field.
+ * Supports MCQ, True/False, and Short Answer questions.
+ */
 function QuizCard({ quiz }) {
-  const { t, i18n } = useTranslation();
-  const { submitQuiz, quizAttempts } = useData();
+  const { t } = useTranslation();
+  const { submitQuiz, getSubmissionForActivity } = useData();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [timeLeft, setTimeLeft] = useState(quiz.timeLimit * 60); // Convert minutes to seconds
+  const [timeLeft, setTimeLeft] = useState(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [questions, setQuestions] = useState([]);
+  const [loadingQuestions, setLoadingQuestions] = useState(false);
+  const [questionsError, setQuestionsError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
-  const currentLang = i18n.language;
-  const attempt = quizAttempts.find(a => a.quizId === quiz.id);
-  const isCompleted = !!attempt;
+  // Get submission for this quiz
+  const submission = getSubmissionForActivity(quiz.id);
+  const isCompleted = !!submission;
 
-  const currentQuestion = quiz.questions[currentQuestionIndex];
-  const totalQuestions = quiz.questions.length;
-  const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+  const currentQuestion = questions[currentQuestionIndex];
+  const totalQuestions = questions.length;
+  const progress = totalQuestions > 0 ? ((currentQuestionIndex + 1) / totalQuestions) * 100 : 0;
 
-  const handleStartQuiz = () => {
-    setDialogOpen(true);
-    setAnswers({});
-    setCurrentQuestionIndex(0);
-    setTimeLeft(quiz.timeLimit * 60);
+  // Load questions when quiz dialog opens
+  const handleStartQuiz = async () => {
+    try {
+      setLoadingQuestions(true);
+      setQuestionsError(null);
+      
+      // Fetch questions from backend (without correct answers for students)
+      const fetchedQuestions = await fetchQuestions(quiz.id, false);
+      
+      setQuestions(fetchedQuestions);
+      setAnswers({});
+      setCurrentQuestionIndex(0);
+      setTimeLeft(quiz.time_limit ? quiz.time_limit * 60 : null); // Convert minutes to seconds
+      setDialogOpen(true);
+    } catch (error) {
+      console.error('Error loading questions:', error);
+      setQuestionsError(error.message || 'Failed to load questions');
+    } finally {
+      setLoadingQuestions(false);
+    }
   };
 
   const handleAnswerChange = (questionId, answer) => {
@@ -63,10 +92,21 @@ function QuizCard({ quiz }) {
     }
   };
 
-  const handleSubmitQuiz = () => {
-    submitQuiz(quiz.id, answers);
-    setDialogOpen(false);
-    setShowConfetti(true);
+  const handleSubmitQuiz = async () => {
+    try {
+      setSubmitting(true);
+      setSubmitError(null);
+      
+      await submitQuiz(quiz.id, answers);
+      
+      setDialogOpen(false);
+      setShowConfetti(true);
+    } catch (error) {
+      console.error('Submit error:', error);
+      setSubmitError(error.message || 'Failed to submit quiz');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const formatTime = (seconds) => {
@@ -75,7 +115,23 @@ function QuizCard({ quiz }) {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const subjectColor = getSubjectColor(quiz.subject[currentLang]);
+  // Timer countdown effect
+  useEffect(() => {
+    if (dialogOpen && timeLeft !== null && timeLeft > 0) {
+      const timer = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            handleSubmitQuiz(); // Auto-submit when time runs out
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      
+      return () => clearInterval(timer);
+    }
+  }, [dialogOpen, timeLeft]);
 
   return (
     <>
@@ -83,7 +139,7 @@ function QuizCard({ quiz }) {
       <Card 
         elevation={2}
         sx={{
-          borderTop: `4px solid ${subjectColor.main}`,
+          borderTop: `4px solid #2196F3`,
           position: 'relative',
           overflow: 'visible',
         }}
@@ -92,36 +148,29 @@ function QuizCard({ quiz }) {
           <Box display="flex" alignItems="center" gap={1} mb={2}>
             <QuizIcon color="primary" />
             <Typography variant="h6" component="h3">
-              {quiz.title[currentLang]}
+              {quiz.title || t('quiz.untitled')}
             </Typography>
           </Box>
 
-          <Typography variant="body2" color="text.secondary" paragraph>
-            {quiz.description?.[currentLang] || ''}
-          </Typography>
-
           <Box display="flex" gap={2} flexWrap="wrap">
-            <Chip 
-              label={`${totalQuestions} ${t('common.questions')}`} 
-              size="small" 
-              variant="outlined"
-            />
-            <Chip 
-              label={`${quiz.timeLimit} ${t('common.minutes')}`} 
-              size="small" 
-              variant="outlined"
-            />
-            {isCompleted && attempt.score && (
+            {quiz.time_limit && (
               <Chip 
-                label={`${t('homework.score')}: ${attempt.score}%`} 
-                color="success" 
-                size="small"
+                label={`${quiz.time_limit} ${t('common.minutes')}`} 
+                size="small" 
+                variant="outlined"
               />
             )}
-            {isCompleted && !attempt.score && (
+            {quiz.max_score && (
               <Chip 
-                label={t('homework.pending')} 
-                color="warning" 
+                label={`${t('quiz.maxScore')}: ${quiz.max_score}`} 
+                size="small" 
+                variant="outlined"
+              />
+            )}
+            {isCompleted && submission.score !== undefined && submission.score !== null && (
+              <Chip 
+                label={`${t('homework.score')}: ${submission.score}/${quiz.max_score || 100}`} 
+                color="success" 
                 size="small"
               />
             )}
@@ -134,8 +183,13 @@ function QuizCard({ quiz }) {
               {t('homework.submitted')}
             </Button>
           ) : (
-            <Button size="small" variant="contained" onClick={handleStartQuiz}>
-              {t('homework.startQuiz')}
+            <Button 
+              size="small" 
+              variant="contained" 
+              onClick={handleStartQuiz}
+              disabled={loadingQuestions}
+            >
+              {loadingQuestions ? t('common.loading') : t('quiz.start')}
             </Button>
           )}
         </CardActions>
@@ -151,78 +205,139 @@ function QuizCard({ quiz }) {
       >
         <DialogTitle>
           <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Typography variant="h6">{quiz.title[currentLang]}</Typography>
-            <Chip 
-              label={`${t('homework.timeRemaining')}: ${formatTime(timeLeft)}`}
-              color="primary"
-              size="small"
-            />
+            <Typography variant="h6">{quiz.title || t('quiz.untitled')}</Typography>
+            {timeLeft !== null && (
+              <Chip 
+                label={`${t('quiz.timeRemaining')}: ${formatTime(timeLeft)}`}
+                color={timeLeft < 60 ? 'error' : 'primary'}
+                size="small"
+              />
+            )}
           </Box>
         </DialogTitle>
 
         <DialogContent>
-          {/* Vine Progress */}
-          <Box mb={3}>
-            <Box display="flex" justifyContent="space-between" mb={1}>
-              <Typography variant="caption" sx={{ fontWeight: 600 }}>
-                🌱 {t('common.question')} {currentQuestionIndex + 1} {t('common.of')} {totalQuestions}
+          {questionsError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {questionsError}
+            </Alert>
+          )}
+          
+          {submitError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {submitError}
+            </Alert>
+          )}
+          
+          {loadingQuestions ? (
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+              <CircularProgress />
+            </Box>
+          ) : totalQuestions === 0 ? (
+            <Box textAlign="center" py={4}>
+              <Typography variant="h6" color="text.secondary">
+                {t('quiz.noQuestions')}
               </Typography>
             </Box>
-            <Box 
-              sx={{ 
-                height: 12, 
-                background: '#E8F5E9',
-                borderRadius: 10,
-                overflow: 'hidden',
-                position: 'relative',
-                border: '2px solid #81C784',
-              }}
-            >
-              <Box
-                sx={{
-                  width: `${progress}%`,
-                  height: '100%',
-                  background: 'linear-gradient(90deg, #4CAF50 0%, #66BB6A 50%, #81C784 100%)',
-                  transition: 'width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  borderRadius: 10,
-                  position: 'relative',
-                  '&::after': {
-                    content: '"🌿"',
-                    position: 'absolute',
-                    right: -8,
-                    top: -12,
-                    fontSize: '1.5rem',
-                  }
-                }}
-              />
-            </Box>
-          </Box>
-          
-          <Typography variant="h6" paragraph>
-            {currentQuestion.question[currentLang]}
-          </Typography>
+          ) : (
+            <>
+              {/* Progress Bar */}
+              <Box mb={3}>
+                <Box display="flex" justifyContent="space-between" mb={1}>
+                  <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                    🌱 {t('common.question')} {currentQuestionIndex + 1} {t('common.of')} {totalQuestions}
+                  </Typography>
+                </Box>
+                <Box 
+                  sx={{ 
+                    height: 12, 
+                    background: '#E8F5E9',
+                    borderRadius: 10,
+                    overflow: 'hidden',
+                    position: 'relative',
+                    border: '2px solid #81C784',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: `${progress}%`,
+                      height: '100%',
+                      background: 'linear-gradient(90deg, #4CAF50 0%, #66BB6A 50%, #81C784 100%)',
+                      transition: 'width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                      borderRadius: 10,
+                      position: 'relative',
+                      '&::after': {
+                        content: '"🌿"',
+                        position: 'absolute',
+                        right: -8,
+                        top: -12,
+                        fontSize: '1.5rem',
+                      }
+                    }}
+                  />
+                </Box>
+              </Box>
+              
+              {/* Question */}
+              <Typography variant="h6" paragraph>
+                {currentQuestion?.question || ''}
+              </Typography>
 
-          <FormControl component="fieldset" fullWidth>
-            <RadioGroup
-              value={answers[currentQuestion.id] || ''}
-              onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
-            >
-              {currentQuestion.options.map((option, index) => (
-                <FormControlLabel
-                  key={index}
-                  value={option[currentLang]}
-                  control={<Radio />}
-                  label={option[currentLang]}
-                />
-              ))}
-            </RadioGroup>
-          </FormControl>
+              {/* Answer Input based on question type */}
+              <FormControl component="fieldset" fullWidth>
+                {currentQuestion?.type === 'mcq' && (
+                  <RadioGroup
+                    value={answers[currentQuestion.id] || ''}
+                    onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
+                  >
+                    {(currentQuestion.options || []).map((option, index) => (
+                      <FormControlLabel
+                        key={index}
+                        value={option}
+                        control={<Radio />}
+                        label={option}
+                      />
+                    ))}
+                  </RadioGroup>
+                )}
+                
+                {currentQuestion?.type === 'tf' && (
+                  <RadioGroup
+                    value={answers[currentQuestion.id]?.toString() || ''}
+                    onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value === 'true')}
+                  >
+                    <FormControlLabel
+                      value="true"
+                      control={<Radio />}
+                      label={t('quiz.true')}
+                    />
+                    <FormControlLabel
+                      value="false"
+                      control={<Radio />}
+                      label={t('quiz.false')}
+                    />
+                  </RadioGroup>
+                )}
+                
+                {currentQuestion?.type === 'short' && (
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={3}
+                    placeholder={t('quiz.enterAnswer')}
+                    value={answers[currentQuestion.id] || ''}
+                    onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
+                  />
+                )}
+              </FormControl>
+            </>
+          )}
         </DialogContent>
 
         <DialogActions sx={{ justifyContent: 'space-between', px: 3, pb: 2 }}>
           <Button 
             onClick={handlePrevious} 
-            disabled={currentQuestionIndex === 0}
+            disabled={currentQuestionIndex === 0 || loadingQuestions || submitting}
           >
             {t('common.previous')}
           </Button>
@@ -232,14 +347,15 @@ function QuizCard({ quiz }) {
               <Button 
                 variant="contained" 
                 onClick={handleSubmitQuiz}
-                disabled={Object.keys(answers).length < totalQuestions}
+                disabled={loadingQuestions || submitting || Object.keys(answers).length === 0}
               >
-                {t('homework.submitQuiz')}
+                {submitting ? t('common.loading') : t('quiz.submit')}
               </Button>
             ) : (
               <Button 
                 variant="contained" 
                 onClick={handleNext}
+                disabled={loadingQuestions || submitting}
               >
                 {t('common.next')}
               </Button>

@@ -1,4 +1,4 @@
-import { Box, Typography, Grid, Container, IconButton } from '@mui/material';
+import { Box, Typography, Grid, Container, IconButton, CircularProgress, Alert } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../context/DataContext';
 import NewsCard from '../components/NewsCard';
@@ -7,7 +7,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 function HomePage() {
   const { t } = useTranslation();
-  const { news } = useData();
+  const { news, loading, error } = useData();
   
   const heroImages = [
     '/images/hero/students_queue.png',
@@ -27,6 +27,29 @@ function HomePage() {
 
     return () => clearInterval(interval);
   }, []);
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="70vh">
+        <CircularProgress size={60} />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container sx={{ mt: 4 }}>
+        <Alert severity="error" sx={{ mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            {t('error.loadingFailed')}
+          </Typography>
+          <Typography variant="body2">
+            {error}
+          </Typography>
+        </Alert>
+      </Container>
+    );
+  }
 
   return (
     <>

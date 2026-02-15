@@ -8,7 +8,8 @@ import {
   Tabs,
   Tab,
   Grid,
-  CircularProgress
+  CircularProgress,
+  Alert
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useTranslation } from 'react-i18next';
@@ -18,7 +19,7 @@ import QuizCard from '../components/QuizCard';
 
 function ActivitiesPage() {
   const { t } = useTranslation();
-  const { homework, quizzes, loading } = useData();
+  const { homework, quizzes, loading, error } = useData();
   const [searchQuery, setSearchQuery] = useState('');
   const [subTab, setSubTab] = useState(0); // 0 = Homework, 1 = Quizzes
 
@@ -39,8 +40,23 @@ function ActivitiesPage() {
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
-        <CircularProgress />
+        <CircularProgress size={60} />
       </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container sx={{ mt: 4 }}>
+        <Alert severity="error" sx={{ mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            {t('error.loadingFailed')}
+          </Typography>
+          <Typography variant="body2">
+            {error}
+          </Typography>
+        </Alert>
+      </Container>
     );
   }
 
