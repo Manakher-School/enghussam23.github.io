@@ -84,6 +84,17 @@ function ActivitiesPage() {
       />
 
       {/* Sub Tabs */}
+      <Tabs
+        value={subTab}
+        onChange={(e, v) => setSubTab(v)}
+        sx={{ mb: 3 }}
+        textColor="primary"
+        indicatorColor="primary"
+      >
+        <Tab label={t('homework.title')} />
+        <Tab label={t('homework.quizzes')} />
+      </Tabs>
+
       {/* Activities List */}
       {subTab === 0 && (
         <Grid container spacing={3}>

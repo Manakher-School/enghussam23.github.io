@@ -2,32 +2,30 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import localforage from 'localforage';
 import { useAuth } from './AuthContext';
 import { pb } from '../lib/pocketbase';
-import { 
-  fetchNews, 
-  fetchActivities, 
+import {
+  fetchNews,
+  fetchActivities,
   fetchLessons,
-  transformRecordToFrontend 
+  transformRecordToFrontend
 } from '../services/api';
 
 const DataContext = createContext();
 
-// Export the provider as default
 export default function DataProvider({ children }) {
   const { user, isAuthenticated } = useAuth();
-  
+
   // Server data states
-  const [enrollments, setEnrollments] = useState([]);
-  const [classes, setClasses] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [lessons, setLessons] = useState([]);
   const [activities, setActivities] = useState([]);
   const [news, setNews] = useState([]);
   const [submissions, setSubmissions] = useState([]);
-  
+
   // UI states
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  
+
   // Local data (offline support)
   const [comments, setComments] = useState({});
   const [localSubmissions, setLocalSubmissions] = useState({});
@@ -36,20 +34,14 @@ export default function DataProvider({ children }) {
   // Monitor online/offline status
   useEffect(() => {
     const handleOnline = () => {
-      console.log('App is online');
       setIsOnline(true);
-      // Sync pending submissions when back online
       syncPendingData();
     };
-    
     const handleOffline = () => {
-      console.log('App is offline');
       setIsOnline(false);
     };
-
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
@@ -62,90 +54,65 @@ export default function DataProvider({ children }) {
       loadAllData();
       loadLocalData();
     } else {
-      // Clear data when logged out
-      setEnrollments([]);
-      setClasses([]);
+      setCourses([]);
       setLessons([]);
       setActivities([]);
       setNews([]);
       setSubmissions([]);
       setLoading(false);
     }
-  }, [user?.id, isAuthenticated]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
-  // Real-time subscriptions for updates
+  // Real-time subscriptions
   useEffect(() => {
     if (!isAuthenticated() || !user) return;
 
-    // Subscribe to news updates (visible to all)
     pb.collection('news').subscribe('*', (e) => {
-      console.log('News update:', e.action);
-      
-      const transformedRecord = transformRecordToFrontend(e.record, ['title', 'content']);
-      
+      const rec = transformRecordToFrontend(e.record, ['title', 'content']);
       if (e.action === 'create' && e.record.is_published) {
-        setNews(prev => [transformedRecord, ...prev]);
+        setNews(prev => [rec, ...prev]);
       } else if (e.action === 'update') {
-        setNews(prev => prev.map(item => 
-          item.id === e.record.id ? transformedRecord : item
-        ));
+        setNews(prev => prev.map(item => item.id === e.record.id ? rec : item));
       } else if (e.action === 'delete') {
         setNews(prev => prev.filter(item => item.id !== e.record.id));
       }
-    });
+    }).catch(err => console.warn('news subscription failed (collection may not exist yet):', err?.message || err));
 
-    // Subscribe to activities updates (students see new homework/quizzes)
     pb.collection('activities').subscribe('*', (e) => {
-      console.log('Activity update:', e.action);
-      
-      const transformedRecord = transformRecordToFrontend(e.record, ['title', 'content', 'description', 'subject']);
-      
+      const rec = transformRecordToFrontend(e.record, ['title', 'content', 'description', 'subject']);
       if (e.action === 'create') {
-        setActivities(prev => [transformedRecord, ...prev]);
+        setActivities(prev => [rec, ...prev]);
       } else if (e.action === 'update') {
-        setActivities(prev => prev.map(item => 
-          item.id === e.record.id ? transformedRecord : item
-        ));
+        setActivities(prev => prev.map(item => item.id === e.record.id ? rec : item));
       } else if (e.action === 'delete') {
         setActivities(prev => prev.filter(item => item.id !== e.record.id));
       }
     });
 
-    // Subscribe to lessons updates (new materials)
     pb.collection('lessons').subscribe('*', (e) => {
-      console.log('Lesson update:', e.action);
-      
-      const transformedRecord = transformRecordToFrontend(e.record, ['title', 'content', 'subject']);
-      
+      const rec = transformRecordToFrontend(e.record, ['title', 'content', 'subject']);
       if (e.action === 'create') {
-        setLessons(prev => [transformedRecord, ...prev]);
+        setLessons(prev => [rec, ...prev]);
       } else if (e.action === 'update') {
-        setLessons(prev => prev.map(item => 
-          item.id === e.record.id ? transformedRecord : item
-        ));
+        setLessons(prev => prev.map(item => item.id === e.record.id ? rec : item));
       } else if (e.action === 'delete') {
         setLessons(prev => prev.filter(item => item.id !== e.record.id));
       }
     });
 
-    // Subscribe to submissions updates (for teachers to see new submissions)
     if (user.role === 'teacher' || user.role === 'admin') {
       pb.collection('submissions').subscribe('*', (e) => {
-        console.log('Submission update:', e.action);
-        
         if (e.action === 'create') {
           setSubmissions(prev => [e.record, ...prev]);
         } else if (e.action === 'update') {
-          setSubmissions(prev => prev.map(item => 
-            item.id === e.record.id ? e.record : item
-          ));
+          setSubmissions(prev => prev.map(item => item.id === e.record.id ? e.record : item));
         } else if (e.action === 'delete') {
           setSubmissions(prev => prev.filter(item => item.id !== e.record.id));
         }
       });
     }
 
-    // Cleanup subscriptions on unmount
     return () => {
       pb.collection('news').unsubscribe('*');
       pb.collection('activities').unsubscribe('*');
@@ -154,19 +121,31 @@ export default function DataProvider({ children }) {
         pb.collection('submissions').unsubscribe('*');
       }
     };
-  }, [user?.id, user?.role, isAuthenticated]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, user?.role]);
 
   /**
-   * Load all data from PocketBase based on user role and enrollments
+   * Safely fetch news — returns [] instead of throwing when the collection
+   * doesn't exist yet (404 "The requested resource wasn't found").
+   */
+  const safelyFetchNews = async (limit) => {
+    try {
+      return await fetchNews(limit);
+    } catch (err) {
+      console.warn('fetchNews failed (collection may not exist yet):', err?.message || err);
+      return [];
+    }
+  };
+
+  /**
+   * Load all data based on user role
    */
   const loadAllData = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Check if offline and load from cache
       if (!isOnline) {
-        console.log('Offline mode: loading from cache');
         await loadFromCache();
         setError('You are offline. Showing cached data.');
         return;
@@ -179,20 +158,9 @@ export default function DataProvider({ children }) {
       } else if (user.role === 'admin') {
         await loadAdminData();
       }
-
-      // Cache data after successful load
-      await saveToCache('enrollments', enrollments);
-      await saveToCache('classes', classes);
-      await saveToCache('lessons', lessons);
-      await saveToCache('activities', activities);
-      await saveToCache('news', news);
-      await saveToCache('submissions', submissions);
     } catch (err) {
       console.error('Error loading data:', err);
       setError(err.message || 'Failed to load data');
-      
-      // Try to load from cache on error
-      console.log('Fetch failed: attempting to load from cache');
       await loadFromCache();
     } finally {
       setLoading(false);
@@ -200,116 +168,156 @@ export default function DataProvider({ children }) {
   };
 
   /**
-   * Load data for student role
+   * Load data for student role.
+   * Finds the student's enrolled classes, then loads content for those classes.
    */
   const loadStudentData = async () => {
-    // 1. Get student's enrollments
+    // 1. Find all active enrollments for this student
     const enrollmentRecords = await pb.collection('enrollments').getFullList({
       filter: `student_id='${user.id}' && status='active'`,
-      expand: 'class_id,class_id.course_id,class_id.teacher_id',
-      sort: '-created'
+      sort: '-created',
+      requestKey: null,
     });
-    setEnrollments(enrollmentRecords);
 
-    // Extract class IDs
     const classIds = enrollmentRecords.map(e => e.class_id);
-    
+
     if (classIds.length === 0) {
-      setClasses([]);
+      // Not enrolled in any class — show empty state, not an error
+      console.warn('Student has no active enrollments.');
+      setCourses([]);
       setLessons([]);
       setActivities([]);
-      setNews([]);
+      setSubmissions([]);
+      setNews(await safelyFetchNews(20));
       return;
     }
 
-    // 2. Get classes (already expanded in enrollments)
-    const classRecords = enrollmentRecords.map(e => e.expand?.class_id).filter(Boolean);
-    setClasses(classRecords);
+    // 2. Fetch lessons, activities, submissions, and news in parallel
+    const [lessonRecords, activityRecords, submissionRecords, newsRecords] = await Promise.all([
+      fetchLessons(classIds),
+      fetchActivities(classIds),
+      pb.collection('submissions').getFullList({
+        filter: `student_id='${user.id}'`,
+        expand: 'activity_id',
+        sort: '-created',
+        requestKey: null,
+      }),
+      safelyFetchNews(20),
+    ]);
 
-    // 3. Get lessons for enrolled classes using API service
-    const lessonRecords = await fetchLessons(classIds);
     setLessons(lessonRecords);
-
-    // 4. Get activities for enrolled classes using API service
-    const activityRecords = await fetchActivities(classIds);
     setActivities(activityRecords);
-
-    // 5. Get student's submissions
-    const submissionRecords = await pb.collection('submissions').getFullList({
-      filter: `student_id='${user.id}'`,
-      expand: 'activity_id',
-      sort: '-created'
-    });
     setSubmissions(submissionRecords);
-
-    // 6. Get news using API service
-    const newsRecords = await fetchNews(20);
     setNews(newsRecords);
+
+    // Cache with fresh data
+    await saveToCache('lessons', lessonRecords);
+    await saveToCache('activities', activityRecords);
+    await saveToCache('submissions', submissionRecords);
+    await saveToCache('news', newsRecords);
   };
 
   /**
-   * Load data for teacher role
+   * Load data for teacher role.
+   * Fetches classes where teacher_id = user.id, then content for those classes.
    */
   const loadTeacherData = async () => {
-    // Get classes taught by this teacher
+    // 1. Fetch classes taught by this teacher
     const classRecords = await pb.collection('classes').getFullList({
       filter: `teacher_id='${user.id}'`,
       expand: 'course_id',
-      sort: '-created'
+      sort: 'created',
+      requestKey: null,
     });
-    setClasses(classRecords);
 
-    const classIds = classRecords.map(c => c.id);
-    
+    const mappedClasses = classRecords.map(r => ({
+      id: r.id,
+      course_id: r.course_id,
+      teacher_id: r.teacher_id,
+      course: r.expand?.course_id || null,
+      createdAt: r.created,
+      updatedAt: r.updated,
+    }));
+    setCourses(mappedClasses);
+
+    const classIds = mappedClasses.map(c => c.id);
+
     if (classIds.length === 0) {
       setLessons([]);
       setActivities([]);
+      setNews(await safelyFetchNews());
       return;
     }
 
-    // Get lessons for teacher's classes using API service
-    const lessonRecords = await fetchLessons(classIds);
+    // 2. Fetch lessons, activities, and news in parallel
+    const [lessonRecords, activityRecords, newsRecords] = await Promise.all([
+      fetchLessons(classIds),
+      fetchActivities(classIds),
+      safelyFetchNews(),
+    ]);
+
     setLessons(lessonRecords);
-
-    // Get activities for teacher's classes using API service
-    const activityRecords = await fetchActivities(classIds);
     setActivities(activityRecords);
+    setNews(newsRecords);
 
-    // Get all submissions for teacher's activities
+    // 3. Fetch all submissions for teacher's activities
     const activityIds = activityRecords.map(a => a.id);
     if (activityIds.length > 0) {
       const activityFilter = activityIds.map(id => `activity_id='${id}'`).join(' || ');
       const submissionRecords = await pb.collection('submissions').getFullList({
         filter: activityFilter,
         expand: 'student_id,activity_id',
-        sort: '-created'
+        sort: '-created',
       });
       setSubmissions(submissionRecords);
+      await saveToCache('submissions', submissionRecords);
     }
 
-    // Get news using API service
-    const newsRecords = await fetchNews();
-    setNews(newsRecords);
+    await saveToCache('courses', mappedClasses);
+    await saveToCache('lessons', lessonRecords);
+    await saveToCache('activities', activityRecords);
+    await saveToCache('news', newsRecords);
   };
 
   /**
-   * Load data for admin role
+   * Load data for admin role.
+   * Fetches everything with no filters.
    */
   const loadAdminData = async () => {
-    // Admins get all data
-    const [classRecords, lessonRecords, activityRecords, newsRecords, submissionRecords] = await Promise.all([
-      pb.collection('classes').getFullList({ expand: 'course_id,teacher_id', sort: '-created' }),
-      fetchLessons([]), // Fetch all lessons using API service
-      fetchActivities([]), // Fetch all activities using API service
-      fetchNews(), // Fetch all news using API service
-      pb.collection('submissions').getFullList({ expand: 'student_id,activity_id', sort: '-created' })
-    ]);
+    const [classRecords, lessonRecords, activityRecords, newsRecords, submissionRecords] =
+      await Promise.all([
+        pb.collection('classes').getFullList({ expand: 'course_id,teacher_id', sort: 'created', requestKey: null }),
+        fetchLessons([]),        // all lessons
+        fetchActivities([]),     // all activities
+        safelyFetchNews(),
+        pb.collection('submissions').getFullList({
+          expand: 'student_id,activity_id',
+          sort: '-created',
+        }),
+      ]);
 
-    setClasses(classRecords);
+    const mappedClasses = classRecords.map(r => ({
+      id: r.id,
+      course_id: r.course_id,
+      teacher_id: r.teacher_id,
+      course: r.expand?.course_id || null,
+      teacher: r.expand?.teacher_id || null,
+      createdAt: r.created,
+      updatedAt: r.updated,
+    }));
+
+    setCourses(mappedClasses);
     setLessons(lessonRecords);
     setActivities(activityRecords);
     setNews(newsRecords);
     setSubmissions(submissionRecords);
+
+    // Cache with fresh data
+    await saveToCache('courses', mappedClasses);
+    await saveToCache('lessons', lessonRecords);
+    await saveToCache('activities', activityRecords);
+    await saveToCache('news', newsRecords);
+    await saveToCache('submissions', submissionRecords);
   };
 
   /**
@@ -320,7 +328,6 @@ export default function DataProvider({ children }) {
       const savedComments = await localforage.getItem('comments');
       const savedLocalSubmissions = await localforage.getItem('localSubmissions');
       const savedPendingSync = await localforage.getItem('pendingSync');
-
       if (savedComments) setComments(savedComments);
       if (savedLocalSubmissions) setLocalSubmissions(savedLocalSubmissions);
       if (savedPendingSync) setPendingSync(savedPendingSync);
@@ -329,9 +336,6 @@ export default function DataProvider({ children }) {
     }
   };
 
-  /**
-   * Save data to cache
-   */
   const saveToCache = async (key, data) => {
     try {
       await localforage.setItem(key, data);
@@ -340,27 +344,20 @@ export default function DataProvider({ children }) {
     }
   };
 
-  /**
-   * Load from cache when offline
-   */
   const loadFromCache = async () => {
     try {
       const cached = {
-        enrollments: await localforage.getItem('enrollments'),
-        classes: await localforage.getItem('classes'),
+        courses: await localforage.getItem('courses'),
         lessons: await localforage.getItem('lessons'),
         activities: await localforage.getItem('activities'),
         news: await localforage.getItem('news'),
         submissions: await localforage.getItem('submissions'),
       };
-
-      if (cached.enrollments) setEnrollments(cached.enrollments);
-      if (cached.classes) setClasses(cached.classes);
+      if (cached.courses) setCourses(cached.courses);
       if (cached.lessons) setLessons(cached.lessons);
       if (cached.activities) setActivities(cached.activities);
       if (cached.news) setNews(cached.news);
       if (cached.submissions) setSubmissions(cached.submissions);
-
       return cached;
     } catch (error) {
       console.error('Error loading from cache:', error);
@@ -374,7 +371,6 @@ export default function DataProvider({ children }) {
   const syncPendingData = async () => {
     if (!isOnline || pendingSync.length === 0) return;
 
-    console.log('Syncing pending data...', pendingSync.length, 'items');
     const synced = [];
     const failed = [];
 
@@ -390,23 +386,14 @@ export default function DataProvider({ children }) {
       }
     }
 
-    // Remove synced items from pending queue
     const remaining = failed;
     setPendingSync(remaining);
     await localforage.setItem('pendingSync', remaining);
 
     if (synced.length > 0) {
-      console.log(`Successfully synced ${synced.length} items`);
-      // Reload data to get fresh state
       await loadAllData();
     }
   };
-
-  // Computed data for backward compatibility
-  const homework = activities.filter(a => a.type === 'homework' || a.type === 'assignment');
-  const quizzes = activities.filter(a => a.type === 'quiz');
-  const exams = activities.filter(a => a.type === 'exam');
-  const materials = lessons; // Lessons are materials
 
   /**
    * Submit homework/activity to PocketBase
@@ -420,22 +407,18 @@ export default function DataProvider({ children }) {
     };
 
     try {
-      // If offline, queue for later sync
       if (!isOnline) {
-        console.log('Offline: queuing submission for sync');
         const pendingItem = {
           id: Date.now().toString(),
           type: 'submission',
           data,
-          files: submissionData.files || [], // Store file references for offline sync
+          files: submissionData.files || [],
           timestamp: new Date().toISOString(),
         };
-        
         const newPending = [...pendingSync, pendingItem];
         setPendingSync(newPending);
         await localforage.setItem('pendingSync', newPending);
-        
-        // Save locally
+
         const newLocalSubmissions = {
           ...localSubmissions,
           [activityId]: {
@@ -446,46 +429,27 @@ export default function DataProvider({ children }) {
         };
         setLocalSubmissions(newLocalSubmissions);
         await localforage.setItem('localSubmissions', newLocalSubmissions);
-        
-        return { 
-          success: true, 
-          offline: true,
-          message: 'Submission saved. Will sync when online.'
-        };
+
+        return { success: true, offline: true, message: 'Submission saved. Will sync when online.' };
       }
 
-      // If files are included, use FormData for upload
       if (submissionData.files && submissionData.files.length > 0) {
         const formData = new FormData();
         formData.append('activity_id', activityId);
         formData.append('student_id', user.id);
         formData.append('submission_text', submissionData.text || '');
         formData.append('answers', JSON.stringify(submissionData.answers || {}));
-        
-        // Append each file
-        submissionData.files.forEach((file, index) => {
-          formData.append('files', file);
-        });
-        
+        submissionData.files.forEach((file) => formData.append('files', file));
         const record = await pb.collection('submissions').create(formData);
-        
-        // Update local state
         setSubmissions(prev => [...prev, record]);
-        
         return { success: true, submission: record };
       } else {
-        // Text-only submission
         const record = await pb.collection('submissions').create(data);
-        
-        // Update local state
         setSubmissions(prev => [...prev, record]);
-        
         return { success: true, submission: record };
       }
     } catch (error) {
       console.error('Error submitting homework:', error);
-      
-      // Save locally if online submit fails
       const newLocalSubmissions = {
         ...localSubmissions,
         [activityId]: {
@@ -496,7 +460,6 @@ export default function DataProvider({ children }) {
       };
       setLocalSubmissions(newLocalSubmissions);
       await localforage.setItem('localSubmissions', newLocalSubmissions);
-      
       throw error;
     }
   };
@@ -508,57 +471,36 @@ export default function DataProvider({ children }) {
     const data = {
       activity_id: activityId,
       student_id: user.id,
-      answers: answers, // { questionId: answer }
+      answers,
     };
 
     try {
-      // If offline, queue for later sync
       if (!isOnline) {
-        console.log('Offline: queuing quiz submission for sync');
         const pendingItem = {
           id: Date.now().toString(),
           type: 'submission',
           data,
           timestamp: new Date().toISOString(),
         };
-        
         const newPending = [...pendingSync, pendingItem];
         setPendingSync(newPending);
         await localforage.setItem('pendingSync', newPending);
-        
-        return { 
-          success: true, 
-          offline: true,
-          message: 'Quiz saved. Will sync when online.'
-        };
+        return { success: true, offline: true, message: 'Quiz saved. Will sync when online.' };
       }
 
       const record = await pb.collection('submissions').create(data);
-      
-      // Update local state
       setSubmissions(prev => [...prev, record]);
-      
-      return { 
-        success: true, 
-        submission: record,
-        score: record.score // Auto-calculated by backend
-      };
+      return { success: true, submission: record, score: record.score };
     } catch (error) {
       console.error('Error submitting quiz:', error);
       throw error;
     }
   };
 
-  /**
-   * Get submission for a specific activity
-   */
   const getSubmissionForActivity = (activityId) => {
     return submissions.find(s => s.activity_id === activityId && s.student_id === user?.id);
   };
 
-  /**
-   * Add comment to news (local only for now)
-   */
   const addComment = async (newsId, comment) => {
     const newsComments = comments[newsId] || [];
     const newComment = {
@@ -567,27 +509,26 @@ export default function DataProvider({ children }) {
       author: user?.name || 'Student',
       timestamp: new Date().toISOString(),
     };
-    const newComments = {
-      ...comments,
-      [newsId]: [...newsComments, newComment],
-    };
+    const newComments = { ...comments, [newsId]: [...newsComments, newComment] };
     setComments(newComments);
     await localforage.setItem('comments', newComments);
   };
 
-  /**
-   * Refresh data
-   */
   const refreshData = async () => {
     await loadAllData();
   };
+
+  // Computed splits of activities
+  const homework = activities.filter(a => a.type === 'homework' || a.type === 'assignment');
+  const quizzes = activities.filter(a => a.type === 'quiz');
+  const exams = activities.filter(a => a.type === 'exam');
+  const materials = lessons;
 
   return (
     <DataContext.Provider
       value={{
         // Data
-        enrollments,
-        classes,
+        courses,
         lessons,
         activities,
         homework,
@@ -596,19 +537,19 @@ export default function DataProvider({ children }) {
         materials,
         news,
         submissions,
-        
+
         // Computed/legacy
         userSubmissions: submissions.filter(s => s.student_id === user?.id),
-        newsComments: Object.entries(comments).flatMap(([newsId, cmts]) => 
+        newsComments: Object.entries(comments).flatMap(([newsId, cmts]) =>
           (cmts || []).map(c => ({ ...c, newsId }))
         ),
-        
+
         // States
         loading,
         error,
         isOnline,
         pendingSync,
-        
+
         // Methods
         submitHomework,
         submitQuiz,

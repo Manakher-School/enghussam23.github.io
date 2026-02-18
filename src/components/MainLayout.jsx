@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -41,7 +41,7 @@ import AdminDashboard from '../pages/AdminDashboard';
 const MainLayout = () => {
   const { t, i18n } = useTranslation();
   const { user, logout, isAuthenticated, loading, isStudent, isTeacher, isAdmin } = useAuth();
-  const { gradeSelection, clearGradeSelection } = useGrade();
+  const { gradeSelection } = useGrade();
   
   // Default page based on role: dashboard for teachers/admins, home for students
   const getDefaultPage = () => {
@@ -50,6 +50,12 @@ const MainLayout = () => {
   };
   
   const [currentPage, setCurrentPage] = useState(getDefaultPage());
+
+  // Update the default page whenever the logged-in user changes (e.g. after login)
+  useEffect(() => {
+    setCurrentPage(getDefaultPage());
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
@@ -121,11 +127,6 @@ const MainLayout = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-  };
-
-  const handleChangeGrade = () => {
-    clearGradeSelection();
-    handleMenuClose();
   };
 
   const handleLogout = () => {
@@ -260,11 +261,6 @@ const MainLayout = () => {
             {user?.name || user?.email}
           </Typography>
         </MenuItem>
-        {isStudent() && (
-          <MenuItem onClick={handleChangeGrade}>
-            {t('menu.changeGrade')}
-          </MenuItem>
-        )}
         <MenuItem onClick={handleLogout}>
           {t('nav.logout') || 'Logout'}
         </MenuItem>

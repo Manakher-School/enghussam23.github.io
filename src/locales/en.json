@@ -1,5 +1,5 @@
 {
-    "appName": "School Educational Platform",
+    "appName": "Al-Manakhir Elementary School",
     "hero": {
         "subtitle": "Towards a bright future of excellence and creativity"
     },
@@ -229,7 +229,9 @@
         "shortAnswer": "Short Answer",
         "questionText": "Question Text",
         "option": "Option",
-        "correctAnswer": "Correct Answer"
+        "correctAnswer": "Correct Answer",
+        "editActivity": "Edit Activity",
+        "editLesson": "Edit Lesson"
     },
     "admin": {
         "dashboard": "Admin Dashboard",
@@ -264,6 +266,7 @@
         "student": "Student",
         "class": "Class",
         "enrollmentsInfo": "Select a student and class to create enrollment",
+        "noEnrollments": "No enrollments yet",
         "password": "Password",
         "admin": "Admin"
     }

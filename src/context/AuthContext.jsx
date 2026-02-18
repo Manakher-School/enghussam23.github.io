@@ -89,39 +89,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   /**
-   * Quick login for students (one-click)
-   * Students login with their email automatically (password: student123)
-   * @param {Object} student - Student user object
-   * @returns {Promise<Object>} User data
-   */
-  const quickLoginAsStudent = async (student) => {
-    try {
-      setError(null);
-      setLoading(true);
-
-      // Student quick login uses default password
-      const defaultPassword = 'student123';
-      const authData = await pb.collection('users').authWithPassword(student.email, defaultPassword);
-      
-      setUser(authData.record);
-      setToken(authData.token);
-
-      return {
-        success: true,
-        user: authData.record,
-        role: authData.record.role,
-      };
-    } catch (err) {
-      console.error('Quick login error:', err);
-      const errorMessage = err?.response?.message || err.message || 'Login failed';
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /**
    * Logout current user
    * Clears PocketBase authStore and local state
    */
@@ -205,7 +172,6 @@ export const AuthProvider = ({ children }) => {
     
     // Methods
     login,
-    quickLoginAsStudent,
     logout,
     refreshAuth,
     

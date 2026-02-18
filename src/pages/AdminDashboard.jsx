@@ -41,10 +41,11 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import { useData } from '../context/DataContext';
 import {
   fetchAllUsers,
   fetchAllCourses,
-  fetchAllClasses,
+  fetchAllEnrollments,
   createUser,
   createCourse,
   createClass,
@@ -56,14 +57,15 @@ import {
 function AdminDashboard() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [loading, setLoading] = useState(true);
+  const { courses: classes, loading: contextLoading } = useData();
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
   
-  // Data
+  // Data fetched locally (not in DataContext)
   const [users, setUsers] = useState([]);
   const [courses, setCourses] = useState([]);
-  const [classes, setClasses] = useState([]);
+  const [enrollments, setEnrollments] = useState([]);
   
   // Dialogs
   const [userDialog, setUserDialog] = useState(false);
@@ -93,25 +95,32 @@ function AdminDashboard() {
   });
 
   useEffect(() => {
-    loadData();
+    let cancelled = false;
+    loadData(cancelled);
+    return () => { cancelled = true; };
   }, []);
 
-  const loadData = async () => {
+  const loadData = async (cancelled = false) => {
     try {
       setLoading(true);
-      const [usersData, coursesData, classesData] = await Promise.all([
+      const [usersData, coursesData, enrollmentsData] = await Promise.all([
         fetchAllUsers(),
         fetchAllCourses(),
-        fetchAllClasses(),
+        fetchAllEnrollments(),
       ]);
-      
-      setUsers(usersData);
-      setCourses(coursesData);
-      setClasses(classesData);
+
+      if (!cancelled) {
+        setUsers(usersData);
+        setCourses(coursesData);
+        setEnrollments(enrollmentsData);
+      }
     } catch (err) {
-      setError(err.message);
+      // Suppress auto-cancellation errors (e.g. React StrictMode double-mount)
+      if (!cancelled && err.message && !err.message.includes('autocancelled') && !err.message.includes('aborted')) {
+        setError(err.message);
+      }
     } finally {
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     }
   };
 
@@ -153,6 +162,7 @@ function AdminDashboard() {
       await createEnrollment(newEnrollment.student_id, newEnrollment.class_id);
       setEnrollmentDialog(false);
       setNewEnrollment({ student_id: '', class_id: '' });
+      loadData();
     } catch (err) {
       setError(err.message);
     }
@@ -177,7 +187,7 @@ function AdminDashboard() {
     }
   };
 
-  if (loading) {
+  if (contextLoading || loading) {
     return (
       <Container>
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
@@ -438,11 +448,43 @@ function AdminDashboard() {
                     {t('admin.createEnrollment')}
                   </Button>
                 </Box>
-                <Box textAlign="center" mt={4}>
-                  <Typography color="text.secondary">
-                    {t('admin.enrollmentsInfo')}
-                  </Typography>
-                </Box>
+                <TableContainer component={Paper}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>{t('admin.student')}</TableCell>
+                        <TableCell>{t('admin.email')}</TableCell>
+                        <TableCell>{t('admin.course')}</TableCell>
+                        <TableCell>{t('admin.status')}</TableCell>
+                        <TableCell>{t('admin.created')}</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {enrollments.map((enrollment) => (
+                        <TableRow key={enrollment.id}>
+                          <TableCell>{enrollment.student?.name || 'N/A'}</TableCell>
+                          <TableCell>{enrollment.student?.email || 'N/A'}</TableCell>
+                          <TableCell>{enrollment.classInfo?.course?.title || 'N/A'}</TableCell>
+                          <TableCell>
+                            <Chip
+                              label={enrollment.status || 'active'}
+                              size="small"
+                              color={enrollment.status === 'active' ? 'success' : 'default'}
+                            />
+                          </TableCell>
+                          <TableCell>{new Date(enrollment.created).toLocaleDateString()}</TableCell>
+                        </TableRow>
+                      ))}
+                      {enrollments.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={5} align="center">
+                            {t('admin.noEnrollments')}
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               </>
             )}
           </Box>

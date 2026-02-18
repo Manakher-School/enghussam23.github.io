@@ -41,8 +41,8 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import { useData } from '../context/DataContext';
 import {
-  fetchTeacherClasses,
   fetchClassEnrollments,
   fetchActivities,
   fetchLessons,
@@ -52,16 +52,18 @@ import {
   createQuestion,
   deleteActivity,
   deleteLesson,
+  updateActivity,
+  updateLesson,
 } from '../services/api';
 
 function TeacherDashboard() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [loading, setLoading] = useState(true);
+  const { courses: classes, loading: contextLoading } = useData();
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
   // State
-  const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
   
@@ -75,6 +77,8 @@ function TeacherDashboard() {
   const [activityDialog, setActivityDialog] = useState(false);
   const [lessonDialog, setLessonDialog] = useState(false);
   const [questionDialog, setQuestionDialog] = useState(false);
+  const [editActivityDialog, setEditActivityDialog] = useState(false);
+  const [editLessonDialog, setEditLessonDialog] = useState(false);
   
   // Form data
   const [newActivity, setNewActivity] = useState({
@@ -94,11 +98,16 @@ function TeacherDashboard() {
     correct_answer: '',
   });
   const [selectedActivity, setSelectedActivity] = useState(null);
+  const [editingActivity, setEditingActivity] = useState(null);
+  const [editingLesson, setEditingLesson] = useState(null);
 
-  // Load teacher's classes on mount
+  // When classes arrive from context, auto-select the first one
   useEffect(() => {
-    loadClasses();
-  }, [user]);
+    if (classes.length > 0 && !selectedClass) {
+      setSelectedClass(classes[0]);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [classes]);
 
   // Load class data when class is selected
   useEffect(() => {
@@ -106,21 +115,6 @@ function TeacherDashboard() {
       loadClassData();
     }
   }, [selectedClass]);
-
-  const loadClasses = async () => {
-    try {
-      setLoading(true);
-      const data = await fetchTeacherClasses(user.id);
-      setClasses(data);
-      if (data.length > 0 && !selectedClass) {
-        setSelectedClass(data[0]);
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const loadClassData = async () => {
     try {
@@ -196,7 +190,47 @@ function TeacherDashboard() {
     }
   };
 
-  if (loading && classes.length === 0) {
+  const handleEditActivityOpen = (activity) => {
+    setEditingActivity({ ...activity });
+    setEditActivityDialog(true);
+  };
+
+  const handleEditActivitySave = async () => {
+    try {
+      await updateActivity(editingActivity.id, {
+        title: editingActivity.title,
+        type: editingActivity.type,
+        time_limit: editingActivity.time_limit,
+        max_score: editingActivity.max_score,
+      });
+      setEditActivityDialog(false);
+      setEditingActivity(null);
+      loadClassData();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleEditLessonOpen = (lesson) => {
+    setEditingLesson({ ...lesson });
+    setEditLessonDialog(true);
+  };
+
+  const handleEditLessonSave = async () => {
+    try {
+      await updateLesson(editingLesson.id, {
+        title: editingLesson.title,
+        content: editingLesson.content,
+      });
+      setEditLessonDialog(false);
+      setEditingLesson(null);
+      loadClassData();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  if (contextLoading && classes.length === 0) {
     return (
       <Container>
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
@@ -404,6 +438,13 @@ function TeacherDashboard() {
                               </IconButton>
                               <IconButton
                                 size="small"
+                                color="primary"
+                                onClick={() => handleEditActivityOpen(activity)}
+                              >
+                                <EditIcon />
+                              </IconButton>
+                              <IconButton
+                                size="small"
                                 color="error"
                                 onClick={() => handleDeleteActivity(activity.id)}
                               >
@@ -453,15 +494,22 @@ function TeacherDashboard() {
                             <TableCell>{lesson.title}</TableCell>
                             <TableCell>{lesson.attachments?.length || 0}</TableCell>
                             <TableCell>{new Date(lesson.createdAt).toLocaleDateString()}</TableCell>
-                            <TableCell>
-                              <IconButton
-                                size="small"
-                                color="error"
-                                onClick={() => handleDeleteLesson(lesson.id)}
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            </TableCell>
+                             <TableCell>
+                               <IconButton
+                                 size="small"
+                                 color="primary"
+                                 onClick={() => handleEditLessonOpen(lesson)}
+                               >
+                                 <EditIcon />
+                               </IconButton>
+                               <IconButton
+                                 size="small"
+                                 color="error"
+                                 onClick={() => handleDeleteLesson(lesson.id)}
+                               >
+                                 <DeleteIcon />
+                               </IconButton>
+                             </TableCell>
                           </TableRow>
                         ))}
                         {lessons.length === 0 && (
@@ -642,6 +690,79 @@ function TeacherDashboard() {
         <DialogActions>
           <Button onClick={() => setQuestionDialog(false)}>{t('common.cancel')}</Button>
           <Button onClick={handleCreateQuestion} variant="contained">{t('common.add')}</Button>
+        </DialogActions>
+      </Dialog>
+      {/* Edit Activity Dialog */}
+      <Dialog open={editActivityDialog} onClose={() => setEditActivityDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>{t('teacher.editActivity')}</DialogTitle>
+        <DialogContent>
+          {editingActivity && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+              <TextField
+                label={t('teacher.activityTitle')}
+                fullWidth
+                value={editingActivity.title}
+                onChange={(e) => setEditingActivity({ ...editingActivity, title: e.target.value })}
+              />
+              <FormControl fullWidth>
+                <InputLabel>{t('teacher.type')}</InputLabel>
+                <Select
+                  value={editingActivity.type}
+                  onChange={(e) => setEditingActivity({ ...editingActivity, type: e.target.value })}
+                >
+                  <MenuItem value="quiz">{t('teacher.quiz')}</MenuItem>
+                  <MenuItem value="exam">{t('teacher.exam')}</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                label={t('teacher.timeLimit')}
+                type="number"
+                fullWidth
+                value={editingActivity.time_limit || ''}
+                onChange={(e) => setEditingActivity({ ...editingActivity, time_limit: parseInt(e.target.value) })}
+              />
+              <TextField
+                label={t('teacher.maxScore')}
+                type="number"
+                fullWidth
+                value={editingActivity.max_score || ''}
+                onChange={(e) => setEditingActivity({ ...editingActivity, max_score: parseInt(e.target.value) })}
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditActivityDialog(false)}>{t('common.cancel')}</Button>
+          <Button onClick={handleEditActivitySave} variant="contained">{t('common.save')}</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Lesson Dialog */}
+      <Dialog open={editLessonDialog} onClose={() => setEditLessonDialog(false)} maxWidth="md" fullWidth>
+        <DialogTitle>{t('teacher.editLesson')}</DialogTitle>
+        <DialogContent>
+          {editingLesson && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+              <TextField
+                label={t('teacher.lessonTitle')}
+                fullWidth
+                value={editingLesson.title}
+                onChange={(e) => setEditingLesson({ ...editingLesson, title: e.target.value })}
+              />
+              <TextField
+                label={t('teacher.content')}
+                fullWidth
+                multiline
+                rows={6}
+                value={editingLesson.content || ''}
+                onChange={(e) => setEditingLesson({ ...editingLesson, content: e.target.value })}
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditLessonDialog(false)}>{t('common.cancel')}</Button>
+          <Button onClick={handleEditLessonSave} variant="contained">{t('common.save')}</Button>
         </DialogActions>
       </Dialog>
     </Container>

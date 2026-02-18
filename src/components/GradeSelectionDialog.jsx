@@ -15,11 +15,13 @@ import {
 import { School as SchoolIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useGrade } from '../context/GradeContext';
+import { useAuth } from '../context/AuthContext';
 import { getGradeBadge } from '../theme/theme';
 
 const GradeSelectionDialog = () => {
   const { t, i18n } = useTranslation();
   const { gradeSelection, saveGradeSelection, grades, sections, loading } = useGrade();
+  const { isAuthenticated, isStudent } = useAuth();
   const [selectedGrade, setSelectedGrade] = useState('');
   const [selectedSection, setSelectedSection] = useState('');
 
@@ -35,7 +37,8 @@ const GradeSelectionDialog = () => {
   if (loading) return null;
 
   const lang = i18n.language;
-  const open = !gradeSelection;
+  // Only open for authenticated students who haven't selected a grade yet
+  const open = isAuthenticated() && isStudent() && !gradeSelection;
 
   return (
     <Dialog
@@ -88,7 +91,7 @@ const GradeSelectionDialog = () => {
           fullWidth
           disabled={!selectedGrade || !selectedSection}
         >
-          {t('تأكيد')}
+          {t('gradeSelection.confirm')}
         </Button>
       </DialogActions>
     </Dialog>

@@ -1,5 +1,5 @@
 {
-    "appName": "مدرسة المناخر الأساسية",
+    "appName": "مدرسة المناخر الأساسية المؤنثة",
     "hero": {
         "subtitle": "نحو مستقبل مشرق من التميز والإبداع"
     },
@@ -228,7 +228,9 @@
         "shortAnswer": "إجابة قصيرة",
         "questionText": "نص السؤال",
         "option": "خيار",
-        "correctAnswer": "الإجابة الصحيحة"
+        "correctAnswer": "الإجابة الصحيحة",
+        "editActivity": "تعديل النشاط",
+        "editLesson": "تعديل الدرس"
     },
     "admin": {
         "dashboard": "لوحة تحكم المسؤول",
@@ -263,6 +265,7 @@
         "student": "الطالب",
         "class": "الصف",
         "enrollmentsInfo": "اختر طالباً وصفاً لإنشاء التسجيل",
+        "noEnrollments": "لا توجد تسجيلات بعد",
         "password": "كلمة المرور",
         "admin": "مسؤول"
     }

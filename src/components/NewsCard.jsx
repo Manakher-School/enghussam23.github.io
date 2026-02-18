@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -85,10 +85,80 @@ function NewsCard({ news }) {
         <Typography variant="body1" paragraph sx={{ whiteSpace: 'pre-line' }}>
           {news.content[currentLang]}
         </Typography>
+
+        {/* Comments toggle */}
+        <Box display="flex" alignItems="center" sx={{ cursor: 'pointer', color: 'text.secondary' }} onClick={() => setExpanded(!expanded)}>
+          <CommentIcon fontSize="small" sx={{ mr: 0.5 }} />
+          <Typography variant="body2">
+            {t('news.comments')} ({comments.length})
+          </Typography>
+          <ExpandMoreIcon
+            fontSize="small"
+            sx={{
+              ml: 0.5,
+              transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 0.2s',
+            }}
+          />
+        </Box>
       </CardContent>
 
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <Divider />
+        <CardContent>
+          {/* Comment input */}
+          <Box display="flex" gap={1} mb={2}>
+            <TextField
+              fullWidth
+              size="small"
+              multiline
+              rows={2}
+              placeholder={t('news.writeComment')}
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+            />
+            <Button
+              variant="contained"
+              size="small"
+              onClick={handleAddComment}
+              disabled={!commentText.trim()}
+              sx={{ alignSelf: 'flex-end', whiteSpace: 'nowrap' }}
+            >
+              {t('news.postComment')}
+            </Button>
+          </Box>
+
+          {/* Comments list */}
+          {comments.length === 0 ? (
+            <Typography variant="body2" color="text.secondary" textAlign="center" py={1}>
+              {t('news.noComments')}
+            </Typography>
+          ) : (
+            <List dense>
+              {comments.map((comment, index) => (
+                <React.Fragment key={comment.id}>
+                  {index > 0 && <Divider component="li" />}
+                  <ListItem alignItems="flex-start">
+                    <Avatar sx={{ width: 32, height: 32, mr: 1, mt: 0.5, bgcolor: 'primary.main', fontSize: '0.75rem' }}>
+                      {getInitials(comment.author)}
+                    </Avatar>
+                    <ListItemText
+                      primary={
+                        <Box display="flex" justifyContent="space-between">
+                          <Typography variant="body2" fontWeight="medium">{comment.author}</Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {new Date(comment.timestamp).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US')}
+                          </Typography>
+                        </Box>
+                      }
+                      secondary={comment.text}
+                    />
+                  </ListItem>
+                </React.Fragment>
+              ))}
+            </List>
+          )}
+        </CardContent>
       </Collapse>
     </Card>
   );

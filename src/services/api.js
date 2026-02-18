@@ -35,10 +35,49 @@ const formatDate = (pbDate) => {
 };
 
 /**
- * FETCH ACTIVITIES (Quizzes/Exams)
+ * FETCH COURSES
  *
- * Backend only supports 'quiz' and 'exam' types
- * For homework-like activities, check if backend added that type
+ * Fetches all published courses for a given grade.
+ * Pass grade=null (or omit) to fetch all courses (admin use).
+ * @param {string|null} grade - Grade ID e.g. "4", or null for all
+ * @returns {Promise<Array>} Array of course records
+ */
+export const fetchCourses = async (grade = null) => {
+  try {
+    let filter = "is_published=true";
+    if (grade) {
+      filter += ` && grade='${grade}'`;
+    }
+
+    const records = await pb.collection("courses").getFullList({
+      filter: filter || undefined,
+      expand: "teacher_id",
+      sort: "-created",
+      requestKey: null,
+    });
+
+    return records.map((record) => ({
+      id: record.id,
+      title: formatBilingualField(record.title),
+      grade: record.grade,
+      teacher_id: record.teacher_id,
+      teacher: record.expand?.teacher_id || null,
+      isPublished: record.is_published,
+      createdAt: formatDate(record.created),
+      updatedAt: formatDate(record.updated),
+    }));
+  } catch (error) {
+    console.error("Error fetching courses:", error);
+    throw new Error(`Failed to fetch courses: ${error.message}`);
+  }
+};
+
+/**
+ * FETCH ACTIVITIES (Homework/Quizzes/Exams)
+ *
+ * Filters by course_id list. Pass empty array to fetch all (admin use).
+ * @param {string[]} courseIds - Array of course IDs
+ * @param {string|null} type - Optional type filter: 'homework', 'quiz', 'exam'
  */
 export const fetchActivities = async (classIds = [], type = null) => {
   try {
@@ -57,26 +96,27 @@ export const fetchActivities = async (classIds = [], type = null) => {
       filter: filter || undefined,
       sort: "-created",
       expand: "class_id",
+      requestKey: null,
     });
 
     return records.map((record) => ({
       id: record.id,
-      title: formatBilingualField(record.title), // Transform to bilingual object
-      content: formatBilingualField(record.content), // Transform to bilingual object
-      description: formatBilingualField(record.description), // Transform to bilingual object
-      subject: formatBilingualField(record.subject), // Transform to bilingual object
+      title: formatBilingualField(record.title),
+      content: formatBilingualField(record.content),
+      description: formatBilingualField(record.description),
+      subject: formatBilingualField(record.subject),
       class_id: record.class_id,
-      type: record.type, // 'quiz' or 'exam'
+      grade: record.expand?.class_id?.grade || null,
+      type: record.type, // 'homework', 'quiz', or 'exam'
       time_limit: record.time_limit,
       max_score: record.max_score,
-      dueDate: record.due_date ? formatDate(record.due_date) : null, // For homework
+      dueDate: record.due_date ? formatDate(record.due_date) : null,
       date: record.due_date
         ? formatDate(record.due_date)
-        : formatDate(record.created), // Compatibility
+        : formatDate(record.created),
       createdAt: formatDate(record.created),
       updatedAt: formatDate(record.updated),
-      // Expanded data
-      class: record.expand?.class_id,
+      class: record.expand?.class_id || null,
     }));
   } catch (error) {
     console.error("Error fetching activities:", error);
@@ -95,6 +135,7 @@ export const fetchQuestions = async (activityId, includeAnswers = false) => {
     const options = {
       filter: `activity_id='${activityId}'`,
       sort: "created",
+      requestKey: null,
     };
 
     // Students should NOT see correct answers
@@ -123,7 +164,9 @@ export const fetchQuestions = async (activityId, includeAnswers = false) => {
 /**
  * FETCH LESSONS (Materials)
  *
- * Maps lessons to materials with attachment handling
+ * Filters by course_id list. Pass empty array to fetch all (admin use).
+ * Maps lessons to materials with attachment handling.
+ * @param {string[]} courseIds - Array of course IDs
  */
 export const fetchLessons = async (classIds = []) => {
   try {
@@ -138,21 +181,21 @@ export const fetchLessons = async (classIds = []) => {
       filter: filter || undefined,
       sort: "-created",
       expand: "class_id",
+      requestKey: null,
     });
 
     return records.map((record) => ({
       id: record.id,
       class_id: record.class_id,
-      title: formatBilingualField(record.title), // Transform to bilingual object
-      content: formatBilingualField(record.content), // Transform to bilingual object
-      subject: formatBilingualField(record.subject), // Transform to bilingual object
-      attachments: record.attachments || [], // Array of filenames
-      date: formatDate(record.created), // Add date field for compatibility
+      grade: record.expand?.class_id?.grade || null,
+      title: formatBilingualField(record.title),
+      content: formatBilingualField(record.content),
+      subject: formatBilingualField(record.subject),
+      attachments: record.attachments || [],
+      date: formatDate(record.created),
       createdAt: formatDate(record.created),
       updatedAt: formatDate(record.updated),
-      // Expanded data
-      class: record.expand?.class_id,
-      // File URLs
+      class: record.expand?.class_id || null,
       files: (record.attachments || []).map((filename) => ({
         name: filename,
         url: getFileUrl(record, filename),
@@ -175,6 +218,7 @@ export const fetchNews = async (limit = null) => {
     const options = {
       filter: "is_published=true",
       sort: "-created",
+      requestKey: null,
     };
 
     if (limit) {
@@ -293,7 +337,8 @@ export const getStudentSubmissions = async (studentId, activityType = null) => {
     const records = await pb.collection("submissions").getFullList({
       filter: filter,
       sort: "-created",
-      expand: "activity_id", // Expand to get activity details
+      expand: "activity_id",
+      requestKey: null,
     });
 
     return records;
@@ -314,6 +359,7 @@ export const getEnrollments = async (studentId) => {
       filter: `student_id='${studentId}' && status='active'`,
       expand: "class_id,class_id.course_id,class_id.teacher_id",
       sort: "-created",
+      requestKey: null,
     });
 
     return records;
@@ -380,6 +426,7 @@ export const fetchTeacherClasses = async (teacherId) => {
       filter: `teacher_id='${teacherId}'`,
       expand: "course_id,teacher_id",
       sort: "-created",
+      requestKey: null,
     });
 
     return records.map((record) => ({
@@ -409,6 +456,7 @@ export const fetchClassEnrollments = async (classId) => {
       filter: `class_id='${classId}' && status='active'`,
       expand: "student_id",
       sort: "-created",
+      requestKey: null,
     });
 
     return records.map((record) => ({
@@ -580,6 +628,7 @@ export const fetchClassSubmissions = async (classId) => {
       filter: `activity_id.class_id='${classId}'`,
       expand: "activity_id,student_id",
       sort: "-created",
+      requestKey: null,
     });
 
     return records.map((record) => ({
@@ -618,10 +667,14 @@ export const fetchAllUsers = async (role = null) => {
     const records = await pb.collection("users").getFullList({
       filter: filter || undefined,
       sort: "-created",
+      requestKey: null, // disable auto-cancellation
     });
 
     return records;
   } catch (error) {
+    if (error?.isAbort || error?.message?.includes('autocancelled') || error?.message?.includes('aborted')) {
+      return [];
+    }
     console.error("Error fetching users:", error);
     throw new Error(`Failed to fetch users: ${error.message}`);
   }
@@ -637,7 +690,8 @@ export const fetchStudentsForLogin = async () => {
     const records = await pb.collection("users").getFullList({
       filter: "role='student' && active=true",
       sort: "name",
-      fields: "id,email,name,avatar", // Only public fields
+      fields: "id,email,name,avatar",
+      requestKey: null,
     });
 
     return records;
@@ -657,6 +711,7 @@ export const fetchStudentByName = async (studentName) => {
     const records = await pb.collection("users").getFullList({
       filter: `role='student' && active=true && name~'${studentName}'`,
       fields: "id,email,name,avatar",
+      requestKey: null,
     });
 
     // Return exact match if found, otherwise return first partial match
@@ -738,6 +793,7 @@ export const fetchAllCourses = async () => {
   try {
     const records = await pb.collection("courses").getFullList({
       sort: "-created",
+      requestKey: null, // disable auto-cancellation
     });
 
     return records.map((record) => ({
@@ -748,6 +804,9 @@ export const fetchAllCourses = async () => {
       updated: formatDate(record.updated),
     }));
   } catch (error) {
+    if (error?.isAbort || error?.message?.includes('autocancelled') || error?.message?.includes('aborted')) {
+      return [];
+    }
     console.error("Error fetching courses:", error);
     throw new Error(`Failed to fetch courses: ${error.message}`);
   }
@@ -761,6 +820,7 @@ export const fetchAllClasses = async () => {
     const records = await pb.collection("classes").getFullList({
       expand: "course_id,teacher_id",
       sort: "-created",
+      requestKey: null,
     });
 
     return records.map((record) => ({
@@ -848,6 +908,32 @@ export const createEnrollment = async (studentId, classId) => {
 
 // Export pb instance for direct access if needed
 export { pb };
+
+/**
+ * FETCH ALL ENROLLMENTS (Admin)
+ */
+export const fetchAllEnrollments = async () => {
+  try {
+    const records = await pb.collection("enrollments").getFullList({
+      expand: "student_id,class_id",
+      sort: "-created",
+      requestKey: null, // disable auto-cancellation
+    });
+    return records.map((r) => ({
+      id: r.id,
+      status: r.status,
+      created: r.created,
+      student: r.expand?.student_id || null,
+      classInfo: r.expand?.class_id || null,
+    }));
+  } catch (error) {
+    if (error?.isAbort || error?.message?.includes('autocancelled') || error?.message?.includes('aborted')) {
+      return [];
+    }
+    console.error("Error fetching enrollments:", error);
+    throw new Error(`Failed to fetch enrollments: ${error.message}`);
+  }
+};
 
 /**
  * ============================================================================
