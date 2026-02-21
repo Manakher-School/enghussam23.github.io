@@ -903,8 +903,12 @@ export const fetchAllCourses = async () => {
 
     return records.map((record) => ({
       id: record.id,
-      title: record.title,
+      code: record.code,
+      name: record.name || { en: "", ar: "" },
       description: record.description || "",
+      icon: record.icon || "",
+      color: record.color || "#2196F3",
+      isActive: record.is_active,
       created: formatDate(record.created),
       updated: formatDate(record.updated),
     }));
@@ -961,42 +965,18 @@ export const fetchAllClasses = async () => {
  */
 export const createCourse = async (courseData) => {
   try {
-    // Support legacy format (title/description) OR new format (code/name)
-    let data;
-    
-    if (courseData.code) {
-      // New bilingual format
-      data = {
-        code: courseData.code.toUpperCase(),
-        name: JSON.stringify({
-          en: courseData.nameEn || courseData.code,
-          ar: courseData.nameAr || courseData.code,
-        }),
-        description: courseData.description ? JSON.stringify({
-          en: courseData.description,
-          ar: courseData.description,
-        }) : "",
-        icon: courseData.icon || "school",
-        color: courseData.color || "#2196F3",
-        is_active: true,
-      };
-    } else {
-      // Legacy format - convert title to bilingual
-      data = {
-        code: (courseData.title || "SUBJ").substring(0, 4).toUpperCase(),
-        name: JSON.stringify({
-          en: courseData.title || "Subject",
-          ar: courseData.title || "مادة",
-        }),
-        description: courseData.description ? JSON.stringify({
-          en: courseData.description,
-          ar: courseData.description,
-        }) : "",
-        icon: "school",
-        color: "#2196F3",
-        is_active: true,
-      };
-    }
+    // Bilingual format - name is stored as JSON object by PocketBase
+    const data = {
+      code: courseData.code.toUpperCase(),
+      name: {
+        en: courseData.nameEn || courseData.code,
+        ar: courseData.nameAr || courseData.code,
+      },
+      description: courseData.description || "",
+      icon: courseData.icon || "school",
+      color: courseData.color || "#2196F3",
+      is_active: true,
+    };
 
     const record = await pb.collection("courses").create(data);
 
@@ -1133,7 +1113,7 @@ export const fetchGrades = async () => {
     return records.map((record) => ({
       id: record.id,
       code: record.code,
-      name: JSON.parse(record.name || '{"en":"","ar":""}'),
+      name: record.name || { en: "", ar: "" },
       displayOrder: record.display_order,
       isActive: record.is_active,
     }));
@@ -1195,7 +1175,7 @@ export const fetchSubjects = async () => {
     return records.map((record) => ({
       id: record.id,
       code: record.code,
-      name: JSON.parse(record.name || '{"en":"","ar":""}'),
+      name: record.name || { en: "", ar: "" },
       icon: record.icon || "",
       color: record.color || "#2196F3",
       isActive: record.is_active,
@@ -1460,5 +1440,167 @@ export const createTeacherWithAssignments = async (data) => {
   } catch (error) {
     console.error("Error creating teacher:", error);
     throw error; // Re-throw to preserve original error message
+  }
+};
+
+/**
+ * ============================================================================
+ * USER DELETION SYSTEM (Two-Tier: Soft Delete + Hard Delete)
+ * ============================================================================
+ * Based on backend handoff documentation
+ */
+
+/**
+ * GET USER DEPENDENCIES
+ * 
+ * Checks what will be deleted when a user is removed
+ * @param {string} userId - User ID to check
+ * @returns {Promise<Object>} Dependencies summary
+ */
+export const getUserDependencies = async (userId) => {
+  try {
+    const response = await fetch(`/api/users/${userId}/dependencies`, {
+      headers: {
+        'Authorization': pb.authStore.token,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch dependencies: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching user dependencies:", error);
+    throw new Error(`Failed to fetch user dependencies: ${error.message}`);
+  }
+};
+
+/**
+ * SOFT DELETE USER (Deactivation)
+ * 
+ * Deactivates user account while preserving all data
+ * @param {string} userId - User ID to deactivate
+ * @returns {Promise<Object>} Success result
+ */
+export const softDeleteUser = async (userId) => {
+  try {
+    const response = await fetch(`/api/collections/users/records/${userId}?mode=soft`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': pb.authStore.token,
+      },
+    });
+
+    // Soft delete returns 400 with success message (by design)
+    if (!response.ok) {
+      const error = await response.json();
+      // Check if this is actually a success (message contains "successfully")
+      if (error.message && error.message.toLowerCase().includes('successfully')) {
+        return { success: true, message: error.message };
+      }
+      throw new Error(error.message || 'Failed to deactivate user');
+    }
+
+    return { success: true };
+  } catch (error) {
+    // Check if error message indicates success
+    if (error.message && error.message.toLowerCase().includes('successfully')) {
+      return { success: true, message: error.message };
+    }
+    console.error("Error soft deleting user:", error);
+    throw new Error(`Failed to deactivate user: ${error.message}`);
+  }
+};
+
+/**
+ * HARD DELETE USER (Permanent)
+ * 
+ * Permanently deletes user and all dependencies (CANNOT BE UNDONE)
+ * @param {string} userId - User ID to permanently delete
+ * @returns {Promise<Object>} Success result
+ */
+export const hardDeleteUser = async (userId) => {
+  try {
+    const response = await fetch(`/api/collections/users/records/${userId}?mode=hard`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': pb.authStore.token,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to permanently delete user');
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error hard deleting user:", error);
+    throw new Error(`Failed to permanently delete user: ${error.message}`);
+  }
+};
+
+/**
+ * REASSIGN CLASSES
+ * 
+ * Reassigns classes from one teacher to another
+ * @param {string} oldTeacherId - Current teacher ID
+ * @param {string} newTeacherId - New teacher ID
+ * @param {Array<string>} classIds - Optional: specific class IDs to reassign
+ * @returns {Promise<Object>} Reassignment result
+ */
+export const reassignClasses = async (oldTeacherId, newTeacherId, classIds = []) => {
+  try {
+    const response = await fetch('/api/classes/reassign', {
+      method: 'POST',
+      headers: {
+        'Authorization': pb.authStore.token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        old_teacher_id: oldTeacherId,
+        new_teacher_id: newTeacherId,
+        class_ids: classIds,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to reassign classes');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error reassigning classes:", error);
+    throw new Error(`Failed to reassign classes: ${error.message}`);
+  }
+};
+
+/**
+ * REACTIVATE USER
+ * 
+ * Reactivates a soft-deleted user
+ * @param {string} userId - User ID to reactivate
+ * @returns {Promise<Object>} Reactivation result
+ */
+export const reactivateUser = async (userId) => {
+  try {
+    const response = await fetch(`/api/users/${userId}/reactivate`, {
+      method: 'POST',
+      headers: {
+        'Authorization': pb.authStore.token,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to reactivate user');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error reactivating user:", error);
+    throw new Error(`Failed to reactivate user: ${error.message}`);
   }
 };

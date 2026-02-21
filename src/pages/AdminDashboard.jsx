@@ -53,9 +53,11 @@ import {
 } from '../services/api';
 import StudentCreationDialog from '../components/StudentCreationDialog';
 import TeacherCreationDialog from '../components/TeacherCreationDialog';
+import UserDeletionDialog from '../components/UserDeletionDialog';
 
 function AdminDashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
   const { user } = useAuth();
   const { courses: classes, loading: contextLoading } = useData();
   const [loading, setLoading] = useState(false);
@@ -72,6 +74,8 @@ function AdminDashboard() {
   const [teacherDialog, setTeacherDialog] = useState(false);
   const [courseDialog, setCourseDialog] = useState(false);
   const [classDialog, setClassDialog] = useState(false);
+  const [deletionDialog, setDeletionDialog] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
   
   // Form data
   const [newUser, setNewUser] = useState({
@@ -82,8 +86,12 @@ function AdminDashboard() {
     active: true,
   });
   const [newCourse, setNewCourse] = useState({
-    title: '',
+    code: '',
+    nameEn: '',
+    nameAr: '',
     description: '',
+    icon: 'school',
+    color: '#2196F3',
   });
   const [newClass, setNewClass] = useState({
     course_id: '',
@@ -133,7 +141,7 @@ function AdminDashboard() {
     try {
       await createCourse(newCourse);
       setCourseDialog(false);
-      setNewCourse({ title: '', description: '' });
+      setNewCourse({ code: '', nameEn: '', nameAr: '', description: '', icon: 'school', color: '#2196F3' });
       loadData();
     } catch (err) {
       setError(err.message);
@@ -151,14 +159,21 @@ function AdminDashboard() {
     }
   };
 
-  const handleDeleteUser = async (userId) => {
-    if (!window.confirm(t('admin.confirmDeleteUser'))) return;
-    try {
-      await deleteUser(userId);
-      loadData();
-    } catch (err) {
-      setError(err.message);
-    }
+  const handleDeleteUser = async (userToDelete) => {
+    // Open the new deletion dialog instead of immediate delete
+    setUserToDelete(userToDelete);
+    setDeletionDialog(true);
+  };
+
+  const handleDeletionSuccess = ({ mode, user }) => {
+    // Refresh the user list after successful deletion
+    loadData();
+    // Show success message based on mode
+    const message = mode === 'soft' 
+      ? t('admin.userDeactivated') 
+      : t('admin.userDeleted');
+    // You could add a toast notification here if you have one
+    console.log(message);
   };
 
   const handleToggleUserStatus = async (userId, currentStatus) => {
@@ -329,7 +344,7 @@ function AdminDashboard() {
                             <IconButton
                               size="small"
                               color="error"
-                              onClick={() => handleDeleteUser(u.id)}
+                              onClick={() => handleDeleteUser(u)}
                               disabled={u.id === user.id}
                             >
                               <DeleteIcon />
@@ -367,7 +382,7 @@ function AdminDashboard() {
                     <TableBody>
                       {courses.map((course) => (
                         <TableRow key={course.id}>
-                          <TableCell>{course.title}</TableCell>
+                          <TableCell>{course.name?.[lang] || course.name?.en || ''}</TableCell>
                           <TableCell>{course.description}</TableCell>
                           <TableCell>{new Date(course.created).toLocaleDateString()}</TableCell>
                         </TableRow>
@@ -409,7 +424,7 @@ function AdminDashboard() {
                     <TableBody>
                       {classes.map((cls) => (
                         <TableRow key={cls.id}>
-                          <TableCell>{cls.course?.title || 'N/A'}</TableCell>
+                          <TableCell>{cls.course?.name?.[lang] || cls.course?.name?.en || 'N/A'}</TableCell>
                           <TableCell>{cls.teacher?.name || 'N/A'}</TableCell>
                           <TableCell>{new Date(cls.created).toLocaleDateString()}</TableCell>
                         </TableRow>
@@ -469,18 +484,54 @@ function AdminDashboard() {
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             <TextField
-              label={t('admin.title')}
+              label={t('admin.courseCode')}
               fullWidth
-              value={newCourse.title}
-              onChange={(e) => setNewCourse({ ...newCourse, title: e.target.value })}
+              required
+              placeholder="e.g., MATH, SCI, ENG"
+              value={newCourse.code}
+              onChange={(e) => setNewCourse({ ...newCourse, code: e.target.value.toUpperCase() })}
+              helperText={t('admin.courseCodeHelp')}
+            />
+            <TextField
+              label={t('admin.nameEnglish')}
+              fullWidth
+              required
+              placeholder="e.g., Mathematics"
+              value={newCourse.nameEn}
+              onChange={(e) => setNewCourse({ ...newCourse, nameEn: e.target.value })}
+            />
+            <TextField
+              label={t('admin.nameArabic')}
+              fullWidth
+              required
+              placeholder="مثال: رياضيات"
+              value={newCourse.nameAr}
+              onChange={(e) => setNewCourse({ ...newCourse, nameAr: e.target.value })}
             />
             <TextField
               label={t('admin.description')}
               fullWidth
               multiline
-              rows={4}
+              rows={3}
+              placeholder={t('admin.descriptionOptional')}
               value={newCourse.description}
               onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })}
+            />
+            <TextField
+              label={t('admin.icon')}
+              fullWidth
+              placeholder="e.g., calculate, science, book"
+              value={newCourse.icon}
+              onChange={(e) => setNewCourse({ ...newCourse, icon: e.target.value })}
+              helperText={t('admin.iconHelp')}
+            />
+            <TextField
+              label={t('admin.color')}
+              fullWidth
+              type="color"
+              value={newCourse.color}
+              onChange={(e) => setNewCourse({ ...newCourse, color: e.target.value })}
+              helperText={t('admin.colorHelp')}
             />
           </Box>
         </DialogContent>
@@ -503,7 +554,7 @@ function AdminDashboard() {
               >
                 {courses.map((course) => (
                   <MenuItem key={course.id} value={course.id}>
-                    {course.title}
+                    {course.name?.[lang] || course.name?.en || ''}
                   </MenuItem>
                 ))}
               </Select>
@@ -547,6 +598,17 @@ function AdminDashboard() {
           setTeacherDialog(false);
           loadData();
         }}
+      />
+
+      {/* User Deletion Dialog */}
+      <UserDeletionDialog
+        open={deletionDialog}
+        onClose={() => {
+          setDeletionDialog(false);
+          setUserToDelete(null);
+        }}
+        user={userToDelete}
+        onSuccess={handleDeletionSuccess}
       />
     </Container>
   );
