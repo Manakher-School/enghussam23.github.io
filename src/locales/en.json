@@ -268,6 +268,8 @@
         "enrollmentsInfo": "Select a student and class to create enrollment",
         "noEnrollments": "No enrollments yet",
         "password": "Password",
-        "admin": "Admin"
+        "admin": "Admin",
+        "addStudent": "Add Student",
+        "addTeacher": "Add Teacher"
     }
 }

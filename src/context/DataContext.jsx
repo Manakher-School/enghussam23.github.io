@@ -169,52 +169,78 @@ export default function DataProvider({ children }) {
 
   /**
    * Load data for student role.
-   * Finds the student's enrolled classes, then loads content for those classes.
+   * Uses student's grade/section from profile to load content.
    */
   const loadStudentData = async () => {
-    // 1. Find all active enrollments for this student
-    const enrollmentRecords = await pb.collection('enrollments').getFullList({
-      filter: `student_id='${user.id}' && status='active'`,
-      sort: '-created',
-      requestKey: null,
-    });
-
-    const classIds = enrollmentRecords.map(e => e.class_id);
-
-    if (classIds.length === 0) {
-      // Not enrolled in any class — show empty state, not an error
-      console.warn('Student has no active enrollments.');
-      setCourses([]);
-      setLessons([]);
-      setActivities([]);
-      setSubmissions([]);
-      setNews(await safelyFetchNews(20));
-      return;
-    }
-
-    // 2. Fetch lessons, activities, submissions, and news in parallel
-    const [lessonRecords, activityRecords, submissionRecords, newsRecords] = await Promise.all([
-      fetchLessons(classIds),
-      fetchActivities(classIds),
-      pb.collection('submissions').getFullList({
-        filter: `student_id='${user.id}'`,
-        expand: 'activity_id',
-        sort: '-created',
+    try {
+      // 1. Get student's profile to determine grade and section
+      const profileRecords = await pb.collection('user_profiles').getFullList({
+        filter: `user_id='${user.id}'`,
+        expand: 'grade_id,section_id',
         requestKey: null,
-      }),
-      safelyFetchNews(20),
-    ]);
+      });
 
-    setLessons(lessonRecords);
-    setActivities(activityRecords);
-    setSubmissions(submissionRecords);
-    setNews(newsRecords);
+      if (profileRecords.length === 0) {
+        console.warn('Student has no profile.');
+        setCourses([]);
+        setLessons([]);
+        setActivities([]);
+        setSubmissions([]);
+        setNews(await safelyFetchNews(20));
+        return;
+      }
 
-    // Cache with fresh data
-    await saveToCache('lessons', lessonRecords);
-    await saveToCache('activities', activityRecords);
-    await saveToCache('submissions', submissionRecords);
-    await saveToCache('news', newsRecords);
+      const profile = profileRecords[0];
+      const gradeId = profile.grade_id;
+      const sectionId = profile.section_id;
+
+      if (!gradeId || !sectionId) {
+        console.warn('Student profile missing grade or section.');
+        setCourses([]);
+        setLessons([]);
+        setActivities([]);
+        setSubmissions([]);
+        setNews(await safelyFetchNews(20));
+        return;
+      }
+
+      // 2. Fetch lessons, activities, submissions, and news in parallel
+      // Filter by student's grade and section
+      const [lessonRecords, activityRecords, submissionRecords, newsRecords] = await Promise.all([
+        pb.collection('lessons').getFullList({
+          filter: `grade_id='${gradeId}' && section_ids~'${sectionId}'`,
+          sort: '-created',
+          expand: 'grade_id,section_ids',
+          requestKey: null,
+        }),
+        pb.collection('activities').getFullList({
+          filter: `grade_id='${gradeId}' && section_ids~'${sectionId}'`,
+          sort: '-created',
+          expand: 'grade_id,section_ids',
+          requestKey: null,
+        }),
+        pb.collection('submissions').getFullList({
+          filter: `student_id='${user.id}'`,
+          expand: 'activity_id',
+          sort: '-created',
+          requestKey: null,
+        }),
+        safelyFetchNews(20),
+      ]);
+
+      setLessons(lessonRecords);
+      setActivities(activityRecords);
+      setSubmissions(submissionRecords);
+      setNews(newsRecords);
+
+      // Cache with fresh data
+      await saveToCache('lessons', lessonRecords);
+      await saveToCache('activities', activityRecords);
+      await saveToCache('submissions', submissionRecords);
+    } catch (error) {
+      console.error('Error loading student data:', error);
+      throw error;
+    }
   };
 
   /**

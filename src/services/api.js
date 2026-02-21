@@ -79,23 +79,60 @@ export const fetchCourses = async (grade = null) => {
  * @param {string[]} courseIds - Array of course IDs
  * @param {string|null} type - Optional type filter: 'homework', 'quiz', 'exam'
  */
-export const fetchActivities = async (classIds = [], type = null) => {
+/**
+ * FETCH ACTIVITIES (Student/Teacher)
+ *
+ * Filters by grade_id and section_id for students, or by teacher's assigned sections
+ * @param {Object} options - Filter options
+ * @param {string} options.gradeId - Grade ID to filter by
+ * @param {string} options.sectionId - Section ID to filter by (uses relation ~)
+ * @param {string} options.type - Activity type ('quiz', 'exam', 'homework')
+ * @param {string[]} options.classIds - Legacy class IDs (deprecated, for backward compatibility)
+ */
+export const fetchActivities = async (options = {}) => {
   try {
     let filter = "";
-
-    if (classIds.length > 0) {
-      const classFilter = classIds.map((id) => `class_id='${id}'`).join(" || ");
-      filter = `(${classFilter})`;
-    }
-
-    if (type) {
-      filter += filter ? ` && type='${type}'` : `type='${type}'`;
+    
+    // Support legacy classIds array parameter (backward compatibility)
+    if (Array.isArray(options)) {
+      const classIds = options;
+      const type = arguments[1] || null;
+      
+      if (classIds.length > 0) {
+        const classFilter = classIds.map((id) => `class_id='${id}'`).join(" || ");
+        filter = `(${classFilter})`;
+      }
+      
+      if (type) {
+        filter += filter ? ` && type='${type}'` : `type='${type}'`;
+      }
+    } else {
+      // New grade/section-based filtering
+      const { gradeId, sectionId, type, classIds } = options;
+      
+      if (gradeId) {
+        filter = `grade_id='${gradeId}'`;
+      }
+      
+      if (sectionId) {
+        filter += filter ? ` && section_ids~'${sectionId}'` : `section_ids~'${sectionId}'`;
+      }
+      
+      if (type) {
+        filter += filter ? ` && type='${type}'` : `type='${type}'`;
+      }
+      
+      // Legacy support
+      if (classIds && classIds.length > 0) {
+        const classFilter = classIds.map((id) => `class_id='${id}'`).join(" || ");
+        filter = filter ? `(${filter}) && (${classFilter})` : `(${classFilter})`;
+      }
     }
 
     const records = await pb.collection("activities").getFullList({
       filter: filter || undefined,
       sort: "-created",
-      expand: "class_id",
+      expand: "class_id,grade_id,section_ids",
       requestKey: null,
     });
 
@@ -106,7 +143,10 @@ export const fetchActivities = async (classIds = [], type = null) => {
       description: formatBilingualField(record.description),
       subject: formatBilingualField(record.subject),
       class_id: record.class_id,
-      grade: record.expand?.class_id?.grade || null,
+      grade_id: record.grade_id,
+      section_ids: record.section_ids || [],
+      grade: record.expand?.grade_id || record.expand?.class_id?.grade || null,
+      sections: record.expand?.section_ids || [],
       type: record.type, // 'homework', 'quiz', or 'exam'
       time_limit: record.time_limit,
       max_score: record.max_score,
@@ -164,30 +204,57 @@ export const fetchQuestions = async (activityId, includeAnswers = false) => {
 /**
  * FETCH LESSONS (Materials)
  *
- * Filters by course_id list. Pass empty array to fetch all (admin use).
- * Maps lessons to materials with attachment handling.
- * @param {string[]} courseIds - Array of course IDs
+ * Filters by grade_id and section_id for students
+ * @param {Object} options - Filter options
+ * @param {string} options.gradeId - Grade ID to filter by
+ * @param {string} options.sectionId - Section ID to filter by (uses relation ~)
+ * @param {string[]} options.classIds - Legacy class IDs (deprecated, for backward compatibility)
  */
-export const fetchLessons = async (classIds = []) => {
+export const fetchLessons = async (options = {}) => {
   try {
     let filter = "";
-
-    if (classIds.length > 0) {
-      const classFilter = classIds.map((id) => `class_id='${id}'`).join(" || ");
-      filter = `(${classFilter})`;
+    
+    // Support legacy classIds array parameter (backward compatibility)
+    if (Array.isArray(options)) {
+      const classIds = options;
+      
+      if (classIds.length > 0) {
+        const classFilter = classIds.map((id) => `class_id='${id}'`).join(" || ");
+        filter = `(${classFilter})`;
+      }
+    } else {
+      // New grade/section-based filtering
+      const { gradeId, sectionId, classIds } = options;
+      
+      if (gradeId) {
+        filter = `grade_id='${gradeId}'`;
+      }
+      
+      if (sectionId) {
+        filter += filter ? ` && section_ids~'${sectionId}'` : `section_ids~'${sectionId}'`;
+      }
+      
+      // Legacy support
+      if (classIds && classIds.length > 0) {
+        const classFilter = classIds.map((id) => `class_id='${id}'`).join(" || ");
+        filter = filter ? `(${filter}) && (${classFilter})` : `(${classFilter})`;
+      }
     }
 
     const records = await pb.collection("lessons").getFullList({
       filter: filter || undefined,
       sort: "-created",
-      expand: "class_id",
+      expand: "class_id,grade_id,section_ids",
       requestKey: null,
     });
 
     return records.map((record) => ({
       id: record.id,
       class_id: record.class_id,
-      grade: record.expand?.class_id?.grade || null,
+      grade_id: record.grade_id,
+      section_ids: record.section_ids || [],
+      grade: record.expand?.grade_id || record.expand?.class_id?.grade || null,
+      sections: record.expand?.section_ids || [],
       title: formatBilingualField(record.title),
       content: formatBilingualField(record.content),
       subject: formatBilingualField(record.subject),
@@ -347,28 +414,6 @@ export const getStudentSubmissions = async (studentId, activityType = null) => {
     throw new Error(`Failed to fetch submissions: ${error.message}`);
   }
 };
-
-/**
- * GET ENROLLMENTS
- *
- * Fetch student's enrollments with expanded class and course data
- */
-export const getEnrollments = async (studentId) => {
-  try {
-    const records = await pb.collection("enrollments").getFullList({
-      filter: `student_id='${studentId}' && status='active'`,
-      expand: "class_id,class_id.course_id,class_id.teacher_id",
-      sort: "-created",
-      requestKey: null,
-    });
-
-    return records;
-  } catch (error) {
-    console.error("Error fetching enrollments:", error);
-    throw new Error(`Failed to fetch enrollments: ${error.message}`);
-  }
-};
-
 /**
  * Authentication Helper: Check if user is logged in
  */
@@ -446,48 +491,60 @@ export const fetchTeacherClasses = async (teacherId) => {
 };
 
 /**
- * FETCH CLASS ENROLLMENTS
- *
- * Get all students enrolled in a specific class
- */
-export const fetchClassEnrollments = async (classId) => {
-  try {
-    const records = await pb.collection("enrollments").getFullList({
-      filter: `class_id='${classId}' && status='active'`,
-      expand: "student_id",
-      sort: "-created",
-      requestKey: null,
-    });
-
-    return records.map((record) => ({
-      id: record.id,
-      student_id: record.student_id,
-      class_id: record.class_id,
-      status: record.status,
-      enrolled_at: formatDate(record.created),
-      // Expanded data
-      student: record.expand?.student_id,
-    }));
-  } catch (error) {
-    console.error("Error fetching class enrollments:", error);
-    throw new Error(`Failed to fetch enrollments: ${error.message}`);
-  }
-};
-
-/**
  * CREATE ACTIVITY (Teacher)
  *
  * Create a new quiz or exam
  */
-export const createActivity = async (classId, activityData) => {
+/**
+ * CREATE ACTIVITY (Teacher)
+ *
+ * Creates a new activity (quiz/exam/homework) for specific grade and sections
+ * @param {Object} activityData - Activity data
+ * @param {string} activityData.gradeId - Grade ID (required)
+ * @param {string[]} activityData.sectionIds - Section IDs array (required, min 1)
+ * @param {string} activityData.title - Activity title
+ * @param {string} activityData.type - Activity type ('quiz', 'exam', 'homework')
+ * @param {number} activityData.time_limit - Time limit in minutes
+ * @param {number} activityData.max_score - Maximum score
+ * @param {string} activityData.classId - Legacy class ID (deprecated, for backward compatibility)
+ */
+export const createActivity = async (activityData) => {
   try {
-    const data = {
-      class_id: classId,
-      title: activityData.title,
-      type: activityData.type, // 'quiz' or 'exam'
-      time_limit: activityData.time_limit || null,
-      max_score: activityData.max_score || 100,
-    };
+    // Support legacy signature: createActivity(classId, activityData)
+    let data;
+    if (typeof activityData === 'string') {
+      const classId = activityData;
+      const legacyData = arguments[1];
+      data = {
+        class_id: classId,
+        title: legacyData.title,
+        type: legacyData.type,
+        time_limit: legacyData.time_limit || null,
+        max_score: legacyData.max_score || 100,
+      };
+    } else {
+      // New signature: createActivity(activityData)
+      if (!activityData.gradeId) {
+        throw new Error("Grade ID is required");
+      }
+      if (!activityData.sectionIds || activityData.sectionIds.length === 0) {
+        throw new Error("At least one section is required");
+      }
+      
+      data = {
+        grade_id: activityData.gradeId,
+        section_ids: activityData.sectionIds,
+        title: activityData.title,
+        type: activityData.type, // 'quiz', 'exam', or 'homework'
+        time_limit: activityData.time_limit || null,
+        max_score: activityData.max_score || 100,
+      };
+      
+      // Legacy support: include class_id if provided
+      if (activityData.classId) {
+        data.class_id = activityData.classId;
+      }
+    }
 
     const record = await pb.collection("activities").create(data);
 
@@ -533,17 +590,65 @@ export const createQuestion = async (activityId, questionData) => {
  *
  * Create a new lesson/material
  */
-export const createLesson = async (classId, lessonData, files = []) => {
+/**
+ * CREATE LESSON (Teacher)
+ *
+ * Creates a new lesson for specific grade and sections
+ * @param {Object} lessonData - Lesson data
+ * @param {string} lessonData.gradeId - Grade ID (required)
+ * @param {string[]} lessonData.sectionIds - Section IDs array (required, min 1)
+ * @param {string} lessonData.title - Lesson title
+ * @param {string} lessonData.content - Lesson content
+ * @param {File[]} files - File attachments (optional, max 5)
+ * @param {string} lessonData.classId - Legacy class ID (deprecated, for backward compatibility)
+ */
+export const createLesson = async (lessonData, files = []) => {
   try {
-    const formData = new FormData();
-    formData.append("class_id", classId);
-    formData.append("title", lessonData.title);
-    formData.append("content", lessonData.content || "");
-
-    // Add file attachments (up to 5 files)
-    files.forEach((file) => {
-      formData.append("attachments", file);
-    });
+    // Support legacy signature: createLesson(classId, lessonData, files)
+    let formData = new FormData();
+    
+    if (typeof lessonData === 'string') {
+      // Legacy signature
+      const classId = lessonData;
+      const legacyData = arguments[1];
+      const legacyFiles = arguments[2] || [];
+      
+      formData.append("class_id", classId);
+      formData.append("title", legacyData.title);
+      formData.append("content", legacyData.content || "");
+      
+      legacyFiles.forEach((file) => {
+        formData.append("attachments", file);
+      });
+    } else {
+      // New signature: createLesson(lessonData, files)
+      if (!lessonData.gradeId) {
+        throw new Error("Grade ID is required");
+      }
+      if (!lessonData.sectionIds || lessonData.sectionIds.length === 0) {
+        throw new Error("At least one section is required");
+      }
+      
+      formData.append("grade_id", lessonData.gradeId);
+      
+      // Append each section ID separately (PocketBase handles relation arrays)
+      lessonData.sectionIds.forEach((sectionId) => {
+        formData.append("section_ids", sectionId);
+      });
+      
+      formData.append("title", lessonData.title);
+      formData.append("content", lessonData.content || "");
+      
+      // Legacy support: include class_id if provided
+      if (lessonData.classId) {
+        formData.append("class_id", lessonData.classId);
+      }
+      
+      // Add file attachments (up to 5 files)
+      files.forEach((file) => {
+        formData.append("attachments", file);
+      });
+    }
 
     const record = await pb.collection("lessons").create(formData);
 
@@ -842,12 +947,56 @@ export const fetchAllClasses = async () => {
 /**
  * CREATE COURSE (Admin)
  */
+/**
+ * CREATE COURSE/SUBJECT (Admin)
+ * 
+ * Creates a new subject with bilingual name
+ * @param {Object} courseData
+ * @param {string} courseData.code - Subject code (e.g., "MATH", "SCI")
+ * @param {string} courseData.nameEn - English name
+ * @param {string} courseData.nameAr - Arabic name
+ * @param {string} courseData.description - Description (optional)
+ * @param {string} courseData.icon - Material icon name (optional)
+ * @param {string} courseData.color - Hex color (optional, default #2196F3)
+ */
 export const createCourse = async (courseData) => {
   try {
-    const data = {
-      title: courseData.title,
-      description: courseData.description || "",
-    };
+    // Support legacy format (title/description) OR new format (code/name)
+    let data;
+    
+    if (courseData.code) {
+      // New bilingual format
+      data = {
+        code: courseData.code.toUpperCase(),
+        name: JSON.stringify({
+          en: courseData.nameEn || courseData.code,
+          ar: courseData.nameAr || courseData.code,
+        }),
+        description: courseData.description ? JSON.stringify({
+          en: courseData.description,
+          ar: courseData.description,
+        }) : "",
+        icon: courseData.icon || "school",
+        color: courseData.color || "#2196F3",
+        is_active: true,
+      };
+    } else {
+      // Legacy format - convert title to bilingual
+      data = {
+        code: (courseData.title || "SUBJ").substring(0, 4).toUpperCase(),
+        name: JSON.stringify({
+          en: courseData.title || "Subject",
+          ar: courseData.title || "مادة",
+        }),
+        description: courseData.description ? JSON.stringify({
+          en: courseData.description,
+          ar: courseData.description,
+        }) : "",
+        icon: "school",
+        color: "#2196F3",
+        is_active: true,
+      };
+    }
 
     const record = await pb.collection("courses").create(data);
 
@@ -883,57 +1032,8 @@ export const createClass = async (courseId, teacherId) => {
   }
 };
 
-/**
- * CREATE ENROLLMENT (Admin)
- */
-export const createEnrollment = async (studentId, classId) => {
-  try {
-    const data = {
-      student_id: studentId,
-      class_id: classId,
-      status: "active",
-    };
-
-    const record = await pb.collection("enrollments").create(data);
-
-    return {
-      success: true,
-      enrollment: record,
-    };
-  } catch (error) {
-    console.error("Error creating enrollment:", error);
-    throw new Error(`Failed to create enrollment: ${error.message}`);
-  }
-};
-
 // Export pb instance for direct access if needed
 export { pb };
-
-/**
- * FETCH ALL ENROLLMENTS (Admin)
- */
-export const fetchAllEnrollments = async () => {
-  try {
-    const records = await pb.collection("enrollments").getFullList({
-      expand: "student_id,class_id",
-      sort: "-created",
-      requestKey: null, // disable auto-cancellation
-    });
-    return records.map((r) => ({
-      id: r.id,
-      status: r.status,
-      created: r.created,
-      student: r.expand?.student_id || null,
-      classInfo: r.expand?.class_id || null,
-    }));
-  } catch (error) {
-    if (error?.isAbort || error?.message?.includes('autocancelled') || error?.message?.includes('aborted')) {
-      return [];
-    }
-    console.error("Error fetching enrollments:", error);
-    throw new Error(`Failed to fetch enrollments: ${error.message}`);
-  }
-};
 
 /**
  * ============================================================================
@@ -1007,4 +1107,358 @@ export const transformRecordToFrontend = (
   });
 
   return transformed;
+};
+
+/**
+ * ============================================================================
+ * NEW ENROLLMENT SYSTEM API FUNCTIONS
+ * ============================================================================
+ * Functions for the new grade/section-based enrollment system
+ */
+
+/**
+ * FETCH GRADES (Classes Collection)
+ * 
+ * Fetches all active grade levels for dropdowns
+ * @returns {Promise<Array>} Array of grade records
+ */
+export const fetchGrades = async () => {
+  try {
+    const records = await pb.collection("classes").getFullList({
+      filter: "is_active=true",
+      sort: "display_order",
+      requestKey: null,
+    });
+
+    return records.map((record) => ({
+      id: record.id,
+      code: record.code,
+      name: JSON.parse(record.name || '{"en":"","ar":""}'),
+      displayOrder: record.display_order,
+      isActive: record.is_active,
+    }));
+  } catch (error) {
+    console.error("Error fetching grades:", error);
+    throw new Error(`Failed to fetch grades: ${error.message}`);
+  }
+};
+
+/**
+ * FETCH SECTIONS BY GRADE
+ * 
+ * Fetches sections filtered by grade (or all if gradeId is null)
+ * @param {string|null} gradeId - Grade ID to filter by, or null for all
+ * @returns {Promise<Array>} Array of section records
+ */
+export const fetchSectionsByGrade = async (gradeId = null) => {
+  try {
+    let filter = "is_active=true";
+    if (gradeId) {
+      filter += ` && grade='${gradeId}'`;
+    }
+
+    const records = await pb.collection("class_sections").getFullList({
+      filter,
+      expand: "grade",
+      sort: "name",
+      requestKey: null,
+    });
+
+    return records.map((record) => ({
+      id: record.id,
+      name: record.name,
+      gradeId: record.grade,
+      grade: record.expand?.grade || null,
+      maxStudents: record.max_students,
+      isActive: record.is_active,
+    }));
+  } catch (error) {
+    console.error("Error fetching sections:", error);
+    throw new Error(`Failed to fetch sections: ${error.message}`);
+  }
+};
+
+/**
+ * FETCH SUBJECTS (Courses Collection)
+ * 
+ * Fetches all active subjects for teacher assignment
+ * @returns {Promise<Array>} Array of subject records
+ */
+export const fetchSubjects = async () => {
+  try {
+    const records = await pb.collection("courses").getFullList({
+      filter: "is_active=true",
+      sort: "code",
+      requestKey: null,
+    });
+
+    return records.map((record) => ({
+      id: record.id,
+      code: record.code,
+      name: JSON.parse(record.name || '{"en":"","ar":""}'),
+      icon: record.icon || "",
+      color: record.color || "#2196F3",
+      isActive: record.is_active,
+    }));
+  } catch (error) {
+    console.error("Error fetching subjects:", error);
+    throw new Error(`Failed to fetch subjects: ${error.message}`);
+  }
+};
+
+/**
+ * CREATE STUDENT WITH ENROLLMENT
+ * 
+ * Creates student user + profile with grade/section assignment in one operation
+ * Validates that section belongs to grade before creating
+ * 
+ * @param {Object} data - Student data
+ * @param {string} data.email - Student email
+ * @param {string} data.password - Password
+ * @param {string} data.firstName - First name (English)
+ * @param {string} data.lastName - Last name (English)
+ * @param {string} data.firstNameAr - First name (Arabic) - REQUIRED
+ * @param {string} data.lastNameAr - Last name (Arabic) - REQUIRED
+ * @param {string} data.gradeId - Grade ID from classes collection
+ * @param {string} data.sectionId - Section ID from class_sections collection
+ * @param {string} data.parentPhone - Parent phone (optional)
+ * @param {string} data.dateOfBirth - Date of birth (optional)
+ * @returns {Promise<Object>} Created user record
+ */
+export const createStudentWithEnrollment = async (data) => {
+  try {
+    // 1. Validate required fields
+    if (!data.email || !data.password) {
+      throw new Error("Email and password are required");
+    }
+    if (!data.firstName || !data.lastName) {
+      throw new Error("First name and last name are required");
+    }
+    if (!data.firstNameAr || !data.lastNameAr) {
+      throw new Error("Arabic names are required");
+    }
+    if (!data.gradeId || !data.sectionId) {
+      throw new Error("Grade and section are required");
+    }
+
+    // 2. Validate that section belongs to selected grade
+    const section = await pb.collection("class_sections").getOne(data.sectionId);
+    if (section.grade !== data.gradeId) {
+      throw new Error("Selected section does not belong to selected grade");
+    }
+
+    // 3. Create user account
+    const userData = {
+      email: data.email,
+      password: data.password,
+      passwordConfirm: data.password,
+      role: "student",
+      is_active: true,
+    };
+
+    let userRecord;
+    try {
+      userRecord = await pb.collection("users").create(userData);
+    } catch (error) {
+      throw new Error(`Failed to create user account: ${error.message}`);
+    }
+
+    // 4. Create user profile with grade/section
+    const profileData = {
+      user_id: userRecord.id,
+      first_name: data.firstName,
+      last_name: data.lastName,
+      first_name_ar: data.firstNameAr,
+      last_name_ar: data.lastNameAr,
+      grade_id: data.gradeId,
+      section_id: data.sectionId,
+      parent_phone: data.parentPhone || "",
+      date_of_birth: data.dateOfBirth || "",
+      enrollment_date: new Date().toISOString().split("T")[0],
+    };
+
+    try {
+      await pb.collection("user_profiles").create(profileData);
+    } catch (error) {
+      // Profile creation failed - attempt cleanup
+      console.error("Profile creation failed, attempting cleanup...");
+      try {
+        await pb.collection("users").delete(userRecord.id);
+      } catch (cleanupError) {
+        console.error("Cleanup failed:", cleanupError);
+      }
+      throw new Error(`Failed to create profile: ${error.message}`);
+    }
+
+    return {
+      success: true,
+      id: userRecord.id,
+      email: userRecord.email,
+      role: userRecord.role,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      gradeId: data.gradeId,
+      sectionId: data.sectionId,
+    };
+  } catch (error) {
+    console.error("Error creating student:", error);
+    throw error; // Re-throw to preserve original error message
+  }
+};
+
+/**
+ * CREATE TEACHER WITH ASSIGNMENTS
+ * 
+ * Creates teacher user + profile + subject assignments + grade/section assignments
+ * Teacher account is created first, then assignments are attempted (best-effort)
+ * 
+ * @param {Object} data - Teacher data
+ * @param {string} data.email - Teacher email
+ * @param {string} data.password - Password
+ * @param {string} data.firstName - First name (English)
+ * @param {string} data.lastName - Last name (English)
+ * @param {string} data.firstNameAr - First name (Arabic) - REQUIRED
+ * @param {string} data.lastNameAr - Last name (Arabic) - REQUIRED
+ * @param {Array} data.subjectAssignments - Array of {subjectId, grades: [{gradeId, sectionIds: []}]}
+ * @returns {Promise<Object>} Created user record with assignment results
+ */
+export const createTeacherWithAssignments = async (data) => {
+  try {
+    // 1. Validate required fields
+    if (!data.email || !data.password) {
+      throw new Error("Email and password are required");
+    }
+    if (!data.firstName || !data.lastName) {
+      throw new Error("First name and last name are required");
+    }
+    if (!data.firstNameAr || !data.lastNameAr) {
+      throw new Error("Arabic names are required");
+    }
+    if (!data.subjectAssignments || data.subjectAssignments.length === 0) {
+      throw new Error("At least one subject assignment is required");
+    }
+
+    // 2. Validate assignment structure
+    for (const assignment of data.subjectAssignments) {
+      if (!assignment.subjectId) {
+        throw new Error("Subject ID is required for all assignments");
+      }
+      if (!assignment.grades || assignment.grades.length === 0) {
+        throw new Error(`At least one grade is required for subject ${assignment.subjectId}`);
+      }
+      for (const grade of assignment.grades) {
+        if (!grade.gradeId) {
+          throw new Error("Grade ID is required");
+        }
+        if (!grade.sectionIds || grade.sectionIds.length === 0) {
+          throw new Error(`At least one section is required for grade ${grade.gradeId}`);
+        }
+      }
+    }
+
+    // 3. Create user account
+    const userData = {
+      email: data.email,
+      password: data.password,
+      passwordConfirm: data.password,
+      role: "teacher",
+      is_active: true,
+    };
+
+    let userRecord;
+    try {
+      userRecord = await pb.collection("users").create(userData);
+    } catch (error) {
+      throw new Error(`Failed to create user account: ${error.message}`);
+    }
+
+    // 4. Create user profile
+    const profileData = {
+      user_id: userRecord.id,
+      first_name: data.firstName,
+      last_name: data.lastName,
+      first_name_ar: data.firstNameAr,
+      last_name_ar: data.lastNameAr,
+    };
+
+    try {
+      await pb.collection("user_profiles").create(profileData);
+    } catch (error) {
+      // Profile creation failed - attempt cleanup
+      console.error("Profile creation failed, attempting cleanup...");
+      try {
+        await pb.collection("users").delete(userRecord.id);
+      } catch (cleanupError) {
+        console.error("Cleanup failed:", cleanupError);
+      }
+      throw new Error(`Failed to create profile: ${error.message}`);
+    }
+
+    // 5. Attempt to create assignments (best-effort)
+    const results = {
+      success: true,
+      id: userRecord.id,
+      email: userRecord.email,
+      role: userRecord.role,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      assignmentsCreated: 0,
+      assignmentsFailed: 0,
+      errors: [],
+    };
+
+    for (const assignment of data.subjectAssignments) {
+      // Create teacher-subject relationship
+      try {
+        await pb.collection("teacher_subjects").create({
+          teacher_id: userRecord.id,
+          subject_id: assignment.subjectId,
+        });
+      } catch (error) {
+        results.assignmentsFailed++;
+        results.errors.push({
+          type: "subject",
+          subjectId: assignment.subjectId,
+          error: error.message,
+        });
+        continue; // Skip grade/section assignments for this subject
+      }
+
+      // Create teacher-class assignments for each grade/section
+      for (const gradeAssignment of assignment.grades) {
+        for (const sectionId of gradeAssignment.sectionIds) {
+          try {
+            // Validate section belongs to grade
+            const section = await pb.collection("class_sections").getOne(sectionId);
+            if (section.grade !== gradeAssignment.gradeId) {
+              throw new Error("Section does not belong to selected grade");
+            }
+
+            await pb.collection("teacher_classes").create({
+              teacher_id: userRecord.id,
+              subject_id: assignment.subjectId,
+              grade_id: gradeAssignment.gradeId,
+              section_id: sectionId,
+            });
+
+            results.assignmentsCreated++;
+          } catch (error) {
+            results.assignmentsFailed++;
+            results.errors.push({
+              type: "class",
+              subjectId: assignment.subjectId,
+              gradeId: gradeAssignment.gradeId,
+              sectionId: sectionId,
+              error: error.message,
+            });
+          }
+        }
+      }
+    }
+
+    return results;
+  } catch (error) {
+    console.error("Error creating teacher:", error);
+    throw error; // Re-throw to preserve original error message
+  }
 };

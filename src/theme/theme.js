@@ -197,11 +197,10 @@ export const createAppTheme = (direction = "rtl") => {
             fontSize: "1rem",
             fontWeight: 600,
             boxShadow: "0px 2px 8px rgba(76, 175, 80, 0.2)",
-            transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+            transition: "all 0.2s ease-in-out",
             "&:hover": {
-              transform: "translateY(-2px) scale(1.05)",
-              boxShadow: "0px 6px 16px rgba(76, 175, 80, 0.3)",
-              animation: "wiggle 0.5s ease",
+              transform: "translateY(-1px)",
+              boxShadow: "0px 4px 12px rgba(76, 175, 80, 0.3)",
             },
           },
           contained: {
@@ -219,15 +218,8 @@ export const createAppTheme = (direction = "rtl") => {
             boxShadow: "0px 4px 12px rgba(46, 125, 50, 0.1)",
             transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
             border: "1px solid rgba(76, 175, 80, 0.1)",
-            cursor: "pointer",
-            "&:hover": {
-              transform: "translateY(-8px) scale(1.02)",
-              boxShadow: "0px 12px 28px rgba(46, 125, 50, 0.2)",
-            },
-            "&:active": {
-              transform: "translateY(-2px) scale(0.98)",
-              transition: "all 0.1s ease",
-            },
+            // Removed cursor: "pointer" - only specific clickable cards should have this
+            // Removed hover transform - cards shouldn't move unless they're interactive
           },
         },
       },
@@ -279,8 +271,14 @@ export const createAppTheme = (direction = "rtl") => {
             fontWeight: 600,
             fontSize: "1rem",
             minHeight: 56,
+            color: "#2E7D32", // Default text color (forest green)
             "&.Mui-selected": {
-              color: "#FFFFFF",
+              color: "#4CAF50", // Selected tab color (primary green, not white!)
+              fontWeight: 700,
+            },
+            "&:hover": {
+              color: "#388E3C", // Hover color
+              backgroundColor: "rgba(76, 175, 80, 0.08)",
             },
           },
         },

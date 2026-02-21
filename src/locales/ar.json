@@ -267,6 +267,8 @@
         "enrollmentsInfo": "اختر طالباً وصفاً لإنشاء التسجيل",
         "noEnrollments": "لا توجد تسجيلات بعد",
         "password": "كلمة المرور",
-        "admin": "مسؤول"
+        "admin": "مسؤول",
+        "addStudent": "إضافة طالب",
+        "addTeacher": "إضافة معلم"
     }
 }

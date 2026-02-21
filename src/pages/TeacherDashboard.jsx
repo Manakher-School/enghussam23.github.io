@@ -43,7 +43,6 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import {
-  fetchClassEnrollments,
   fetchActivities,
   fetchLessons,
   fetchClassSubmissions,
@@ -68,7 +67,6 @@ function TeacherDashboard() {
   const [currentTab, setCurrentTab] = useState(0);
   
   // Class data
-  const [enrollments, setEnrollments] = useState([]);
   const [activities, setActivities] = useState([]);
   const [lessons, setLessons] = useState([]);
   const [submissions, setSubmissions] = useState([]);
@@ -119,14 +117,12 @@ function TeacherDashboard() {
   const loadClassData = async () => {
     try {
       setLoading(true);
-      const [enrollmentsData, activitiesData, lessonsData, submissionsData] = await Promise.all([
-        fetchClassEnrollments(selectedClass.id),
+      const [activitiesData, lessonsData, submissionsData] = await Promise.all([
         fetchActivities([selectedClass.id]),
         fetchLessons([selectedClass.id]),
         fetchClassSubmissions(selectedClass.id),
       ]);
       
-      setEnrollments(enrollmentsData);
       setActivities(activitiesData);
       setLessons(lessonsData);
       setSubmissions(submissionsData);
@@ -289,9 +285,12 @@ function TeacherDashboard() {
               <Box display="flex" alignItems="center">
                 <PeopleIcon color="success" fontSize="large" />
                 <Box ml={2}>
-                  <Typography variant="h4">{enrollments.length}</Typography>
+                  <Typography variant="h4">-</Typography>
                   <Typography variant="body2" color="text.secondary">
                     {t('teacher.totalStudents')}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    (Coming soon)
                   </Typography>
                 </Box>
               </Box>
@@ -365,33 +364,15 @@ function TeacherDashboard() {
             <Box mt={3}>
               {/* Students Tab */}
               {currentTab === 0 && (
-                <TableContainer component={Paper}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>{t('teacher.studentName')}</TableCell>
-                        <TableCell>{t('teacher.email')}</TableCell>
-                        <TableCell>{t('teacher.enrolledDate')}</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {enrollments.map((enrollment) => (
-                        <TableRow key={enrollment.id}>
-                          <TableCell>{enrollment.student?.name || 'N/A'}</TableCell>
-                          <TableCell>{enrollment.student?.email || 'N/A'}</TableCell>
-                          <TableCell>{new Date(enrollment.enrolled_at).toLocaleDateString()}</TableCell>
-                        </TableRow>
-                      ))}
-                      {enrollments.length === 0 && (
-                        <TableRow>
-                          <TableCell colSpan={3} align="center">
-                            {t('teacher.noStudents')}
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                <Box textAlign="center" py={4}>
+                  <PeopleIcon sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
+                  <Typography variant="h6" color="text.secondary" gutterBottom>
+                    Student Management Coming Soon
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    This feature is being migrated to the new grade/section-based system.
+                  </Typography>
+                </Box>
               )}
 
               {/* Activities Tab */}

@@ -45,14 +45,14 @@ import { useData } from '../context/DataContext';
 import {
   fetchAllUsers,
   fetchAllCourses,
-  fetchAllEnrollments,
   createUser,
   createCourse,
   createClass,
-  createEnrollment,
   updateUser,
   deleteUser,
 } from '../services/api';
+import StudentCreationDialog from '../components/StudentCreationDialog';
+import TeacherCreationDialog from '../components/TeacherCreationDialog';
 
 function AdminDashboard() {
   const { t } = useTranslation();
@@ -65,20 +65,20 @@ function AdminDashboard() {
   // Data fetched locally (not in DataContext)
   const [users, setUsers] = useState([]);
   const [courses, setCourses] = useState([]);
-  const [enrollments, setEnrollments] = useState([]);
   
   // Dialogs
   const [userDialog, setUserDialog] = useState(false);
+  const [studentDialog, setStudentDialog] = useState(false);
+  const [teacherDialog, setTeacherDialog] = useState(false);
   const [courseDialog, setCourseDialog] = useState(false);
   const [classDialog, setClassDialog] = useState(false);
-  const [enrollmentDialog, setEnrollmentDialog] = useState(false);
   
   // Form data
   const [newUser, setNewUser] = useState({
     email: '',
     password: '',
     name: '',
-    role: 'student',
+    role: 'admin',
     active: true,
   });
   const [newCourse, setNewCourse] = useState({
@@ -88,10 +88,6 @@ function AdminDashboard() {
   const [newClass, setNewClass] = useState({
     course_id: '',
     teacher_id: '',
-  });
-  const [newEnrollment, setNewEnrollment] = useState({
-    student_id: '',
-    class_id: '',
   });
 
   useEffect(() => {
@@ -103,16 +99,14 @@ function AdminDashboard() {
   const loadData = async (cancelled = false) => {
     try {
       setLoading(true);
-      const [usersData, coursesData, enrollmentsData] = await Promise.all([
+      const [usersData, coursesData] = await Promise.all([
         fetchAllUsers(),
         fetchAllCourses(),
-        fetchAllEnrollments(),
       ]);
 
       if (!cancelled) {
         setUsers(usersData);
         setCourses(coursesData);
-        setEnrollments(enrollmentsData);
       }
     } catch (err) {
       // Suppress auto-cancellation errors (e.g. React StrictMode double-mount)
@@ -128,7 +122,7 @@ function AdminDashboard() {
     try {
       await createUser(newUser);
       setUserDialog(false);
-      setNewUser({ email: '', password: '', name: '', role: 'student', active: true });
+      setNewUser({ email: '', password: '', name: '', role: 'admin', active: true });
       loadData();
     } catch (err) {
       setError(err.message);
@@ -151,17 +145,6 @@ function AdminDashboard() {
       await createClass(newClass.course_id, newClass.teacher_id);
       setClassDialog(false);
       setNewClass({ course_id: '', teacher_id: '' });
-      loadData();
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  const handleCreateEnrollment = async () => {
-    try {
-      await createEnrollment(newEnrollment.student_id, newEnrollment.class_id);
-      setEnrollmentDialog(false);
-      setNewEnrollment({ student_id: '', class_id: '' });
       loadData();
     } catch (err) {
       setError(err.message);
@@ -286,20 +269,28 @@ function AdminDashboard() {
             <Tab label={t('admin.users')} />
             <Tab label={t('admin.courses')} />
             <Tab label={t('admin.classes')} />
-            <Tab label={t('admin.enrollments')} />
           </Tabs>
 
           <Box mt={3}>
             {/* Users Tab */}
             {currentTab === 0 && (
               <>
-                <Box mb={2}>
+                <Box mb={2} sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                   <Button
                     variant="contained"
                     startIcon={<AddIcon />}
-                    onClick={() => setUserDialog(true)}
+                    onClick={() => setStudentDialog(true)}
+                    color="primary"
                   >
-                    {t('admin.createUser')}
+                    {t('admin.addStudent')}
+                  </Button>
+                  <Button
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={() => setTeacherDialog(true)}
+                    color="success"
+                  >
+                    {t('admin.addTeacher')}
                   </Button>
                 </Box>
                 <TableContainer component={Paper}>
@@ -435,65 +426,13 @@ function AdminDashboard() {
                 </TableContainer>
               </>
             )}
-
-            {/* Enrollments Tab */}
-            {currentTab === 3 && (
-              <>
-                <Box mb={2}>
-                  <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={() => setEnrollmentDialog(true)}
-                  >
-                    {t('admin.createEnrollment')}
-                  </Button>
-                </Box>
-                <TableContainer component={Paper}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>{t('admin.student')}</TableCell>
-                        <TableCell>{t('admin.email')}</TableCell>
-                        <TableCell>{t('admin.course')}</TableCell>
-                        <TableCell>{t('admin.status')}</TableCell>
-                        <TableCell>{t('admin.created')}</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {enrollments.map((enrollment) => (
-                        <TableRow key={enrollment.id}>
-                          <TableCell>{enrollment.student?.name || 'N/A'}</TableCell>
-                          <TableCell>{enrollment.student?.email || 'N/A'}</TableCell>
-                          <TableCell>{enrollment.classInfo?.course?.title || 'N/A'}</TableCell>
-                          <TableCell>
-                            <Chip
-                              label={enrollment.status || 'active'}
-                              size="small"
-                              color={enrollment.status === 'active' ? 'success' : 'default'}
-                            />
-                          </TableCell>
-                          <TableCell>{new Date(enrollment.created).toLocaleDateString()}</TableCell>
-                        </TableRow>
-                      ))}
-                      {enrollments.length === 0 && (
-                        <TableRow>
-                          <TableCell colSpan={5} align="center">
-                            {t('admin.noEnrollments')}
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </>
-            )}
           </Box>
         </CardContent>
       </Card>
 
-      {/* Create User Dialog */}
+      {/* Create Admin Dialog */}
       <Dialog open={userDialog} onClose={() => setUserDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{t('admin.createUser')}</DialogTitle>
+        <DialogTitle>{t('admin.createAdmin') || 'Create Admin'}</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             <TextField
@@ -516,17 +455,6 @@ function AdminDashboard() {
               value={newUser.password}
               onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
             />
-            <FormControl fullWidth>
-              <InputLabel>{t('admin.role')}</InputLabel>
-              <Select
-                value={newUser.role}
-                onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
-              >
-                <MenuItem value="student">{t('admin.student')}</MenuItem>
-                <MenuItem value="teacher">{t('admin.teacher')}</MenuItem>
-                <MenuItem value="admin">{t('admin.admin')}</MenuItem>
-              </Select>
-            </FormControl>
           </Box>
         </DialogContent>
         <DialogActions>
@@ -601,44 +529,25 @@ function AdminDashboard() {
         </DialogActions>
       </Dialog>
 
-      {/* Create Enrollment Dialog */}
-      <Dialog open={enrollmentDialog} onClose={() => setEnrollmentDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{t('admin.createEnrollment')}</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-            <FormControl fullWidth>
-              <InputLabel>{t('admin.student')}</InputLabel>
-              <Select
-                value={newEnrollment.student_id}
-                onChange={(e) => setNewEnrollment({ ...newEnrollment, student_id: e.target.value })}
-              >
-                {students.map((student) => (
-                  <MenuItem key={student.id} value={student.id}>
-                    {student.name} ({student.email})
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl fullWidth>
-              <InputLabel>{t('admin.class')}</InputLabel>
-              <Select
-                value={newEnrollment.class_id}
-                onChange={(e) => setNewEnrollment({ ...newEnrollment, class_id: e.target.value })}
-              >
-                {classes.map((cls) => (
-                  <MenuItem key={cls.id} value={cls.id}>
-                    {cls.course?.title} - {cls.teacher?.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setEnrollmentDialog(false)}>{t('common.cancel')}</Button>
-          <Button onClick={handleCreateEnrollment} variant="contained">{t('common.create')}</Button>
-        </DialogActions>
-      </Dialog>
+      {/* New Student Creation Dialog */}
+      <StudentCreationDialog
+        open={studentDialog}
+        onClose={() => setStudentDialog(false)}
+        onSuccess={() => {
+          setStudentDialog(false);
+          loadData();
+        }}
+      />
+
+      {/* Teacher Creation Dialog */}
+      <TeacherCreationDialog
+        open={teacherDialog}
+        onClose={() => setTeacherDialog(false)}
+        onSuccess={() => {
+          setTeacherDialog(false);
+          loadData();
+        }}
+      />
     </Container>
   );
 }
