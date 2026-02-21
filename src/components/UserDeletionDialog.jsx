@@ -60,7 +60,7 @@ const UserDeletionDialog = ({ open, onClose, user, onSuccess }) => {
   useEffect(() => {
     if (open && user) {
       loadDependencies();
-      if (user.role === 'teacher') {
+      if (user?.role === 'teacher') {
         loadAvailableTeachers();
       }
     } else {
@@ -91,7 +91,7 @@ const UserDeletionDialog = ({ open, onClose, user, onSuccess }) => {
     try {
       const users = await fetchAllUsers();
       const teachers = users.filter(
-        (u) => u.role === 'teacher' && u.id !== user.id && u.active
+        (u) => u.role === 'teacher' && user && u.id !== user.id && u.active
       );
       setAvailableTeachers(teachers);
     } catch (err) {
@@ -162,7 +162,7 @@ const UserDeletionDialog = ({ open, onClose, user, onSuccess }) => {
   };
 
   const renderDependenciesSummary = () => {
-    if (!dependencies) return null;
+    if (!dependencies || !user) return null;
 
     const deps = dependencies.dependencies || {};
     const items = Object.entries(deps)
@@ -184,7 +184,7 @@ const UserDeletionDialog = ({ open, onClose, user, onSuccess }) => {
     return (
       <Box sx={{ mt: 2 }}>
         <Typography variant="subtitle2" gutterBottom>
-          {t('admin.thisDependenciesTitle', { role: t(`roles.${user.role}`) })}
+          {t('admin.thisDependenciesTitle', { role: t(`roles.${user?.role || 'unknown'}`) })}
         </Typography>
         <List dense>
           {items.map((item) => (
@@ -205,7 +205,7 @@ const UserDeletionDialog = ({ open, onClose, user, onSuccess }) => {
   };
 
   const renderClassReassignment = () => {
-    if (user.role !== 'teacher' || !dependencies?.dependencies?.classes) {
+    if (!user || user.role !== 'teacher' || !dependencies?.dependencies?.classes) {
       return null;
     }
 
