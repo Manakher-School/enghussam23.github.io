@@ -92,40 +92,48 @@ export const fetchCourses = async (grade = null) => {
 export const fetchActivities = async (options = {}) => {
   try {
     let filter = "";
-    
+
     // Support legacy classIds array parameter (backward compatibility)
     if (Array.isArray(options)) {
       const classIds = options;
       const type = arguments[1] || null;
-      
+
       if (classIds.length > 0) {
-        const classFilter = classIds.map((id) => `class_id='${id}'`).join(" || ");
+        const classFilter = classIds
+          .map((id) => `class_id='${id}'`)
+          .join(" || ");
         filter = `(${classFilter})`;
       }
-      
+
       if (type) {
         filter += filter ? ` && type='${type}'` : `type='${type}'`;
       }
     } else {
       // New grade/section-based filtering
       const { gradeId, sectionId, type, classIds } = options;
-      
+
       if (gradeId) {
         filter = `grade_id='${gradeId}'`;
       }
-      
+
       if (sectionId) {
-        filter += filter ? ` && section_ids~'${sectionId}'` : `section_ids~'${sectionId}'`;
+        filter += filter
+          ? ` && section_ids~'${sectionId}'`
+          : `section_ids~'${sectionId}'`;
       }
-      
+
       if (type) {
         filter += filter ? ` && type='${type}'` : `type='${type}'`;
       }
-      
+
       // Legacy support
       if (classIds && classIds.length > 0) {
-        const classFilter = classIds.map((id) => `class_id='${id}'`).join(" || ");
-        filter = filter ? `(${filter}) && (${classFilter})` : `(${classFilter})`;
+        const classFilter = classIds
+          .map((id) => `class_id='${id}'`)
+          .join(" || ");
+        filter = filter
+          ? `(${filter}) && (${classFilter})`
+          : `(${classFilter})`;
       }
     }
 
@@ -213,31 +221,39 @@ export const fetchQuestions = async (activityId, includeAnswers = false) => {
 export const fetchLessons = async (options = {}) => {
   try {
     let filter = "";
-    
+
     // Support legacy classIds array parameter (backward compatibility)
     if (Array.isArray(options)) {
       const classIds = options;
-      
+
       if (classIds.length > 0) {
-        const classFilter = classIds.map((id) => `class_id='${id}'`).join(" || ");
+        const classFilter = classIds
+          .map((id) => `class_id='${id}'`)
+          .join(" || ");
         filter = `(${classFilter})`;
       }
     } else {
       // New grade/section-based filtering
       const { gradeId, sectionId, classIds } = options;
-      
+
       if (gradeId) {
         filter = `grade_id='${gradeId}'`;
       }
-      
+
       if (sectionId) {
-        filter += filter ? ` && section_ids~'${sectionId}'` : `section_ids~'${sectionId}'`;
+        filter += filter
+          ? ` && section_ids~'${sectionId}'`
+          : `section_ids~'${sectionId}'`;
       }
-      
+
       // Legacy support
       if (classIds && classIds.length > 0) {
-        const classFilter = classIds.map((id) => `class_id='${id}'`).join(" || ");
-        filter = filter ? `(${filter}) && (${classFilter})` : `(${classFilter})`;
+        const classFilter = classIds
+          .map((id) => `class_id='${id}'`)
+          .join(" || ");
+        filter = filter
+          ? `(${filter}) && (${classFilter})`
+          : `(${classFilter})`;
       }
     }
 
@@ -512,7 +528,7 @@ export const createActivity = async (activityData) => {
   try {
     // Support legacy signature: createActivity(classId, activityData)
     let data;
-    if (typeof activityData === 'string') {
+    if (typeof activityData === "string") {
       const classId = activityData;
       const legacyData = arguments[1];
       data = {
@@ -530,7 +546,7 @@ export const createActivity = async (activityData) => {
       if (!activityData.sectionIds || activityData.sectionIds.length === 0) {
         throw new Error("At least one section is required");
       }
-      
+
       data = {
         grade_id: activityData.gradeId,
         section_ids: activityData.sectionIds,
@@ -539,7 +555,7 @@ export const createActivity = async (activityData) => {
         time_limit: activityData.time_limit || null,
         max_score: activityData.max_score || 100,
       };
-      
+
       // Legacy support: include class_id if provided
       if (activityData.classId) {
         data.class_id = activityData.classId;
@@ -606,17 +622,17 @@ export const createLesson = async (lessonData, files = []) => {
   try {
     // Support legacy signature: createLesson(classId, lessonData, files)
     let formData = new FormData();
-    
-    if (typeof lessonData === 'string') {
+
+    if (typeof lessonData === "string") {
       // Legacy signature
       const classId = lessonData;
       const legacyData = arguments[1];
       const legacyFiles = arguments[2] || [];
-      
+
       formData.append("class_id", classId);
       formData.append("title", legacyData.title);
       formData.append("content", legacyData.content || "");
-      
+
       legacyFiles.forEach((file) => {
         formData.append("attachments", file);
       });
@@ -628,22 +644,22 @@ export const createLesson = async (lessonData, files = []) => {
       if (!lessonData.sectionIds || lessonData.sectionIds.length === 0) {
         throw new Error("At least one section is required");
       }
-      
+
       formData.append("grade_id", lessonData.gradeId);
-      
+
       // Append each section ID separately (PocketBase handles relation arrays)
       lessonData.sectionIds.forEach((sectionId) => {
         formData.append("section_ids", sectionId);
       });
-      
+
       formData.append("title", lessonData.title);
       formData.append("content", lessonData.content || "");
-      
+
       // Legacy support: include class_id if provided
       if (lessonData.classId) {
         formData.append("class_id", lessonData.classId);
       }
-      
+
       // Add file attachments (up to 5 files)
       files.forEach((file) => {
         formData.append("attachments", file);
@@ -777,7 +793,11 @@ export const fetchAllUsers = async (role = null) => {
 
     return records;
   } catch (error) {
-    if (error?.isAbort || error?.message?.includes('autocancelled') || error?.message?.includes('aborted')) {
+    if (
+      error?.isAbort ||
+      error?.message?.includes("autocancelled") ||
+      error?.message?.includes("aborted")
+    ) {
       return [];
     }
     console.error("Error fetching users:", error);
@@ -913,7 +933,11 @@ export const fetchAllCourses = async () => {
       updated: formatDate(record.updated),
     }));
   } catch (error) {
-    if (error?.isAbort || error?.message?.includes('autocancelled') || error?.message?.includes('aborted')) {
+    if (
+      error?.isAbort ||
+      error?.message?.includes("autocancelled") ||
+      error?.message?.includes("aborted")
+    ) {
       return [];
     }
     console.error("Error fetching courses:", error);
@@ -953,7 +977,7 @@ export const fetchAllClasses = async () => {
  */
 /**
  * CREATE COURSE/SUBJECT (Admin)
- * 
+ *
  * Creates a new subject with bilingual name
  * @param {Object} courseData
  * @param {string} courseData.code - Subject code (e.g., "MATH", "SCI")
@@ -1098,7 +1122,7 @@ export const transformRecordToFrontend = (
 
 /**
  * FETCH GRADES (Classes Collection)
- * 
+ *
  * Fetches all active grade levels for dropdowns
  * @returns {Promise<Array>} Array of grade records
  */
@@ -1125,7 +1149,7 @@ export const fetchGrades = async () => {
 
 /**
  * FETCH SECTIONS BY GRADE
- * 
+ *
  * Fetches sections filtered by grade (or all if gradeId is null)
  * @param {string|null} gradeId - Grade ID to filter by, or null for all
  * @returns {Promise<Array>} Array of section records
@@ -1160,7 +1184,7 @@ export const fetchSectionsByGrade = async (gradeId = null) => {
 
 /**
  * FETCH SUBJECTS (Courses Collection)
- * 
+ *
  * Fetches all active subjects for teacher assignment
  * @returns {Promise<Array>} Array of subject records
  */
@@ -1188,10 +1212,10 @@ export const fetchSubjects = async () => {
 
 /**
  * CREATE STUDENT WITH ENROLLMENT
- * 
+ *
  * Creates student user + profile with grade/section assignment in one operation
  * Validates that section belongs to grade before creating
- * 
+ *
  * @param {Object} data - Student data
  * @param {string} data.email - Student email
  * @param {string} data.password - Password
@@ -1222,7 +1246,9 @@ export const createStudentWithEnrollment = async (data) => {
     }
 
     // 2. Validate that section belongs to selected grade
-    const section = await pb.collection("class_sections").getOne(data.sectionId);
+    const section = await pb
+      .collection("class_sections")
+      .getOne(data.sectionId);
     if (section.grade !== data.gradeId) {
       throw new Error("Selected section does not belong to selected grade");
     }
@@ -1233,7 +1259,8 @@ export const createStudentWithEnrollment = async (data) => {
       password: data.password,
       passwordConfirm: data.password,
       role: "student",
-      is_active: true,
+      name: `${data.firstName} ${data.lastName}`,
+      active: true,
     };
 
     let userRecord;
@@ -1288,10 +1315,10 @@ export const createStudentWithEnrollment = async (data) => {
 
 /**
  * CREATE TEACHER WITH ASSIGNMENTS
- * 
+ *
  * Creates teacher user + profile + subject assignments + grade/section assignments
  * Teacher account is created first, then assignments are attempted (best-effort)
- * 
+ *
  * @param {Object} data - Teacher data
  * @param {string} data.email - Teacher email
  * @param {string} data.password - Password
@@ -1324,14 +1351,18 @@ export const createTeacherWithAssignments = async (data) => {
         throw new Error("Subject ID is required for all assignments");
       }
       if (!assignment.grades || assignment.grades.length === 0) {
-        throw new Error(`At least one grade is required for subject ${assignment.subjectId}`);
+        throw new Error(
+          `At least one grade is required for subject ${assignment.subjectId}`,
+        );
       }
       for (const grade of assignment.grades) {
         if (!grade.gradeId) {
           throw new Error("Grade ID is required");
         }
         if (!grade.sectionIds || grade.sectionIds.length === 0) {
-          throw new Error(`At least one section is required for grade ${grade.gradeId}`);
+          throw new Error(
+            `At least one section is required for grade ${grade.gradeId}`,
+          );
         }
       }
     }
@@ -1342,7 +1373,8 @@ export const createTeacherWithAssignments = async (data) => {
       password: data.password,
       passwordConfirm: data.password,
       role: "teacher",
-      is_active: true,
+      active: true,
+      name: `${data.firstName} ${data.lastName}`,
     };
 
     let userRecord;
@@ -1409,7 +1441,9 @@ export const createTeacherWithAssignments = async (data) => {
         for (const sectionId of gradeAssignment.sectionIds) {
           try {
             // Validate section belongs to grade
-            const section = await pb.collection("class_sections").getOne(sectionId);
+            const section = await pb
+              .collection("class_sections")
+              .getOne(sectionId);
             if (section.grade !== gradeAssignment.gradeId) {
               throw new Error("Section does not belong to selected grade");
             }
@@ -1452,7 +1486,7 @@ export const createTeacherWithAssignments = async (data) => {
 
 /**
  * GET USER DEPENDENCIES
- * 
+ *
  * Checks what will be deleted when a user is removed
  * @param {string} userId - User ID to check
  * @returns {Promise<Object>} Dependencies summary
@@ -1461,7 +1495,7 @@ export const getUserDependencies = async (userId) => {
   try {
     const response = await fetch(`/api/users/${userId}/dependencies`, {
       headers: {
-        'Authorization': pb.authStore.token,
+        Authorization: pb.authStore.token,
       },
     });
 
@@ -1478,34 +1512,40 @@ export const getUserDependencies = async (userId) => {
 
 /**
  * SOFT DELETE USER (Deactivation)
- * 
+ *
  * Deactivates user account while preserving all data
  * @param {string} userId - User ID to deactivate
  * @returns {Promise<Object>} Success result
  */
 export const softDeleteUser = async (userId) => {
   try {
-    const response = await fetch(`/api/collections/users/records/${userId}?mode=soft`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': pb.authStore.token,
+    const response = await fetch(
+      `/api/collections/users/records/${userId}?mode=soft`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: pb.authStore.token,
+        },
       },
-    });
+    );
 
     // Soft delete returns 400 with success message (by design)
     if (!response.ok) {
       const error = await response.json();
       // Check if this is actually a success (message contains "successfully")
-      if (error.message && error.message.toLowerCase().includes('successfully')) {
+      if (
+        error.message &&
+        error.message.toLowerCase().includes("successfully")
+      ) {
         return { success: true, message: error.message };
       }
-      throw new Error(error.message || 'Failed to deactivate user');
+      throw new Error(error.message || "Failed to deactivate user");
     }
 
     return { success: true };
   } catch (error) {
     // Check if error message indicates success
-    if (error.message && error.message.toLowerCase().includes('successfully')) {
+    if (error.message && error.message.toLowerCase().includes("successfully")) {
       return { success: true, message: error.message };
     }
     console.error("Error soft deleting user:", error);
@@ -1515,23 +1555,26 @@ export const softDeleteUser = async (userId) => {
 
 /**
  * HARD DELETE USER (Permanent)
- * 
+ *
  * Permanently deletes user and all dependencies (CANNOT BE UNDONE)
  * @param {string} userId - User ID to permanently delete
  * @returns {Promise<Object>} Success result
  */
 export const hardDeleteUser = async (userId) => {
   try {
-    const response = await fetch(`/api/collections/users/records/${userId}?mode=hard`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': pb.authStore.token,
+    const response = await fetch(
+      `/api/collections/users/records/${userId}?mode=hard`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: pb.authStore.token,
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to permanently delete user');
+      throw new Error(error.message || "Failed to permanently delete user");
     }
 
     return { success: true };
@@ -1543,20 +1586,24 @@ export const hardDeleteUser = async (userId) => {
 
 /**
  * REASSIGN CLASSES
- * 
+ *
  * Reassigns classes from one teacher to another
  * @param {string} oldTeacherId - Current teacher ID
  * @param {string} newTeacherId - New teacher ID
  * @param {Array<string>} classIds - Optional: specific class IDs to reassign
  * @returns {Promise<Object>} Reassignment result
  */
-export const reassignClasses = async (oldTeacherId, newTeacherId, classIds = []) => {
+export const reassignClasses = async (
+  oldTeacherId,
+  newTeacherId,
+  classIds = [],
+) => {
   try {
-    const response = await fetch('/api/classes/reassign', {
-      method: 'POST',
+    const response = await fetch("/api/classes/reassign", {
+      method: "POST",
       headers: {
-        'Authorization': pb.authStore.token,
-        'Content-Type': 'application/json',
+        Authorization: pb.authStore.token,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         old_teacher_id: oldTeacherId,
@@ -1567,7 +1614,7 @@ export const reassignClasses = async (oldTeacherId, newTeacherId, classIds = [])
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to reassign classes');
+      throw new Error(error.message || "Failed to reassign classes");
     }
 
     return await response.json();
@@ -1579,7 +1626,7 @@ export const reassignClasses = async (oldTeacherId, newTeacherId, classIds = [])
 
 /**
  * REACTIVATE USER
- * 
+ *
  * Reactivates a soft-deleted user
  * @param {string} userId - User ID to reactivate
  * @returns {Promise<Object>} Reactivation result
@@ -1587,15 +1634,15 @@ export const reassignClasses = async (oldTeacherId, newTeacherId, classIds = [])
 export const reactivateUser = async (userId) => {
   try {
     const response = await fetch(`/api/users/${userId}/reactivate`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': pb.authStore.token,
+        Authorization: pb.authStore.token,
       },
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to reactivate user');
+      throw new Error(error.message || "Failed to reactivate user");
     }
 
     return await response.json();
