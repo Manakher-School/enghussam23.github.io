@@ -1374,7 +1374,8 @@ export const createTeacherWithAssignments = async (data) => {
       passwordConfirm: data.password,
       role: "teacher",
       active: true,
-      name: `${data.firstName} ${data.lastName}`,
+      name: `${data.firstNameAr} ${data.lastNameAr}`,
+      name_en: `${data.firstName} ${data.lastName}`,
     };
 
     let userRecord;
@@ -1384,29 +1385,7 @@ export const createTeacherWithAssignments = async (data) => {
       throw new Error(`Failed to create user account: ${error.message}`);
     }
 
-    // 4. Create user profile
-    const profileData = {
-      user_id: userRecord.id,
-      first_name: data.firstName,
-      last_name: data.lastName,
-      first_name_ar: data.firstNameAr,
-      last_name_ar: data.lastNameAr,
-    };
-
-    try {
-      await pb.collection("user_profiles").create(profileData);
-    } catch (error) {
-      // Profile creation failed - attempt cleanup
-      console.error("Profile creation failed, attempting cleanup...");
-      try {
-        await pb.collection("users").delete(userRecord.id);
-      } catch (cleanupError) {
-        console.error("Cleanup failed:", cleanupError);
-      }
-      throw new Error(`Failed to create profile: ${error.message}`);
-    }
-
-    // 5. Attempt to create assignments (best-effort)
+    // 4. Attempt to create assignments (best-effort)
     const results = {
       success: true,
       id: userRecord.id,
@@ -1414,6 +1393,8 @@ export const createTeacherWithAssignments = async (data) => {
       role: userRecord.role,
       firstName: data.firstName,
       lastName: data.lastName,
+      firstNameAr: data.firstNameAr,
+      lastNameAr: data.lastNameAr,
       assignmentsCreated: 0,
       assignmentsFailed: 0,
       errors: [],
@@ -1451,7 +1432,7 @@ export const createTeacherWithAssignments = async (data) => {
             await pb.collection("teacher_classes").create({
               teacher_id: userRecord.id,
               subject_id: assignment.subjectId,
-              grade_id: gradeAssignment.gradeId,
+              class_id: gradeAssignment.gradeId,
               section_id: sectionId,
             });
 

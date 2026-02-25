@@ -197,6 +197,8 @@ const TeacherCreationDialog = ({ open, onClose, onSuccess }) => {
       setError(null);
 
       const result = await createTeacherWithAssignments(formData);
+      console.log("THE ASSIGNMENT RECEIPT:", result);
+      console.log("EMAIL", result.email);
 
       setSuccess(true);
       setResult(result);
@@ -207,6 +209,8 @@ const TeacherCreationDialog = ({ open, onClose, onSuccess }) => {
           handleClose();
           if (onSuccess) onSuccess();
         }, 2000);
+        // Page Reload
+        window.location.reload();
       }
     } catch (err) {
       setError(err.message || 'Failed to create teacher');
