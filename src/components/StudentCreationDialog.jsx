@@ -364,8 +364,8 @@ const StudentCreationDialog = ({ open, onClose, onSuccess }) => {
         </Grid>
       </DialogContent>
 
-      <DialogActions sx={{ p: 2 }}>
-        <Button onClick={handleClose} disabled={loading}>
+      <DialogActions sx={{ p: 2, gap: 2 }}>
+        <Button onClick={handleClose} disabled={loading} variant='outlined'>
           {lang === 'ar' ? 'إلغاء' : 'Cancel'}
         </Button>
         <Button
@@ -373,6 +373,7 @@ const StudentCreationDialog = ({ open, onClose, onSuccess }) => {
           variant="contained"
           disabled={!isFormValid() || loading}
           startIcon={loading ? <CircularProgress size={20} /> : <PersonAddIcon />}
+          sx={{gap: 2}}
         >
           {loading
             ? lang === 'ar'

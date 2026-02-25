@@ -366,8 +366,8 @@ const UserDeletionDialog = ({ open, onClose, user, onSuccess }) => {
         )}
       </DialogContent>
 
-      <DialogActions>
-        <Button onClick={onClose} disabled={loading}>
+      <DialogActions sx={{ gap: 2 }}>
+        <Button onClick={onClose} disabled={loading} variant="outlined">
           {t('common.cancel')}
         </Button>
         <Button
@@ -376,6 +376,7 @@ const UserDeletionDialog = ({ open, onClose, user, onSuccess }) => {
           color={deletionMode === 'soft' ? 'primary' : 'error'}
           disabled={loading || fetchingDeps || !isFormValid()}
           startIcon={loading ? <CircularProgress size={20} /> : deletionMode === 'soft' ? <PersonOffIcon /> : <DeleteIcon />}
+          sx={{gap: 2}}
         >
           {loading
             ? t('common.processing')

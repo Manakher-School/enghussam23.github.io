@@ -197,7 +197,8 @@ function AdminDashboard() {
 
   const students = users.filter(u => u.role === 'student');
   const teachers = users.filter(u => u.role === 'teacher');
-  const admins = users.filter(u => u.role === 'admin');
+  // Declared but not used (not needed).
+  // const admins = users.filter(u => u.role === 'admin');
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
@@ -280,6 +281,7 @@ function AdminDashboard() {
       {/* Main Content */}
       <Card>
         <CardContent>
+        {/* Tabs labels */}
           <Tabs value={currentTab} onChange={(e, v) => setCurrentTab(v)}>
             <Tab label={t('admin.users')} />
             <Tab label={t('admin.courses')} />
@@ -290,9 +292,10 @@ function AdminDashboard() {
             {/* Users Tab */}
             {currentTab === 0 && (
               <>
+              {/* CTAs */}
                 <Box mb={2} sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                   <Button
-                    variant="contained"
+                    variant="outlined"
                     startIcon={<AddIcon />}
                     onClick={() => setStudentDialog(true)}
                     color="primary"
@@ -300,38 +303,40 @@ function AdminDashboard() {
                     {t('admin.addStudent')}
                   </Button>
                   <Button
-                    variant="contained"
+                    variant="outlined"
                     startIcon={<AddIcon />}
                     onClick={() => setTeacherDialog(true)}
-                    color="success"
+                    color="primary"
                   >
                     {t('admin.addTeacher')}
                   </Button>
                 </Box>
+                {/* Tab Content */}
                 <TableContainer component={Paper}>
                   <Table>
+                    {/* Columns Titles */}
                     <TableHead>
                       <TableRow>
-                        <TableCell>{t('admin.name')}</TableCell>
-                        <TableCell>{t('admin.email')}</TableCell>
-                        <TableCell>{t('admin.role')}</TableCell>
-                        <TableCell>{t('admin.status')}</TableCell>
-                        <TableCell>{t('admin.actions')}</TableCell>
+                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.name')}</TableCell>
+                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.email')}</TableCell>
+                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.role')}</TableCell>
+                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.status')}</TableCell>
+                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.actions')}</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {users.map((u) => (
                         <TableRow key={u.id}>
-                          <TableCell>{u.name}</TableCell>
-                          <TableCell>{u.email}</TableCell>
-                          <TableCell>
+                          <TableCell align={lang === 'ar' ? 'right' : 'left'}>{u.name}</TableCell>
+                          <TableCell align={lang === 'ar' ? 'right' : 'left'}>{u.email}</TableCell>
+                          <TableCell align={lang === 'ar' ? 'right' : 'left'}>
                             <Chip 
                               label={u.role} 
                               size="small"
                               color={u.role === 'admin' ? 'error' : u.role === 'teacher' ? 'primary' : 'default'}
                             />
                           </TableCell>
-                          <TableCell>
+                          <TableCell align={lang === 'ar' ? 'right' : 'left'}>
                             <Chip
                               label={u.active ? t('admin.active') : t('admin.inactive')}
                               size="small"
@@ -340,7 +345,7 @@ function AdminDashboard() {
                               clickable
                             />
                           </TableCell>
-                          <TableCell>
+                          <TableCell align={lang === 'ar' ? 'right' : 'left'}>
                             <IconButton
                               size="small"
                               color="error"
@@ -361,9 +366,10 @@ function AdminDashboard() {
             {/* Courses Tab */}
             {currentTab === 1 && (
               <>
+              {/* CTAs */}
                 <Box mb={2}>
                   <Button
-                    variant="contained"
+                    variant="outlined"
                     startIcon={<AddIcon />}
                     onClick={() => setCourseDialog(true)}
                   >
@@ -372,24 +378,23 @@ function AdminDashboard() {
                 </Box>
                 <TableContainer component={Paper}>
                   <Table>
+                  {/* Columns Titles */}
                     <TableHead>
                       <TableRow>
-                        <TableCell>{t('admin.title')}</TableCell>
-                        <TableCell>{t('admin.description')}</TableCell>
-                        <TableCell>{t('admin.created')}</TableCell>
+                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.title')}</TableCell>
+                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.created')}</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {courses.map((course) => (
                         <TableRow key={course.id}>
-                          <TableCell>{course.name?.[lang] || course.name?.en || ''}</TableCell>
-                          <TableCell>{course.description}</TableCell>
-                          <TableCell>{new Date(course.created).toLocaleDateString()}</TableCell>
+                          <TableCell align={lang === 'ar' ? 'right' : 'left'}>{course.name?.[lang] || course.name?.en || ''}</TableCell>
+                          <TableCell align={lang === 'ar' ? 'right' : 'left'}>{new Date(course.created).toLocaleDateString()}</TableCell>
                         </TableRow>
                       ))}
                       {courses.length === 0 && (
                         <TableRow>
-                          <TableCell colSpan={3} align="center">
+                          <TableCell colSpan={3} align={lang === 'ar' ? 'right' : 'left'}>
                             {t('admin.noCourses')}
                           </TableCell>
                         </TableRow>
@@ -403,9 +408,10 @@ function AdminDashboard() {
             {/* Classes Tab */}
             {currentTab === 2 && (
               <>
+              {/* CTAs */}
                 <Box mb={2}>
                   <Button
-                    variant="contained"
+                    variant="outlined"
                     startIcon={<AddIcon />}
                     onClick={() => setClassDialog(true)}
                   >
@@ -416,22 +422,27 @@ function AdminDashboard() {
                   <Table>
                     <TableHead>
                       <TableRow>
-                        <TableCell>{t('admin.course')}</TableCell>
-                        <TableCell>{t('admin.teacher')}</TableCell>
-                        <TableCell>{t('admin.created')}</TableCell>
+                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.course')}</TableCell>
+                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.teacher')}</TableCell>
+                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.created')}</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {classes.map((cls) => (
+                      {classes.map((cls) => {
+                        return (
                         <TableRow key={cls.id}>
-                          <TableCell>{cls.course?.name?.[lang] || cls.course?.name?.en || 'N/A'}</TableCell>
-                          <TableCell>{cls.teacher?.name || 'N/A'}</TableCell>
-                          <TableCell>{new Date(cls.created).toLocaleDateString()}</TableCell>
+                          <TableCell align={lang === 'ar' ? 'right' : 'left'}>{cls.course?.title || 'N/A'}</TableCell>
+                          <TableCell align={lang === 'ar' ? 'right' : 'left'}>
+                            {cls.teacher?.name || 'N/A'}
+                            </TableCell>
+                          <TableCell align={lang === 'ar' ? 'right' : 'left'}>
+                            {new Date(cls.createdAt).toLocaleDateString()}
+                            </TableCell>
                         </TableRow>
-                      ))}
+                      );})}
                       {classes.length === 0 && (
                         <TableRow>
-                          <TableCell colSpan={3} align="center">
+                          <TableCell colSpan={3} align={lang === 'ar' ? 'right' : 'left'}>
                             {t('admin.noClasses')}
                           </TableCell>
                         </TableRow>
@@ -445,7 +456,7 @@ function AdminDashboard() {
         </CardContent>
       </Card>
 
-      {/* Create Admin Dialog */}
+      {/* Create Admin Dialog, DEPRICATED
       <Dialog open={userDialog} onClose={() => setUserDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>{t('admin.createAdmin') || 'Create Admin'}</DialogTitle>
         <DialogContent>
@@ -476,7 +487,7 @@ function AdminDashboard() {
           <Button onClick={() => setUserDialog(false)}>{t('common.cancel')}</Button>
           <Button onClick={handleCreateUser} variant="contained">{t('common.create')}</Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
 
       {/* Create Course Dialog */}
       <Dialog open={courseDialog} onClose={() => setCourseDialog(false)} maxWidth="sm" fullWidth>
@@ -535,8 +546,8 @@ function AdminDashboard() {
             />
           </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setCourseDialog(false)}>{t('common.cancel')}</Button>
+        <DialogActions sx={{ gap: 2 }}>
+          <Button onClick={() => setCourseDialog(false)} variant="outlined">{t('common.cancel')}</Button>
           <Button onClick={handleCreateCourse} variant="contained">{t('common.create')}</Button>
         </DialogActions>
       </Dialog>
@@ -574,8 +585,8 @@ function AdminDashboard() {
             </FormControl>
           </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setClassDialog(false)}>{t('common.cancel')}</Button>
+        <DialogActions sx={{ gap: 2 }}>
+          <Button onClick={() => setClassDialog(false)} variant="outlined">{t('common.cancel')}</Button>
           <Button onClick={handleCreateClass} variant="contained">{t('common.create')}</Button>
         </DialogActions>
       </Dialog>
