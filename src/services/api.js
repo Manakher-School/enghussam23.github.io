@@ -1473,18 +1473,46 @@ export const createTeacherWithAssignments = async (data) => {
  * @returns {Promise<Object>} Dependencies summary
  */
 export const getUserDependencies = async (userId) => {
+  // try {
+  //   // const response = await fetch(`/api/users/${userId}/dependencies`, {
+  //   //   headers: {
+  //   //     Authorization: pb.authStore.token,
+  //   //   },
+  //   // });
+  //   const response = await pb.send(`/api/users/${userId}/dependencies`, {
+  //     method: "GET",
+  //   });
+
+  //   // if (!response.ok) {
+  //   //   throw new Error(`Failed to fetch dependencies: ${response.statusText}`);
+  //   // }
+
+  //   // return await response.json();
+  //   return response;
+  // } catch (error) {
+  //   console.error("Error fetching user dependencies:", error);
+  //   throw new Error(`Failed to fetch user dependencies: ${error.message}`);
+  // }
+
   try {
-    const response = await fetch(`/api/users/${userId}/dependencies`, {
-      headers: {
-        Authorization: pb.authStore.token,
-      },
+    // 1. Fetch assigned subjects
+    const subjects = await pb.collection("teacher_subjects").getFullList({
+      filter: `teacher_id = "${userId}"`,
     });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch dependencies: ${response.statusText}`);
-    }
+    // 2. Fetch assigned classes
+    const classes = await pb.collection("teacher_classes").getFullList({
+      filter: `teacher_id = "${userId}"`,
+    });
 
-    return await response.json();
+    // 3. Return a clean summary of what will be affected
+    return {
+      total: subjects.length + classes.length,
+      subjectsCount: subjects.length,
+      classesCount: classes.length,
+      subjects: subjects,
+      classes: classes,
+    };
   } catch (error) {
     console.error("Error fetching user dependencies:", error);
     throw new Error(`Failed to fetch user dependencies: ${error.message}`);
@@ -1500,29 +1528,27 @@ export const getUserDependencies = async (userId) => {
  */
 export const softDeleteUser = async (userId) => {
   try {
-    const response = await fetch(
-      `/api/collections/users/records/${userId}?mode=soft`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: pb.authStore.token,
-        },
-      },
-    );
+    // const response = await pb
+    //   .collection("users")
+    //   .delete(userId, { mode: "soft" });
 
-    // Soft delete returns 400 with success message (by design)
-    if (!response.ok) {
-      const error = await response.json();
-      // Check if this is actually a success (message contains "successfully")
-      if (
-        error.message &&
-        error.message.toLowerCase().includes("successfully")
-      ) {
-        return { success: true, message: error.message };
-      }
-      throw new Error(error.message || "Failed to deactivate user");
-    }
+    // // Soft delete returns 400 with success message (by design)
+    // if (!response.ok) {
+    //   const error = await response.json();
+    //   // Check if this is actually a success (message contains "successfully")
+    //   if (
+    //     error.message &&
+    //     error.message.toLowerCase().includes("successfully")
+    //   ) {
+    //     return { success: true, message: error.message };
+    //   }
+    //   throw new Error(error.message || "Failed to deactivate user");
+    // }
 
+    // return { success: true };
+
+    // The SDK handles the DELETE request and query parameters perfectly
+    await pb.collection("users").delete(userId, { mode: "soft" });
     return { success: true };
   } catch (error) {
     // Check if error message indicates success
@@ -1543,21 +1569,25 @@ export const softDeleteUser = async (userId) => {
  */
 export const hardDeleteUser = async (userId) => {
   try {
-    const response = await fetch(
-      `/api/collections/users/records/${userId}?mode=hard`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: pb.authStore.token,
-        },
-      },
-    );
+    // const response = await fetch(
+    //   `/api/collections/users/records/${userId}?mode=hard`,
+    //   {
+    //     method: "DELETE",
+    //     headers: {
+    //       Authorization: pb.authStore.token,
+    //     },
+    //   },
+    // );
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Failed to permanently delete user");
-    }
+    // if (!response.ok) {
+    //   const error = await response.json();
+    //   throw new Error(error.message || "Failed to permanently delete user");
+    // }
 
+    // return { success: true };
+
+    // No more JSON parsing errors! The SDK knows how to handle an empty 204 response.
+    await pb.collection("users").delete(userId, { mode: "hard" });
     return { success: true };
   } catch (error) {
     console.error("Error hard deleting user:", error);
