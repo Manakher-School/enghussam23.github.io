@@ -138,6 +138,7 @@ const UserDeletionDialog = ({ open, onClose, user, onSuccess }) => {
       }
     } catch (err) {
       setError(err.message);
+      console.log('Error details:', err);
     } finally {
       setLoading(false);
     }

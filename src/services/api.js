@@ -1528,30 +1528,15 @@ export const getUserDependencies = async (userId) => {
  */
 export const softDeleteUser = async (userId) => {
   try {
-    // const response = await pb
-    //   .collection("users")
-    //   .delete(userId, { mode: "soft" });
+    // FIX: We use pb.send() with the query param directly in the URL
+    // This avoids the browser "mode" keyword conflict
+    await pb.send(`/api/collections/users/records/${userId}?mode=soft`, {
+      method: "DELETE",
+    });
 
-    // // Soft delete returns 400 with success message (by design)
-    // if (!response.ok) {
-    //   const error = await response.json();
-    //   // Check if this is actually a success (message contains "successfully")
-    //   if (
-    //     error.message &&
-    //     error.message.toLowerCase().includes("successfully")
-    //   ) {
-    //     return { success: true, message: error.message };
-    //   }
-    //   throw new Error(error.message || "Failed to deactivate user");
-    // }
-
-    // return { success: true };
-
-    // The SDK handles the DELETE request and query parameters perfectly
-    await pb.collection("users").delete(userId, { mode: "soft" });
     return { success: true };
   } catch (error) {
-    // Check if error message indicates success
+    // Check if error message indicates success (intentional 400 catch)
     if (error.message && error.message.toLowerCase().includes("successfully")) {
       return { success: true, message: error.message };
     }
@@ -1569,28 +1554,13 @@ export const softDeleteUser = async (userId) => {
  */
 export const hardDeleteUser = async (userId) => {
   try {
-    // const response = await fetch(
-    //   `/api/collections/users/records/${userId}?mode=hard`,
-    //   {
-    //     method: "DELETE",
-    //     headers: {
-    //       Authorization: pb.authStore.token,
-    //     },
-    //   },
-    // );
-
-    // if (!response.ok) {
-    //   const error = await response.json();
-    //   throw new Error(error.message || "Failed to permanently delete user");
-    // }
-
-    // return { success: true };
-
-    // No more JSON parsing errors! The SDK knows how to handle an empty 204 response.
-    await pb.collection("users").delete(userId, { mode: "hard" });
+    // PocketBase will now automatically hunt down and destroy
+    // the assigned classes and subjects for us!
+    await pb.collection("users").delete(userId);
     return { success: true };
   } catch (error) {
     console.error("Error hard deleting user:", error);
+    console.log("Error details:", error);
     throw new Error(`Failed to permanently delete user: ${error.message}`);
   }
 };
