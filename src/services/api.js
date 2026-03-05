@@ -89,14 +89,15 @@ export const fetchCourses = async (grade = null) => {
  * @param {string} options.type - Activity type ('quiz', 'exam', 'homework')
  * @param {string[]} options.classIds - Legacy class IDs (deprecated, for backward compatibility)
  */
-export const fetchActivities = async (options = {}) => {
+export const fetchActivities = async (options = {}, legacyType = null) => {
   try {
     let filter = "";
 
     // Support legacy classIds array parameter (backward compatibility)
     if (Array.isArray(options)) {
       const classIds = options;
-      const type = arguments[1] || null;
+
+      const type = legacyType;
 
       if (classIds.length > 0) {
         const classFilter = classIds
@@ -958,6 +959,7 @@ export const fetchAllClasses = async () => {
 
     return records.map((record) => ({
       id: record.id,
+      name: record.name || "",
       course_id: record.course_id,
       teacher_id: record.teacher_id,
       created: formatDate(record.created),
@@ -1255,24 +1257,15 @@ export const createStudentWithEnrollment = async (data) => {
 
     // 3. Create user account
     const userData = {
+      // Core Auth Data
       email: data.email,
       password: data.password,
       passwordConfirm: data.password,
       role: "student",
-      name: `${data.firstName} ${data.lastName}`,
+      name: `${data.firstNameAr} ${data.lastNameAr}`,
+      name_en: `${data.firstName} ${data.lastName}`,
       active: true,
-    };
-
-    let userRecord;
-    try {
-      userRecord = await pb.collection("users").create(userData);
-    } catch (error) {
-      throw new Error(`Failed to create user account: ${error.message}`);
-    }
-
-    // 4. Create user profile with grade/section
-    const profileData = {
-      user_id: userRecord.id,
+      // Profile Data (merged directly into the user record)
       first_name: data.firstName,
       last_name: data.lastName,
       first_name_ar: data.firstNameAr,
@@ -1284,17 +1277,11 @@ export const createStudentWithEnrollment = async (data) => {
       enrollment_date: new Date().toISOString().split("T")[0],
     };
 
+    let userRecord;
     try {
-      await pb.collection("user_profiles").create(profileData);
+      userRecord = await pb.collection("users").create(userData);
     } catch (error) {
-      // Profile creation failed - attempt cleanup
-      console.error("Profile creation failed, attempting cleanup...");
-      try {
-        await pb.collection("users").delete(userRecord.id);
-      } catch (cleanupError) {
-        console.error("Cleanup failed:", cleanupError);
-      }
-      throw new Error(`Failed to create profile: ${error.message}`);
+      throw new Error(`Failed to create user account: ${error.message}`);
     }
 
     return {

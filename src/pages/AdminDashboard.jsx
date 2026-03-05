@@ -45,6 +45,7 @@ import { useData } from '../context/DataContext';
 import {
   fetchAllUsers,
   fetchAllCourses,
+  fetchAllClasses,
   createUser,
   createCourse,
   createClass,
@@ -59,7 +60,7 @@ function AdminDashboard() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const { user } = useAuth();
-  const { courses: classes, loading: contextLoading } = useData();
+  const { loading: contextLoading } = useData();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
@@ -67,6 +68,7 @@ function AdminDashboard() {
   // Data fetched locally (not in DataContext)
   const [users, setUsers] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [classes, setClasses] = useState([]);
   
   // Dialogs
   const [userDialog, setUserDialog] = useState(false);
@@ -107,14 +109,16 @@ function AdminDashboard() {
   const loadData = async (cancelled = false) => {
     try {
       setLoading(true);
-      const [usersData, coursesData] = await Promise.all([
+      const [usersData, coursesData, classesData] = await Promise.all([
         fetchAllUsers(),
         fetchAllCourses(),
+        fetchAllClasses(),
       ]);
 
       if (!cancelled) {
         setUsers(usersData);
         setCourses(coursesData);
+        setClasses(classesData); 
       }
     } catch (err) {
       // Suppress auto-cancellation errors (e.g. React StrictMode double-mount)
@@ -317,21 +321,19 @@ function AdminDashboard() {
                     {/* Columns Titles */}
                     <TableHead>
                       <TableRow>
-                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.name')}</TableCell>
-                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.email')}</TableCell>
-                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.role')}</TableCell>
-                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.status')}</TableCell>
-                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.actions')}</TableCell>
+                        <TableCell sx={{fontWeight: 'bold'}} align={lang === 'ar' ? 'right' : 'left'}>{t('admin.name')}</TableCell>
+                        <TableCell sx={{fontWeight: 'bold'}} align={lang === 'ar' ? 'right' : 'left'}>{t('admin.role')}</TableCell>
+                        <TableCell sx={{fontWeight: 'bold'}} align={lang === 'ar' ? 'right' : 'left'}>{t('admin.status')}</TableCell>
+                        <TableCell sx={{fontWeight: 'bold'}} align={lang === 'ar' ? 'right' : 'left'}>{t('admin.actions')}</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {users.map((u) => (
                         <TableRow key={u.id}>
                           <TableCell align={lang === 'ar' ? 'right' : 'left'}>{u.name}</TableCell>
-                          <TableCell align={lang === 'ar' ? 'right' : 'left'}>{u.email}</TableCell>
                           <TableCell align={lang === 'ar' ? 'right' : 'left'}>
                             <Chip 
-                              label={u.role} 
+                              label={t(`roles.${u.role}`)} 
                               size="small"
                               color={u.role === 'admin' ? 'error' : u.role === 'teacher' ? 'primary' : 'default'}
                             />
@@ -381,8 +383,8 @@ function AdminDashboard() {
                   {/* Columns Titles */}
                     <TableHead>
                       <TableRow>
-                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.title')}</TableCell>
-                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.created')}</TableCell>
+                        <TableCell sx={{fontWeight: 'bold'}} align={lang === 'ar' ? 'right' : 'left'}>{t('admin.title')}</TableCell>
+                        <TableCell sx={{fontWeight: 'bold'}} align={lang === 'ar' ? 'right' : 'left'}>{t('admin.created')}</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -422,22 +424,17 @@ function AdminDashboard() {
                   <Table>
                     <TableHead>
                       <TableRow>
-                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.course')}</TableCell>
-                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.teacher')}</TableCell>
-                        <TableCell align={lang === 'ar' ? 'right' : 'left'}>{t('admin.created')}</TableCell>
+                        <TableCell sx={{fontWeight: 'bold'}} align={lang === 'ar' ? 'right' : 'left'}>{t('admin.class')}</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {classes.map((cls) => {
+                        console.log("Full Class:", cls);
                         return (
                         <TableRow key={cls.id}>
-                          <TableCell align={lang === 'ar' ? 'right' : 'left'}>{cls.course?.title || 'N/A'}</TableCell>
                           <TableCell align={lang === 'ar' ? 'right' : 'left'}>
-                            {cls.teacher?.name || 'N/A'}
-                            </TableCell>
-                          <TableCell align={lang === 'ar' ? 'right' : 'left'}>
-                            {new Date(cls.createdAt).toLocaleDateString()}
-                            </TableCell>
+                            {cls.name?.[lang] || cls.name?.en ||'N/A'}
+                          </TableCell>
                         </TableRow>
                       );})}
                       {classes.length === 0 && (

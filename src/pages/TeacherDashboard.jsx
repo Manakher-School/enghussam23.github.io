@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import pb from '../lib/pocketbase';
 import {
   Container,
   Grid,
@@ -58,11 +59,12 @@ import {
 function TeacherDashboard() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { courses: classes, loading: contextLoading } = useData();
+  const { loading: contextLoading } = useData();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
   // State
+  const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
   
@@ -98,6 +100,31 @@ function TeacherDashboard() {
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [editingActivity, setEditingActivity] = useState(null);
   const [editingLesson, setEditingLesson] = useState(null);
+
+  // Fetch the classes from PocketBase for this specific teacher
+  useEffect(() => {
+    const fetchTeacherClasses = async () => {
+      if (!user?.id) return;
+
+      // Who is logged in?
+      console.log("Logged in Teacher ID:", user.id);
+
+      try {
+        const records = await pb.collection('classes').getFullList({
+          filter: `teacher_id = '${user.id}'`,
+          sort: '-created'
+        });
+
+        // What did the database return?
+        console.log("Fetched Classes for this Teacher:", records);
+        setClasses(records); // This triggers your other useEffects!
+      } catch (err) {
+        console.error("Error fetching teacher classes:", err);
+      }
+    };
+
+    fetchTeacherClasses();
+  }, [user?.id]);
 
   // When classes arrive from context, auto-select the first one
   useEffect(() => {
@@ -673,6 +700,7 @@ function TeacherDashboard() {
           <Button onClick={handleCreateQuestion} variant="contained">{t('common.add')}</Button>
         </DialogActions>
       </Dialog>
+
       {/* Edit Activity Dialog */}
       <Dialog open={editActivityDialog} onClose={() => setEditActivityDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>{t('teacher.editActivity')}</DialogTitle>
