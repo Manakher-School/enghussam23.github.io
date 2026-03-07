@@ -248,62 +248,72 @@ export default function DataProvider({ children }) {
    * Fetches classes where teacher_id = user.id, then content for those classes.
    */
   const loadTeacherData = async () => {
-    // 1. Fetch classes taught by this teacher
-    const classRecords = await pb.collection('classes').getFullList({
-      filter: `teacher_id='${user.id}'`,
-      expand: 'course_id',
-      sort: 'created',
-      requestKey: null,
+  // 1. Fetch the junction records (Teacher-Class-Subject-Section)
+  const classRecords = await pb.collection('teacher_classes').getFullList({
+    filter: `teacher_id = '${user.id}'`,
+    expand: 'class_id,subject_id,section_id', // Ensure no spaces after commas
+    sort: '-created',
+    requestKey: null,
+  });
+
+  const mappedClasses = classRecords.map(r => ({
+    id: r.id, // This is the Assignment ID
+    class_id: r.class_id,
+    subject_id: r.subject_id,
+    section_id: r.section_id,
+    // THE FIX: Use "class" and "subject" names to match TeacherDashboard
+    class: r.expand?.class_id || null,
+    subject: r.expand?.subject_id || null,
+    section: r.expand?.section_id || null,
+    createdAt: r.created,
+    updatedAt: r.updated,
+  }));
+
+  // 🚨 CRITICAL FIX: Make sure your Context exports 'classes'!
+  // If your state is 'courses', update TeacherDashboard to use 'courses' 
+  // OR update this state setter to 'setClasses' if you renamed it.
+  setClasses(mappedClasses); 
+
+  // 2. Prepare IDs for filtering content
+  const assignmentIds = mappedClasses.map(c => c.id);
+
+  if (assignmentIds.length === 0) {
+    setLessons([]);
+    setActivities([]);
+    setNews(await safelyFetchNews());
+    return;
+  }
+
+  // 3. Parallel Fetching for the rest of the Dashboard
+  const [lessonRecords, activityRecords, newsRecords] = await Promise.all([
+    fetchLessons(assignmentIds),
+    fetchActivities(assignmentIds),
+    safelyFetchNews(),
+  ]);
+
+  setLessons(lessonRecords);
+  setActivities(activityRecords);
+  setNews(newsRecords);
+
+  // 4. Submissions (Keep this as you had it!)
+  const activityIds = activityRecords.map(a => a.id);
+  if (activityIds.length > 0) {
+    const activityFilter = activityIds.map(id => `activity_id='${id}'`).join(' || ');
+    const submissionRecords = await pb.collection('submissions').getFullList({
+      filter: activityFilter,
+      expand: 'student_id,activity_id',
+      sort: '-created',
     });
+    setSubmissions(submissionRecords);
+    await saveToCache('submissions', submissionRecords);
+  }
 
-    const mappedClasses = classRecords.map(r => ({
-      id: r.id,
-      course_id: r.course_id,
-      teacher_id: r.teacher_id,
-      course: r.expand?.course_id || null,
-      createdAt: r.created,
-      updatedAt: r.updated,
-    }));
-    setCourses(mappedClasses);
-
-    const classIds = mappedClasses.map(c => c.id);
-
-    if (classIds.length === 0) {
-      setLessons([]);
-      setActivities([]);
-      setNews(await safelyFetchNews());
-      return;
-    }
-
-    // 2. Fetch lessons, activities, and news in parallel
-    const [lessonRecords, activityRecords, newsRecords] = await Promise.all([
-      fetchLessons(classIds),
-      fetchActivities(classIds),
-      safelyFetchNews(),
-    ]);
-
-    setLessons(lessonRecords);
-    setActivities(activityRecords);
-    setNews(newsRecords);
-
-    // 3. Fetch all submissions for teacher's activities
-    const activityIds = activityRecords.map(a => a.id);
-    if (activityIds.length > 0) {
-      const activityFilter = activityIds.map(id => `activity_id='${id}'`).join(' || ');
-      const submissionRecords = await pb.collection('submissions').getFullList({
-        filter: activityFilter,
-        expand: 'student_id,activity_id',
-        sort: '-created',
-      });
-      setSubmissions(submissionRecords);
-      await saveToCache('submissions', submissionRecords);
-    }
-
-    await saveToCache('courses', mappedClasses);
-    await saveToCache('lessons', lessonRecords);
-    await saveToCache('activities', activityRecords);
-    await saveToCache('news', newsRecords);
-  };
+  // Sync Cache
+  await saveToCache('courses', mappedClasses);
+  await saveToCache('lessons', lessonRecords);
+  await saveToCache('activities', activityRecords);
+  await saveToCache('news', newsRecords);
+};
 
   /**
    * Load data for admin role.
@@ -554,6 +564,7 @@ export default function DataProvider({ children }) {
     <DataContext.Provider
       value={{
         // Data
+        classes,
         courses,
         lessons,
         activities,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import pb from '../lib/pocketbase';
+import { pb } from '../lib/pocketbase';
 import {
   Container,
   Grid,
@@ -59,12 +59,11 @@ import {
 function TeacherDashboard() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { loading: contextLoading } = useData();
+  const { classes, lang, loading: contextLoading } = useData();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   // State
-  const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
   
@@ -110,14 +109,24 @@ function TeacherDashboard() {
       console.log("Logged in Teacher ID:", user.id);
 
       try {
-        const records = await pb.collection('classes').getFullList({
+        const records = await pb.collection('teacher_classes').getFullList({
           filter: `teacher_id = '${user.id}'`,
-          sort: '-created'
+          expand: 'class_id, subject_id, section_id',
+          requestKey: null,
         });
 
-        // What did the database return?
-        console.log("Fetched Classes for this Teacher:", records);
-        setClasses(records); // This triggers your other useEffects!
+        const formattedRecords = records.map(rel => ({
+          id: rel.id,
+          class: rel.expand?.class_id,
+          subject: rel.expand?.subject_id,
+          section: rel.expand?.section_id,
+          displayName: {
+            en: `${rel.expand?.class_id?.name?.en} - ${rel.expand?.subject_id?.title?.en || 'Subject'}`,
+            ar: `${rel.expand?.class_id?.name?.ar} - ${rel.expand?.subject_id?.title?.ar || 'المادة'}`
+          }
+        }));
+
+        setClasses(formattedRecords);
       } catch (err) {
         console.error("Error fetching teacher classes:", err);
       }
@@ -357,7 +366,7 @@ function TeacherDashboard() {
       </Grid>
 
       {/* Class Selector */}
-      <Card sx={{ mb: 3 }}>
+      {/* <Card sx={{ mb: 3 }}>
         <CardContent>
           <FormControl fullWidth>
             <InputLabel>{t('teacher.selectClass')}</InputLabel>
@@ -370,7 +379,33 @@ function TeacherDashboard() {
             >
               {classes.map((cls) => (
                 <MenuItem key={cls.id} value={cls.id}>
-                  {cls.course?.title || t('teacher.untitledClass')}
+                  {cls.displayName[lang]}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </CardContent>
+      </Card> */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <FormControl fullWidth>
+            <InputLabel>{t('teacher.selectClass')}</InputLabel>
+            <Select
+              // Use the ID from our teacher_classes junction record
+              value={selectedClass?.id || ''} 
+              onChange={(e) => {
+                // Find the specific assignment in our list
+                const cls = classes.find(c => c.id === e.target.value);
+                setSelectedClass(cls);
+              }}
+            >
+              {classes.map((item) => (
+                <MenuItem key={item.id} value={item.id}>
+                  {/* We combine the Class Name and Subject Title 
+                      using the 'lang' variable (ar/en) 
+                  */}
+                  {item.class?.name?.[lang] || t('teacher.untitledClass')} - {item.subject?.title?.[lang] || ''}
+                  {item.section?.name?.[lang] ? ` (${item.section.name[lang]})` : ''}
                 </MenuItem>
               ))}
             </Select>
