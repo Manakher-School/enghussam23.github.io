@@ -57,9 +57,10 @@ import {
 } from '../services/api';
 
 function TeacherDashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language.split('-')[0] || 'ar';
   const { user } = useAuth();
-  const { classes, lang, loading: contextLoading } = useData();
+  const { classes, setClasses, loading: contextLoading } = useData();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -121,8 +122,8 @@ function TeacherDashboard() {
           subject: rel.expand?.subject_id,
           section: rel.expand?.section_id,
           displayName: {
-            en: `${rel.expand?.class_id?.name?.en} - ${rel.expand?.subject_id?.title?.en || 'Subject'}`,
-            ar: `${rel.expand?.class_id?.name?.ar} - ${rel.expand?.subject_id?.title?.ar || 'المادة'}`
+            en: `${rel.expand?.class_id?.name?.en} - ${rel.expand?.subject_id?.name?.en || 'Subject'}`,
+            ar: `${rel.expand?.class_id?.name?.ar} - ${rel.expand?.subject_id?.name?.ar || 'المادة'}`
           }
         }));
 
@@ -285,6 +286,7 @@ function TeacherDashboard() {
   }
 
   return (
+    console.log("Check teacher_classes data:", classes[0]), // Debug log
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       
@@ -366,26 +368,6 @@ function TeacherDashboard() {
       </Grid>
 
       {/* Class Selector */}
-      {/* <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <FormControl fullWidth>
-            <InputLabel>{t('teacher.selectClass')}</InputLabel>
-            <Select
-              value={selectedClass?.id || ''}
-              onChange={(e) => {
-                const cls = classes.find(c => c.id === e.target.value);
-                setSelectedClass(cls);
-              }}
-            >
-              {classes.map((cls) => (
-                <MenuItem key={cls.id} value={cls.id}>
-                  {cls.displayName[lang]}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </CardContent>
-      </Card> */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <FormControl fullWidth>
@@ -403,9 +385,9 @@ function TeacherDashboard() {
                 <MenuItem key={item.id} value={item.id}>
                   {/* We combine the Class Name and Subject Title 
                       using the 'lang' variable (ar/en) 
+                      {item.subject?.description?.[lang] || ''}
                   */}
-                  {item.class?.name?.[lang] || t('teacher.untitledClass')} - {item.subject?.title?.[lang] || ''}
-                  {item.section?.name?.[lang] ? ` (${item.section.name[lang]})` : ''}
+                  {item.class?.name?.[lang] || t('teacher.untitledClass')} - {item.subject?.name?.[lang] || ''} - {item.section?.name || 'no section visible'}
                 </MenuItem>
               ))}
             </Select>

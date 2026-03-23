@@ -16,6 +16,7 @@ export default function DataProvider({ children }) {
 
   // Server data states
   const [courses, setCourses] = useState([]);
+  const [classes, setClasses] = useState([]);
   const [lessons, setLessons] = useState([]);
   const [activities, setActivities] = useState([]);
   const [news, setNews] = useState([]);
@@ -563,8 +564,9 @@ export default function DataProvider({ children }) {
   return (
     <DataContext.Provider
       value={{
-        // Data
+        // Data 
         classes,
+        setClasses,
         courses,
         lessons,
         activities,
